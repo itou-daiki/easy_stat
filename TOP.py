@@ -6,7 +6,7 @@ st.title("ブラウザ統計")
 st.caption("Created by Daiki Ito")
 st.write("")
 st.subheader("ブラウザで統計を行うことができるウェブアプリです。")
-st.write("iPad等でも分析を行うことができます")
+st.write("iPad等で分析を行うことができます")
 st.write("")
 
 st.write("2023/03/06")
