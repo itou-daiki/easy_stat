@@ -14,8 +14,6 @@ st.caption("Created by Daiki Ito")
 st.write("")
 st.subheader("ブラウザでt検定　→　表　→　解釈まで出力できるウェブアプリです。")
 st.write("iPad等でも分析を行うことができます")
-st.write('対応ありはコチラ→',
-         'https://dddd-onigiri-browser-ttest-rel-main-n1g75x.streamlit.app/')
 st.write("")
 
 st.subheader("【注意事項】")
