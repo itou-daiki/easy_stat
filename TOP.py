@@ -11,3 +11,6 @@ st.write("")
 
 st.write("2023/03/06")
 st.write("　ｔ検定（対応あり・なし）を統合しました。")
+
+st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
+st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
