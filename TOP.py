@@ -9,6 +9,9 @@ st.subheader("ブラウザで統計を行うことができるウェブアプリ
 st.write("iPad等で分析を行うことができます")
 st.write("")
 
+st.write("実装済み")
+st.write("ｔ検定（対応なし・あり）")
+
 st.write("2023/03/06")
 st.write("　ｔ検定（対応あり・なし）を統合しました。")
 
