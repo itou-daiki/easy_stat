@@ -86,7 +86,7 @@ with st.form(key='check_form'):
         st.subheader('【分析前の確認】')
 
         n = 0
-        for ViewCheck in range(aRange-1):
+        for ViewCheck in range(aRange):
             st.write(
                 f'● 【'f'{(Variable[n])}'f'】')
             n += 1
