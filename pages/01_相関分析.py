@@ -127,23 +127,30 @@ with st.form(key='analyze_form'):
 
         st.write('【分析結果の解釈】')
         vn = 1
-        for interpretation in range(aRange-1):
+        for interpretation in range(aRange - 1):
             dn = Variable[vn]
             r = dfAv.corr().iat[0, vn]
             if dfAv.corr().iat[0, vn] >= 0.7:
-                st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「強い正の相関」がある（ r = 'f'{r} )')
+                st.write(
+                    f'【'f'{Variable[0]}】と【'f'{dn}】の間には「強い正の相関」がある（ r = 'f'{r} )')
             elif dfAv.corr().iat[0, vn] >= 0.4:
-                st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「正の相関」がある（ r = 'f'{r} )')
+                st.write(
+                    f'【'f'{Variable[0]}】と【'f'{dn}】の間には「正の相関」がある（ r = 'f'{r} )')
             elif dfAv.corr().iat[0, vn] >= 0.2:
-                st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「弱い正の相関」がある（ r = 'f'{r} )')
+                st.write(
+                    f'【'f'{Variable[0]}】と【'f'{dn}】の間には「弱い正の相関」がある（ r = 'f'{r} )')
             elif dfAv.corr().iat[0, vn] >= -0.2:
-                st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「相関がない」（ r = 'f'{r} )')
+                st.write(
+                    f'【'f'{Variable[0]}】と【'f'{dn}】の間には「相関がない」（ r = 'f'{r} )')
             elif dfAv.corr().iat[0, vn] >= -0.4:
-                st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「弱い負の相関」がある（ r = 'f'{r} )')
+                st.write(
+                    f'【'f'{Variable[0]}】と【'f'{dn}】の間には「弱い負の相関」がある（ r = 'f'{r} )')
             elif dfAv.corr().iat[0, vn] >= -0.7:
-                st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「負の相関」がある（ r = 'f'{r} )')
+                st.write(
+                    f'【'f'{Variable[0]}】と【'f'{dn}】の間には「負の相関」がある（ r = 'f'{r} )')
             elif dfAv.corr().iat[0, vn] >= -1.0:
-                st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「強い負の相関」がある（ r = 'f'{r} )')
+                st.write(
+                    f'【'f'{Variable[0]}】と【'f'{dn}】の間には「強い負の相関」がある（ r = 'f'{r} )')
             vn += 1
 
     ANALYZE_btn = st.form_submit_button('OK')
