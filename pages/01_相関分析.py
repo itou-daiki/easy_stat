@@ -131,14 +131,6 @@ with st.form(key='analyze_form'):
         st.write('-0.7 ≦ r ≦ -0.4 ・・・負の相関')
         st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
 
-        st.write('【相関の可視化】')
-        sns.set_context("talk")
-        fig = plt.subplots(figsize=(8, 8))
-
-        sns.heatmap(dfAv.corr(), annot=True, fmt='.2f', cmap='Blues',
-                    square=True)
-        st.pyplot(fig)
-
     ANALYZE_btn = st.form_submit_button('OK')
 
     st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
