@@ -116,8 +116,7 @@ with st.form(key='analyze_form'):
         st.write('【相関分析】')
         st.dataframe(dfAv.corr(), width=0)
 
-        if st.checkbox('データフレームの表示（クリックで開きます）'):
-            st.write('【相関係数( r )の判定】')
+        if st.checkbox('【相関係数( r )の判定】（クリックで開きます）'):
             st.write('0.7 ≦ r ≦ 1.0 ・・・強い正の相関')
             st.write('0.4 ≦ r ≦ 0.7 ・・・正の相関')
             st.write('0.2 ≦ r ≦ 0.4 ・・・弱い正の相関')
@@ -127,6 +126,7 @@ with st.form(key='analyze_form'):
             st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
 
         st.write('【分析結果の解釈（１行目のみ）】')
+        st.write('')
         vn = 1
         for interpretation in range(aRange - 1):
             dn = Variable[vn]
