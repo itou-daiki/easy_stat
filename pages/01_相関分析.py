@@ -131,6 +131,26 @@ with st.form(key='analyze_form'):
         st.write('-0.7 ≦ r ≦ -0.4 ・・・負の相関')
         st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
 
+        st.write('【解釈】')
+        vn = 0
+        for interpretation in range(aRange):
+            dn = Variable[n]
+            r = dfAv.iat[1, n]
+            if dfAv.iat[1, n] >= 0.7:
+                st.write(f'{Variable[0]}と【'f'{dn}】の間には「強い正の相関」がある（ r = 'f'{r}')
+            elif dfAv.iat[1, n] >= 0.4:
+                st.write(f'{Variable[0]}と【'f'{dn}】の間には「正の相関」がある（ r = 'f'{r}')
+            elif dfAv.iat[1, n] >= 0.2:
+                st.write(f'{Variable[0]}と【'f'{dn}】の間には「弱い正の相関」がある（ r = 'f'{r}')
+            elif dfAv.iat[1, n] >= -0.2:
+                st.write(f'{Variable[0]}と【'f'{dn}】の間には「相関がない」（ r = 'f'{r}')
+            elif dfAv.iat[1, n] >= -0.4:
+                st.write(f'{Variable[0]}と【'f'{dn}】の間には「弱い負の相関」がある（ r = 'f'{r}')
+            elif dfAv.iat[1, n] >= -0.7:
+                st.write(f'{Variable[0]}と【'f'{dn}】の間には「負の相関」がある（ r = 'f'{r}')
+            elif dfAv.iat[1, n] >= -1.0:
+                st.write(f'{Variable[0]}と【'f'{dn}】の間には「強い負の相関」がある（ r = 'f'{r}')
+
     ANALYZE_btn = st.form_submit_button('OK')
 
     st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
