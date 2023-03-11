@@ -136,19 +136,19 @@ with st.form(key='analyze_form'):
         for interpretation in range(aRange-1):
             dn = Variable[vn]
             r = dfAv.corr().iat[0, vn]
-            if dfAv.corr().iat[1, vn] >= 0.7:
+            if dfAv.corr().iat[0, vn] >= 0.7:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「強い正の相関」がある（ r = 'f'{r} )')
-            elif dfAv.corr().iat[1, vn] >= 0.4:
+            elif dfAv.corr().iat[0, vn] >= 0.4:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「正の相関」がある（ r = 'f'{r} )')
-            elif dfAv.corr().iat[1, vn] >= 0.2:
+            elif dfAv.corr().iat[0, vn] >= 0.2:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「弱い正の相関」がある（ r = 'f'{r} )')
-            elif dfAv.corr().iat[1, vn] >= -0.2:
+            elif dfAv.corr().iat[0, vn] >= -0.2:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「相関がない」（ r = 'f'{r} )')
-            elif dfAv.corr().iat[1, vn] >= -0.4:
+            elif dfAv.corr().iat[0, vn] >= -0.4:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「弱い負の相関」がある（ r = 'f'{r} )')
-            elif dfAv.corr().iat[1, vn] >= -0.7:
+            elif dfAv.corr().iat[0, vn] >= -0.7:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「負の相関」がある（ r = 'f'{r} )')
-            elif dfAv.corr().iat[1, vn] >= -1.0:
+            elif dfAv.corr().iat[0, vn] >= -1.0:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「強い負の相関」がある（ r = 'f'{r} )')
             vn += 1
 
