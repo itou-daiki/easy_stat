@@ -76,7 +76,6 @@ with st.form(key='variable_form'):
         unsafe_allow_html=True)
 
     aRange = len(Variable)
-    st.write("変数の数 " + str(aRange) + "個")
 
     # 確認ボタンの表示
     CHECK_btn = st.form_submit_button('確認')
