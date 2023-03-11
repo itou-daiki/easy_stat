@@ -3,8 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 import seaborn as sns
-
-# from PIL import Image
+from PIL import Image
 
 st.set_page_config(page_title="相関分析", layout="wide")
 
@@ -40,13 +39,8 @@ from statistics import median, variance
 st.code(code, language='python')
 
 # Excelデータの例
-# image = Image.open('correlation.png')
-# st.image(image)
-
-# 変数設定の注意点
-# if st.checkbox('注意点の表示（クリックで開きます）'):
-#     attentionImage = Image.open('correlation_attention.png')
-#     st.image(attentionImage)
+image = Image.open('correlation.png')
+st.image(image)
 
 # デモ用ファイル
 df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
