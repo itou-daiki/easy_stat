@@ -7,7 +7,7 @@ st.set_page_config(page_title="相関分析", layout="wide")
 st.title("相関分析")
 st.caption("Created by Daiki Ito")
 st.write("")
-st.subheader("ブラウザで検定　→　表　→　解釈まで出力できるウェブアプリです。")
+st.subheader("ブラウザで相関分析ができるウェブアプリです。")
 st.write("iPad等でも分析を行うことができます")
 
 st.write("")
@@ -42,7 +42,7 @@ st.code(code, language='python')
 #     st.image(attentionImage)
 
 # デモ用ファイル
-# df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
+df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
 
 # xlsxファイルのアップロード
 upload_files_xlsx = st.file_uploader("ファイルアップロード", type='xlsx')
