@@ -133,7 +133,7 @@ with st.form(key='analyze_form'):
 
         st.write('【解釈】')
         vn = 1
-        for interpretation in range(aRange):
+        for interpretation in range(aRange-1):
             dn = Variable[vn]
             r = dfAv.iat[1, vn]
             if dfAv.iat[1, vn] >= 0.7:
