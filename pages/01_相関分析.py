@@ -132,7 +132,7 @@ with st.form(key='analyze_form'):
         st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
 
         st.write('【解釈】')
-        vn = 0
+        vn = 1
         for interpretation in range(aRange):
             dn = Variable[vn]
             r = dfAv.iat[1, vn]
