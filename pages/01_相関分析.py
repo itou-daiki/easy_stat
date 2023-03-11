@@ -75,7 +75,7 @@ with st.form(key='variable_form'):
         '<span style="color:blue">【注意】変数に数値以外のものがある場合、分析できません</span>',
         unsafe_allow_html=True)
 
-    aRange = len(a)
+    aRange = len(Variable)
     st.write("変数の数 " + str(aRange) + "個")
 
     # 確認ボタンの表示
