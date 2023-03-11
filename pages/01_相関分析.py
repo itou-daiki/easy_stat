@@ -150,6 +150,7 @@ with st.form(key='analyze_form'):
                 st.write(f'{Variable[0]}と【'f'{dn}】の間には「負の相関」がある（ r = 'f'{r} )')
             elif dfAv.iat[1, n] >= -1.0:
                 st.write(f'{Variable[0]}と【'f'{dn}】の間には「強い負の相関」がある（ r = 'f'{r} )')
+            vn += 1
 
     ANALYZE_btn = st.form_submit_button('OK')
 
