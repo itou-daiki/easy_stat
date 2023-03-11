@@ -42,7 +42,7 @@ st.code(code, language='python')
 #     st.image(attentionImage)
 
 # デモ用ファイル
-df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
+# df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
 
 # xlsxファイルのアップロード
 upload_files_xlsx = st.file_uploader("ファイルアップロード", type='xlsx')
