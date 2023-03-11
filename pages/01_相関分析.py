@@ -126,8 +126,8 @@ with st.form(key='analyze_form'):
         sns.set_context("talk")
         fig = plt.subplots(figsize=(8, 8))
 
-        sns.heatmap(dfAv.corr(), annot=True, fmt='.2f', cmap='Blues',
-                    square=True)
+        st.write(sns.heatmap(dfAv.corr(), annot=True, fmt='.2f', cmap='Blues',
+                             square=True))
 
     ANALYZE_btn = st.form_submit_button('OK')
 
