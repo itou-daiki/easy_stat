@@ -125,6 +125,7 @@ with st.form(key='analyze_form'):
             st.write('-0.7 ≦ r ≦ -0.4 ・・・負の相関')
             st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
 
+        st.write('')
         st.write('【分析結果の解釈（１行目のみ）】')
         st.write('')
         vn = 1
