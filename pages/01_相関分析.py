@@ -11,7 +11,7 @@ st.set_page_config(page_title="相関分析", layout="wide")
 st.title("相関分析")
 st.caption("Created by Daiki Ito")
 st.write("")
-st.subheader("ブラウザで相関分析ができるウェブアプリです。")
+st.subheader("ブラウザで相関分析　→　表　→　解釈まで出力できるウェブアプリです。")
 st.write("iPad等でも分析を行うことができます")
 
 st.write("")
@@ -131,7 +131,7 @@ with st.form(key='analyze_form'):
         st.write('-0.7 ≦ r ≦ -0.4 ・・・負の相関')
         st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
 
-        st.write('【解釈】')
+        st.write('【分析結果の解釈】')
         vn = 1
         for interpretation in range(aRange-1):
             dn = Variable[vn]
