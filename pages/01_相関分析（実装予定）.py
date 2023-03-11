@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from PIL import Image
+# from PIL import Image
 
 st.set_page_config(page_title="相関分析", layout="wide")
 
@@ -33,13 +33,13 @@ from statistics import median, variance
 st.code(code, language='python')
 
 # Excelデータの例
-image = Image.open('correlation.png')
-st.image(image)
+# image = Image.open('correlation.png')
+# st.image(image)
 
 # 変数設定の注意点
-if st.checkbox('注意点の表示（クリックで開きます）'):
-    attentionImage = Image.open('correlation_attention.png')
-    st.image(attentionImage)
+# if st.checkbox('注意点の表示（クリックで開きます）'):
+#     attentionImage = Image.open('correlation_attention.png')
+#     st.image(attentionImage)
 
 # デモ用ファイル
 df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
