@@ -1,5 +1,9 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+import seaborn as sns
+
 # from PIL import Image
 
 st.set_page_config(page_title="相関分析", layout="wide")
@@ -26,6 +30,9 @@ code = '''
 #使用ライブラリ
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+import seaborn as sns
 from PIL import Image
 from statistics import median, variance
 '''
@@ -89,7 +96,7 @@ with st.form(key='check_form'):
             st.write(
                 f'● 【'f'{(Variable[n])}'f'】')
             n += 1
-        st.write('    '+'これらの変数間に相関関係があるか分析します。')
+        st.write('    ' + 'これらの変数間に相関関係があるか分析します。')
 
     # 分析実行ボタンの表示
     ANALYZE_btn = st.form_submit_button('分析実行')
@@ -114,6 +121,13 @@ with st.form(key='analyze_form'):
 
         st.write('【相関分析】')
         st.dataframe(dfAv.corr(), width=0)
+
+        st.write('【相関の可視化】')
+        sns.set_context("talk")
+        fig = plt.subplots(figsize=(8, 8))
+
+        sns.heatmap(dfAv.corr(), annot=True, fmt='.2f', cmap='Blues',
+                    square=True)
 
     ANALYZE_btn = st.form_submit_button('OK')
 
