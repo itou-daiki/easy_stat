@@ -135,7 +135,7 @@ with st.form(key='analyze_form'):
         vn = 1
         for interpretation in range(aRange-1):
             dn = Variable[vn]
-            r = dfAv.corr().iat[1, vn]
+            r = dfAv.corr().iat[0, vn]
             if dfAv.corr().iat[1, vn] >= 0.7:
                 st.write(f'【'f'{Variable[0]}】と【'f'{dn}】の間には「強い正の相関」がある（ r = 'f'{r} )')
             elif dfAv.corr().iat[1, vn] >= 0.4:
