@@ -122,12 +122,22 @@ with st.form(key='analyze_form'):
         st.write('【相関分析】')
         st.dataframe(dfAv.corr(), width=0)
 
+        st.write('【相関係数(r)の判定】')
+        st.write('0.7 ≦ r ≦ 1.0 ・・・強い正の相関')
+        st.write('0.4 ≦ r ≦ 0.7 ・・・正の相関')
+        st.write('0.2 ≦ r ≦ 0.4 ・・・弱い正の相関')
+        st.write('-0.2 ≦ r ≦ 0.2 ・・・相関なし')
+        st.write('-0.4 ≦ r ≦ -0.2 ・・・弱い負の相関')
+        st.write('-0.7 ≦ r ≦ -0.4 ・・・負の相関')
+        st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
+
         st.write('【相関の可視化】')
         sns.set_context("talk")
         fig = plt.subplots(figsize=(8, 8))
 
-        st.write(sns.heatmap(dfAv.corr(), annot=True, fmt='.2f', cmap='Blues',
-                             square=True))
+        sns.heatmap(dfAv.corr(), annot=True, fmt='.2f', cmap='Blues',
+                    square=True)
+        st.pyplot(fig)
 
     ANALYZE_btn = st.form_submit_button('OK')
 
