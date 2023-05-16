@@ -287,7 +287,7 @@ with st.form(key='analyze_form'):
                         f'{iv}によって【'f'{dn}】には有位な差が生まれる'f'（{d0}＞'f'{d1}）')
                 elif df1.iat[n, d0n] < df1.iat[n, d1n]:
                     st.write(
-                        f'{iv}によって【'f'{dn}】には有意な差が生まれる'f'（{d1}＞'f'{d0}）')
+                        f'{iv}によって【'f'{dn}】には有意な差が生まれる'f'（{d1}＜'f'{d0}）')
             elif df1.iat[n, sign_n] == "*":
                 if df1.iat[n, d0n] > df1.iat[n, d1n]:
                     st.write(
@@ -298,7 +298,7 @@ with st.form(key='analyze_form'):
             elif df1.iat[n, sign_n] == "†":
                 if df1.iat[n, d0n] > df1.iat[n, d1n]:
                     st.write(
-                        f'{iv}によって【'f'{dn}】には有意な差が生まれる傾向にある'f'（{d0}＜'f'{d1}）')
+                        f'{iv}によって【'f'{dn}】には有意な差が生まれる傾向にある'f'（{d0}＞'f'{d1}）')
                 elif df1.iat[n, d0n] < df1.iat[n, d1n]:
                     st.write(
                         f'{iv}によって【'f'{dn}】には有意な差が生まれる傾向にある'f'（{d1}＜'f'{d0}）')
