@@ -89,13 +89,9 @@ with st.form(key='variable_form'):
     ivType = df[IndependentVariable].dtypes
 
     if ivLen != 2:
-        st.write(
-            '<span style="color:red">独立変数が2群になっていないため、分析を実行できません。</span>',
-            unsafe_allow_html=True)
+        st.error("独立変数が2群になっていないため、分析を実行できません")
     elif ivType != 'object':
-        st.write(
-            '<span style="color:red">独立変数が数値になっているため、分析を実行できません。</span>',
-            unsafe_allow_html=True)
+        st.error("独立変数が数値になっているため、分析を実行できません")
         st.write(
             '<span style="color:red">独立変数を文字列にして、再度アップロードしてください。</span>',
             unsafe_allow_html=True)
@@ -106,12 +102,10 @@ with st.form(key='variable_form'):
             '<span style="color:red">　例２）１年・２年</span>',
             unsafe_allow_html=True)
     else:
-        st.write(
-            '<span style="color:green">分析可能な独立変数です</span>',
-            unsafe_allow_html=True)
+        st.success("分析可能な独立変数です")
 
     # 従属変数のリストから独立変数を削除（独立変数を従属変数に入れないため）
-    dvList.remove(IndependentVariable)
+    # dvList.remove(IndependentVariable)
 
     # 複数選択（従属変数）
     DependentVariable = st.multiselect(
