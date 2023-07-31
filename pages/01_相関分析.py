@@ -127,7 +127,7 @@ with st.form(key='analyze_form'):
             for v2 in range(aRange):
                 if v1 != v2:
                     dn = Variable[v2]
-                    r = dfAv.corr().iat[v1, v2]
+                    r = round(dfAv.corr().iat[v1, v2], 2)  # rを小数点第2位まで表示
                     if dfAv.corr().iat[v1, v2] >= 0.7:
                         st.markdown(
                             f'<p style="color:red;">'
