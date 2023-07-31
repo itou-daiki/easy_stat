@@ -292,6 +292,7 @@ with st.form(key='analyze_form'):
             sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5)
             plt.title(f'平均値の比較： {dn}')
             plt.show()
+            st.pyplot(plt)
 
             if df1.iat[n, sign_n] == "**":
                 if df1.iat[n, d0n] > df1.iat[n, d1n]:
