@@ -17,7 +17,6 @@ st.write("")
 
 
 def main():
-    st.title("ExcelファイルまたはCSVファイルの自動可視化")
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
 
     if file is not None:
