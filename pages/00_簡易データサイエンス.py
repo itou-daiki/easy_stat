@@ -17,11 +17,18 @@ st.write("")
 
 
 def main():
-    st.title("Excelファイルの自動可視化")
-    file = st.file_uploader("Excelファイルをアップロードしてください", type=['xlsx'])
+    st.title("ExcelファイルまたはCSVファイルの自動可視化")
+    file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
 
     if file is not None:
-        df = pd.read_excel(file)
+        if file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            df = pd.read_excel(file)
+        elif file.type == "text/csv":
+            df = pd.read_csv(file)
+        else:
+            st.error("アップロードされたファイルの形式がサポートされていません。")
+            return
+
         st.dataframe(df)
 
         # List down columns for user to select
