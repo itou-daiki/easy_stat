@@ -29,6 +29,11 @@ def main():
             return
 
         st.dataframe(df)
+        st.write("データの基本情報")
+        st.write(df.describe())
+
+        st.write("欠損値の数")
+        st.write(df.isnull().sum())
 
         # List down columns for user to select
         columns = df.columns.tolist()
@@ -66,6 +71,13 @@ def main():
                 fig, ax = plt.subplots()
                 df[col].value_counts().plot(kind='pie', autopct='%1.1f%%')
                 st.pyplot(fig)
+
+        # Correlation matrix and heatmap for numerical data
+        if st.checkbox("Show correlation matrix and heatmap for numerical data"):
+            st.write(df.corr())
+            fig, ax = plt.subplots()
+            sns.heatmap(df.corr(), annot=True, fmt=".2f", cmap='coolwarm', cbar=True, square=True, ax=ax)
+            st.pyplot(fig)
 
 
 if __name__ == "__main__":
