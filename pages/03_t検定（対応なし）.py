@@ -52,15 +52,20 @@ if st.checkbox('注意点の表示（クリックで開きます）'):
 # デモ用ファイル
 df = pd.read_excel('ttest_demo.xlsx', sheet_name=0)
 
-# xlsxファイルのアップロード
-upload_files_xlsx = st.file_uploader("ファイルアップロード", type='xlsx')
+# xlsx, csvファイルのアップロード
+upload_files = st.file_uploader("ファイルアップロード", type=['xlsx', 'csv'])
 
-# xlsxファイルの読み込み → データフレームにセット
-if upload_files_xlsx:
+# xlsx, csvファイルの読み込み → データフレームにセット
+if upload_files:
     # dfを初期化
     df.drop(range(len(df)))
-    # xlsxファイルの読み込み → データフレームにセット
-    df = pd.read_excel(upload_files_xlsx, sheet_name=0)
+    # ファイルの拡張子によって読み込み方法を変える
+    if upload_files.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        # xlsxファイルの読み込み → データフレームにセット
+        df = pd.read_excel(upload_files, sheet_name=0)
+    elif upload_files.type == 'text/csv':
+        # csvファイルの読み込み → データフレームにセット
+        df = pd.read_csv(upload_files)
     # 欠損値を含むレコードを削除
     df.dropna(how='any', inplace=True)
 
