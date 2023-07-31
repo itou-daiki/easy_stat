@@ -122,52 +122,51 @@ with st.form(key='analyze_form'):
             st.write('-1.0 ≦ r ≦ -0.7 ・・・強い負の相関')
 
         st.write('')
-        st.write('【分析結果の解釈（１行目のみ）】')
-        st.write('')
-        vn = 1
-        for interpretation in range(aRange - 1):
-            dn = Variable[vn]
-            r = dfAv.corr().iat[0, vn]
-            if dfAv.corr().iat[0, vn] >= 0.7:
-                st.markdown(
-                    f'<p style="color:red;">'
-                    f'【{Variable[0]}】と【{dn}】の間には「強い正の相関」がある（ r = {r} )'
-                    f'</p>',
-                    unsafe_allow_html=True)
-            elif dfAv.corr().iat[0, vn] >= 0.4:
-                st.markdown(
-                    f'<p style="color:orange;">'
-                    f'【{Variable[0]}】と【{dn}】の間には「正の相関」がある（ r = {r} )'
-                    f'</p>',
-                    unsafe_allow_html=True)
-            elif dfAv.corr().iat[0, vn] >= 0.2:
-                st.markdown(
-                    f'<p style="color:yellow;">'
-                    f'【{Variable[0]}】と【{dn}】の間には「弱い正の相関」がある（ r = {r} )'
-                    f'</p>',
-                    unsafe_allow_html=True)
-            elif dfAv.corr().iat[0, vn] >= -0.2:
-                st.write(
-                    f'【{Variable[0]}】と【{dn}】の間には「相関がない」（ r = {r} )')
-            elif dfAv.corr().iat[0, vn] >= -0.4:
-                st.markdown(
-                    f'<p style="color:yellow;">'
-                    f'【{Variable[0]}】と【{dn}】の間には「弱い負の相関」がある（ r = {r} )'
-                    f'</p>',
-                    unsafe_allow_html=True)
-            elif dfAv.corr().iat[0, vn] >= -0.7:
-                st.markdown(
-                    f'<p style="color:orange;">'
-                    f'【{Variable[0]}】と【{dn}】の間には「負の相関」がある（ r = {r} )'
-                    f'</p>',
-                    unsafe_allow_html=True)
-            elif dfAv.corr().iat[0, vn] >= -1.0:
-                st.markdown(
-                    f'<p style="color:red;">'
-                    f'【{Variable[0]}】と【{dn}】の間には「強い負の相関」がある（ r = {r} )'
-                    f'</p>',
-                    unsafe_allow_html=True)
-            vn += 1
+        st.write('【分析結果の解釈】')
+        for v1 in range(aRange):
+            for v2 in range(aRange):
+                if v1 != v2:
+                    dn = Variable[v2]
+                    r = dfAv.corr().iat[v1, v2]
+                    if dfAv.corr().iat[v1, v2] >= 0.7:
+                        st.markdown(
+                            f'<p style="color:red;">'
+                            f'【{Variable[v1]}】と【{dn}】の間には「強い正の相関」がある（ r = {r} )'
+                            f'</p>',
+                            unsafe_allow_html=True)
+                    elif dfAv.corr().iat[v1, v2] >= 0.4:
+                        st.markdown(
+                            f'<p style="color:orange;">'
+                            f'【{Variable[v1]}】と【{dn}】の間には「正の相関」がある（ r = {r} )'
+                            f'</p>',
+                            unsafe_allow_html=True)
+                    elif dfAv.corr().iat[v1, v2] >= 0.2:
+                        st.markdown(
+                            f'<p style="color:yellow;">'
+                            f'【{Variable[v1]}】と【{dn}】の間には「弱い正の相関」がある（ r = {r} )'
+                            f'</p>',
+                            unsafe_allow_html=True)
+                    elif dfAv.corr().iat[v1, v2] >= -0.2:
+                        st.write(
+                            f'【{Variable[v1]}】と【{dn}】の間には「相関がない」（ r = {r} )')
+                    elif dfAv.corr().iat[v1, v2] >= -0.4:
+                        st.markdown(
+                            f'<p style="color:yellow;">'
+                            f'【{Variable[v1]}】と【{dn}】の間には「弱い負の相関」がある（ r = {r} )'
+                            f'</p>',
+                            unsafe_allow_html=True)
+                    elif dfAv.corr().iat[v1, v2] >= -0.7:
+                        st.markdown(
+                            f'<p style="color:orange;">'
+                            f'【{Variable[v1]}】と【{dn}】の間には「負の相関」がある（ r = {r} )'
+                            f'</p>',
+                            unsafe_allow_html=True)
+                    elif dfAv.corr().iat[v1, v2] >= -1.0:
+                        st.markdown(
+                            f'<p style="color:red;">'
+                            f'【{Variable[v1]}】と【{dn}】の間には「強い負の相関」がある（ r = {r} )'
+                            f'</p>',
+                            unsafe_allow_html=True)
 
     ANALYZE_btn = st.form_submit_button('OK')
 
