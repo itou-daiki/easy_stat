@@ -73,7 +73,7 @@ def main():
                 st.pyplot(fig)
 
         # Correlation matrix and heatmap for numerical data
-        if st.checkbox("Show correlation matrix and heatmap for numerical data"):
+        if st.checkbox("数値データの相関行列とヒートマップの表示"):
             st.write(df.corr())
             fig, ax = plt.subplots()
             sns.heatmap(df.corr(), annot=True, fmt=".2f", cmap='coolwarm', cbar=True, square=True, ax=ax)
