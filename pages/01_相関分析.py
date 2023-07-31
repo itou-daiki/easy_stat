@@ -112,7 +112,7 @@ with st.form(key='analyze_form'):
         sns.heatmap(dfAv.corr(), annot=True, cmap='coolwarm', ax=ax)
         st.pyplot(fig)
 
-        if st.checkbox('【相関係数( r )の判定】（クリックで開きます）'):
+        if st.checkbox('【相関係数( r )の判定】'):
             st.write('0.7 ≦ r ≦ 1.0 ・・・強い正の相関')
             st.write('0.4 ≦ r ≦ 0.7 ・・・正の相関')
             st.write('0.2 ≦ r ≦ 0.4 ・・・弱い正の相関')
