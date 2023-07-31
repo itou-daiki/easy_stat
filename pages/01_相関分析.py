@@ -106,6 +106,12 @@ with st.form(key='analyze_form'):
         st.write('【相関分析】')
         st.dataframe(dfAv.corr(), width=0)
 
+        # Adding a heatmap of correlation
+        st.write('【相関行列のヒートマップ】')
+        fig, ax = plt.subplots()
+        sns.heatmap(dfAv.corr(), annot=True, cmap='coolwarm', ax=ax)
+        st.pyplot(fig)
+
         if st.checkbox('【相関係数( r )の判定】（クリックで開きます）'):
             st.write('0.7 ≦ r ≦ 1.0 ・・・強い正の相関')
             st.write('0.4 ≦ r ≦ 0.7 ・・・正の相関')
