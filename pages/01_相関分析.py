@@ -25,19 +25,6 @@ st.write(
 st.write('<span style="color:red">欠損値を含むレコード（行）は自動で削除されます。</span>',
          unsafe_allow_html=True)
 
-code = '''
-#使用ライブラリ
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-import seaborn as sns
-from PIL import Image
-from statistics import median, variance
-'''
-
-st.code(code, language='python')
-
 # Excelデータの例
 image = Image.open('correlation.png')
 st.image(image)
@@ -45,15 +32,18 @@ st.image(image)
 # デモ用ファイル
 df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
 
-# xlsxファイルのアップロード
-upload_files_xlsx = st.file_uploader("ファイルアップロード", type='xlsx')
+# xlsxまたはcsvファイルのアップロード
+upload_files = st.file_uploader("ファイルアップロード", type=['xlsx', 'csv'])
 
-# xlsxファイルの読み込み → データフレームにセット
-if upload_files_xlsx:
+# xlsxまたはcsvファイルの読み込み → データフレームにセット
+if upload_files:
     # dfを初期化
     df.drop(range(len(df)))
-    # xlsxファイルの読み込み → データフレームにセット
-    df = pd.read_excel(upload_files_xlsx, sheet_name=0)
+    # xlsxまたはcsvファイルの読み込み → データフレームにセット
+    if upload_files.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        df = pd.read_excel(upload_files, sheet_name=0)
+    elif upload_files.type == 'text/csv':
+        df = pd.read_csv(upload_files)
     # 欠損値を含むレコードを削除
     df.dropna(how='any', inplace=True)
 
