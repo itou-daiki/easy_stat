@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
-# 実装予定
-# import matplotlib.pyplot as plt
-# import japanize_matplotlib
+import seaborn as sns
+import matplotlib.pyplot as plt
+import japanize_matplotlib
 from scipy import stats
 from PIL import Image
 from statistics import median, variance
@@ -278,8 +278,21 @@ with st.form(key='analyze_form'):
         # DivideVariable[1] + 'M' の列番号を取得
         d1n = df1.columns.get_loc(d1 + "M")
 
+        # Set the style of seaborn for better graphs
+        sns.set(style="whitegrid")
+
         for interpretation in range(dvRange):
             dn = DependentVariable[n]
+
+            # データフレームから独立変数と従属変数のデータを取得
+            data = df00[[iv, dn]]
+
+            # 平均値を計算し、その結果を棒グラフで表示
+            plt.figure(figsize=(8, 6))
+            sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5)
+            plt.title(f'平均値の比較： {dn}')
+            plt.show()
+
             if df1.iat[n, sign_n] == "**":
                 if df1.iat[n, d0n] > df1.iat[n, d1n]:
                     st.write(
