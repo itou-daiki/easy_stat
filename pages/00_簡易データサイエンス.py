@@ -10,7 +10,7 @@ st.set_page_config(page_title="簡易データサイエンス", layout="wide")
 st.title("簡易データサイエンス")
 st.caption("Created by Daiki Ito")
 st.write("")
-st.subheader("ブラウザで相関分析　→　表　→　解釈まで出力できるウェブアプリです。")
+st.subheader("ブラウザで簡易的なデータサイエンスが実行できるウェブアプリです。")
 st.write("iPad等でも分析を行うことができます")
 
 st.write("")
