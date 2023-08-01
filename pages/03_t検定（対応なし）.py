@@ -287,17 +287,17 @@ with st.form(key='analyze_form'):
             # データフレームから独立変数と従属変数のデータを取得
             data = df00[[iv, dn]]
 
-            # グラフのサイズを設定
-            plt.figure(figsize=(8, 6))
+            # グラフのサイズを設定し、FigureオブジェクトとAxesオブジェクトを取得
+            fig, ax = plt.subplots(figsize=(8, 6))
 
             # seaborn の barplot を使って棒グラフを描画
-            sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5)
+            sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5, ax=ax)
 
             # グラフのタイトルを設定
-            plt.title(f'平均値の比較： {dn}')
+            ax.set_title(f'平均値の比較： {dn}')
 
             # streamlit を使ってグラフをウェブブラウザ上に表示
-            st.pyplot()
+            st.pyplot(fig)
 
             if df1.iat[n, sign_n] == "**":
                 if df1.iat[n, d0n] > df1.iat[n, d1n]:
