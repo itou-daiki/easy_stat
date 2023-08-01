@@ -247,16 +247,16 @@ with st.form(key='analyze_form'):
             data = pd.DataFrame({
                 '群': ['観測値', '測定値'],
                 '平均値': [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]],
-                'error': [df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]]
+                '誤差': [df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]]
             })
 
             fig, ax = plt.subplots(figsize=(8, 6))
 
             # Seaborn barplot
-            sns.barplot(x='group', y='mean', data=data, ax=ax, capsize=0.1, errcolor='black', errwidth=1)
+            sns.barplot(x='群', y='平均値', data=data, ax=ax, capsize=0.1, errcolor='black', errwidth=1)
 
             # Add error bars
-            ax.errorbar(x=data['group'], y=data['mean'], yerr=data['error'], fmt='none', c='black', capsize=3)
+            ax.errorbar(x=data['群'], y=data['平均値'], yerr=data['誤差'], fmt='none', c='black', capsize=3)
 
             st.pyplot(fig)
 
