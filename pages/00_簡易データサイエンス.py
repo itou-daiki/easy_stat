@@ -25,8 +25,6 @@ st.write("")
 # デモ用ファイル
 demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
-
-
 # データのアップロード
 def upload_data():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
@@ -47,14 +45,12 @@ def upload_data():
 
 # データの分析
 def analyze_data(df):
-    # データフレーム表示ボタン
-    if st.checkbox('データフレームの表示（クリックで開きます）'):
-        st.dataframe(demo_df, width=0)
-    st.write("データの基本情報")
-    st.write(df.describe())
-
-    st.write("欠損値の数")
-    st.write(df.isnull().sum())
+    with st.expander('データフレームの表示'):
+        st.dataframe(df, width=0)
+    with st.expander("データの基本情報"):
+        st.write(df.describe())
+    with st.expander("欠損値の数"):
+        st.write(df.isnull().sum())
 
     # List down columns for user to select
     columns = df.columns.tolist()
