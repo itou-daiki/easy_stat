@@ -23,16 +23,20 @@ st.write("iPad等でも分析を行うことができます")
 st.write("")
 
 # デモ用ファイル
-df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
+demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
 # データフレーム表示ボタン
 if st.checkbox('データフレームの表示（クリックで開きます）'):
-    st.dataframe(df, width=0)
+    st.dataframe(demo_df, width=0)
 
-def main():
+# データのアップロード
+def upload_data():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
 
-    if file is not None:
+    # ファイルがアップロードされていない場合、デモ用データを使用
+    if file is None:
+        df = demo_df
+    else:
         if file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
             df = pd.read_excel(file)
         elif file.type == "text/csv":
@@ -41,60 +45,35 @@ def main():
             st.error("アップロードされたファイルの形式がサポートされていません。")
             return
 
-        st.dataframe(df)
-        st.write("データの基本情報")
-        st.write(df.describe())
+    return df
 
-        st.write("欠損値の数")
-        st.write(df.isnull().sum())
+# データの分析
+def analyze_data(df):
+    st.dataframe(df)
+    st.write("データの基本情報")
+    st.write(df.describe())
 
-        # List down columns for user to select
-        columns = df.columns.tolist()
-        selected_columns = st.multiselect("可視化したい列を選択してください", columns)
+    st.write("欠損値の数")
+    st.write(df.isnull().sum())
 
-        for col in selected_columns:
-            if np.issubdtype(df[col].dtype, np.number):
-                # For numerical data, display histogram, box plot, and scatter plot
-                st.subheader(f"ヒストグラム: {col}")
-                fig, ax = plt.subplots()
-                ax = sns.histplot(df[col], kde=False, bins=30)
-                st.pyplot(fig)
+    # List down columns for user to select
+    columns = df.columns.tolist()
+    selected_columns = st.multiselect("可視化したい列を選択してください", columns)
 
-                st.subheader(f"箱ひげ図: {col}")
-                fig, ax = plt.subplots()
-                ax = sns.boxplot(y=df[col])
-                st.pyplot(fig)
+    # Visualization
+    # ...
 
-                if len(selected_columns) > 1:
-                    for scatter_col in selected_columns:
-                        if scatter_col != col:
-                            st.subheader(f"散布図: {col} vs {scatter_col}")
-                            fig, ax = plt.subplots()
-                            ax = sns.scatterplot(x=df[col], y=df[scatter_col])
-                            st.pyplot(fig)
-
-            else:
-                # For non-numerical data, display bar plot and pie chart
-                st.subheader(f"バープロット: {col}")
-                fig, ax = plt.subplots()
-                ax = sns.countplot(df[col])
-                st.pyplot(fig)
-
-                st.subheader(f"パイチャート: {col}")
-                fig, ax = plt.subplots()
-                df[col].value_counts().plot(kind='pie', autopct='%1.1f%%')
-                st.pyplot(fig)
-
-        # Correlation matrix and heatmap for numerical data
-        if st.checkbox("数値データの相関行列とヒートマップの表示"):
-            st.write(df.corr())
-            fig, ax = plt.subplots()
-            sns.heatmap(df.corr(), annot=True, fmt=".2f", cmap='coolwarm', cbar=True, square=True, ax=ax)
-            st.pyplot(fig)
-
+    # Correlation matrix and heatmap for numerical data
+    if st.checkbox("数値データの相関行列とヒートマップの表示"):
+        st.write(df.corr())
+        fig, ax = plt.subplots()
+        sns.heatmap(df.corr(), annot=True, fmt=".2f", cmap='coolwarm', cbar=True, square=True, ax=ax)
+        st.pyplot(fig)
 
 if __name__ == "__main__":
-    main()
+    df = upload_data()
+    if df is not None:
+        analyze_data(df)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
          'まで')
