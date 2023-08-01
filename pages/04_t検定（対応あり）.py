@@ -238,9 +238,15 @@ with st.form(key='analyze_form'):
             elif df1.iat[n, sign_n] == "n.s.":
                 st.write(f'{vn}には有意な差が生まれない')
 
+            data = pd.DataFrame({
+            'group': ['観測値', '測定値'],
+            'mean': [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]],
+            'error': [df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]]
+            })
+
             # エラーバー付き棒グラフの作成
             fig, ax = plt.subplots(figsize=(8, 6))
-            ax.bar(['観測値', '測定値'], [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]], yerr=[df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]])
+            sns.barplot(x='group', y='mean', yerr='error', data=data, ax=ax, capsize=0.1)
             st.pyplot(fig)
 
             n += 1
