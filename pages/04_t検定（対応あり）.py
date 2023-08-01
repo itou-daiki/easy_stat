@@ -196,11 +196,6 @@ with st.form(key='analyze_form'):
             df1.at[VariableList[n], 'sign'] = sign
             df1.at[VariableList[n], 'd'] = d
 
-            # エラーバー付き棒グラフの作成
-            fig, ax = plt.subplots()
-            ax.bar(['観測値', '測定値'], [xm, ym], yerr=[xs, ys])
-            st.pyplot(fig)
-
             n += 1
 
         st.dataframe(df1)
@@ -242,6 +237,11 @@ with st.form(key='analyze_form'):
                     st.write(f'{vn}には有意な差が生まれる傾向にある（ 観測値　＜　測定値 ）')
             elif df1.iat[n, sign_n] == "n.s.":
                 st.write(f'{vn}には有意な差が生まれない')
+
+            # エラーバー付き棒グラフの作成
+            fig, ax = plt.subplots()
+            ax.bar(['観測値', '測定値'], [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]], yerr=[df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]])
+            st.pyplot(fig)
 
             n += 1
 
