@@ -32,10 +32,7 @@ if st.checkbox('データフレームの表示（クリックで開きます）'
 def main():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
 
-    # If no file is uploaded, use the demo DataFrame
-    if file is None:
-        df = demo_df
-    else:
+    if file is not None:
         if file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
             df = pd.read_excel(file)
         elif file.type == "text/csv":
