@@ -289,18 +289,6 @@ with st.form(key='analyze_form'):
             # データフレームから独立変数と従属変数のデータを取得
             data = df00[[iv, dn]]
 
-            # グラフのサイズを設定し、FigureオブジェクトとAxesオブジェクトを取得
-            fig, ax = plt.subplots(figsize=(2, 1))
-
-            # seaborn の barplot を使って棒グラフを描画
-            sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5, ax=ax)
-
-            # グラフのタイトルを設定
-            ax.set_title(f'平均値の比較： {dn}')
-
-            # streamlit を使ってグラフをウェブブラウザ上に表示
-            st.pyplot(fig)
-
             if df1.iat[n, sign_n] == "**":
                 if df1.iat[n, d0n] > df1.iat[n, d1n]:
                     st.write(
@@ -324,6 +312,18 @@ with st.form(key='analyze_form'):
                         f'{iv}によって【'f'{dn}】には有意な差が生まれる傾向にある'f'（{d1}＞'f'{d0}）')
             elif df1.iat[n, sign_n] == "n.s.":
                 st.write(f'{iv}によって【'f'{dn}】には有意な差が生まれない')
+
+            # グラフのサイズを設定し、FigureオブジェクトとAxesオブジェクトを取得
+            fig, ax = plt.subplots(figsize=(8, 6))
+
+            # seaborn の barplot を使って棒グラフを描画
+            sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5, ax=ax)
+
+            # グラフのタイトルを設定
+            ax.set_title(f'平均値の比較： {dn}')
+
+            # streamlit を使ってグラフをウェブブラウザ上に表示
+            st.pyplot(fig)
 
             n += 1
 
