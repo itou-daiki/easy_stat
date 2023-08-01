@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import japanize_matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-import japanize_matplotlib
+
 
 import matplotlib as mpl
 # フォントのプロパティを設定
