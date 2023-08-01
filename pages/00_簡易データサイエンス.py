@@ -65,9 +65,11 @@ def analyze_data(df):
 
     # Correlation matrix and heatmap for numerical data
     if st.checkbox("数値データの相関行列とヒートマップの表示"):
-        st.write(df.corr())
+        # Select only numerical columns
+        numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        st.write(df[numerical_cols].corr())
         fig, ax = plt.subplots()
-        sns.heatmap(df.corr(), annot=True, fmt=".2f", cmap='coolwarm', cbar=True, square=True, ax=ax)
+        sns.heatmap(df[numerical_cols].corr(), annot=True, fmt=".2f", cmap='coolwarm', cbar=True, square=True, ax=ax)
         st.pyplot(fig)
 
 if __name__ == "__main__":
