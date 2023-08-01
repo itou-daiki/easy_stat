@@ -66,7 +66,7 @@ with st.form(key='check_form'):
         n = 0
         for ViewCheck in range(vRange):
             st.write(
-                f'● 【'f'{(Variables[n])}')
+                f'● 【'f'{(Variables[n])}】')
             n += 1
         st.write('    '+'これらの変数の出現度数に有意な差が生まれるか検定します。')
 
