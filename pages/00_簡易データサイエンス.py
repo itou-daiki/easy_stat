@@ -21,9 +21,9 @@ st.write("")
 
 demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
-# Convert columns to appropriate data types
-demo_df['勉強時間'] = pd.to_numeric(demo_df['勉強時間'], errors='coerce')
-demo_df['睡眠時間'] = pd.to_numeric(demo_df['睡眠時間'], errors='coerce')
+# Convert all columns to appropriate data types if possible
+for col in demo_df.columns:
+    demo_df[col] = pd.to_numeric(demo_df[col], errors='coerce')
 
 def upload_data():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
@@ -47,6 +47,10 @@ def upload_data():
         except Exception as e:
             st.error(f"データの読み込みに失敗しました: {e}")
             return None
+
+        # Convert all columns to appropriate data types if possible
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
 
     return df
 
