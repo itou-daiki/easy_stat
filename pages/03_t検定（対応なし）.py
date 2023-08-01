@@ -288,7 +288,7 @@ with st.form(key='analyze_form'):
             data = df00[[iv, dn]]
 
             # グラフのサイズを設定し、FigureオブジェクトとAxesオブジェクトを取得
-            fig, ax = plt.subplots(figsize=(8, 6))
+            fig, ax = plt.subplots(figsize=(4, 3))
 
             # seaborn の barplot を使って棒グラフを描画
             sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5, ax=ax)
