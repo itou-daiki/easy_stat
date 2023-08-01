@@ -7,6 +7,12 @@ from scipy import stats
 from PIL import Image
 from statistics import median, variance
 
+import matplotlib as mpl
+# フォントのプロパティを設定
+font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")
+# Matplotlibのデフォルトのフォントを変更
+mpl.rcParams['font.family'] = font_prop.get_name()
+
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
 st.set_option('deprecation.showPyplotGlobalUse', False)

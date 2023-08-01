@@ -5,6 +5,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import japanize_matplotlib
 
+import matplotlib as mpl
+# フォントのプロパティを設定
+font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")
+# Matplotlibのデフォルトのフォントを変更
+mpl.rcParams['font.family'] = font_prop.get_name()
+
 st.set_page_config(page_title="簡易データサイエンス", layout="wide")
 
 st.title("簡易データサイエンス")

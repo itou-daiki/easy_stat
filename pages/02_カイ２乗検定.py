@@ -4,6 +4,12 @@ import pandas as pd
 from scipy.stats import chi2_contingency
 from PIL import Image
 
+import matplotlib as mpl
+# フォントのプロパティを設定
+font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")
+# Matplotlibのデフォルトのフォントを変更
+mpl.rcParams['font.family'] = font_prop.get_name()
+
 st.set_page_config(page_title="カイ二乗検定", layout="wide")
 
 st.title("カイ二乗検定")
