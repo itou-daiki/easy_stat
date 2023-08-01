@@ -21,10 +21,6 @@ st.write("")
 
 demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
-# Convert all columns to appropriate data types if possible
-for col in demo_df.columns:
-    demo_df[col] = pd.to_numeric(demo_df[col], errors='coerce')
-
 def upload_data():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
     use_demo = st.checkbox("デモ用データを使用する")
@@ -48,10 +44,6 @@ def upload_data():
             st.error(f"データの読み込みに失敗しました: {e}")
             return None
 
-        # Convert all columns to appropriate data types if possible
-        for col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-
     return df
 
 def analyze_data(df):
@@ -60,7 +52,7 @@ def analyze_data(df):
         st.dataframe(df, width=0)
 
     with st.expander("データの基本情報"):
-        st.write(df.describe())
+        st.write(df.describe(include='all'))  # Include categorical variables
 
     with st.expander("欠損値の数"):
         st.write(df.isnull().sum())
