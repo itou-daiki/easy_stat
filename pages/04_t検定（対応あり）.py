@@ -239,7 +239,7 @@ with st.form(key='analyze_form'):
                 st.write(f'{vn}には有意な差が生まれない')
 
             # エラーバー付き棒グラフの作成
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(4, 3))
             ax.bar(['観測値', '測定値'], [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]], yerr=[df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]])
             st.pyplot(fig)
 
