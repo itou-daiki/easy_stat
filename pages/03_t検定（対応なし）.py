@@ -9,6 +9,8 @@ from statistics import median, variance
 
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
 st.title("t検定(対応なし)")
 st.caption("Created by Daiki Ito")
 st.write("")
