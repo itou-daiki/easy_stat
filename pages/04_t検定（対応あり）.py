@@ -1,11 +1,11 @@
-import math
-
 import streamlit as st
 import pandas as pd
-# 実装予定
-# import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.pyplot as plt
+import japanize_matplotlib
 from scipy import stats
 from PIL import Image
+from statistics import median, variance
 
 st.set_page_config(page_title="t検定(対応あり)", layout="wide")
 
@@ -194,6 +194,11 @@ with st.form(key='analyze_form'):
             df1.at[VariableList[n], 'p'] = p
             df1.at[VariableList[n], 'sign'] = sign
             df1.at[VariableList[n], 'd'] = d
+
+            # エラーバー付き棒グラフの作成
+            fig, ax = plt.subplots()
+            ax.bar(['観測値', '測定値'], [xm, ym], yerr=[xs, ys])
+            st.pyplot(fig)
 
             n += 1
 
