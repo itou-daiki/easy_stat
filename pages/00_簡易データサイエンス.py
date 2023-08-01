@@ -23,16 +23,19 @@ st.write("iPad等でも分析を行うことができます")
 st.write("")
 
 # デモ用ファイル
-df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
+demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
 # データフレーム表示ボタン
 if st.checkbox('データフレームの表示（クリックで開きます）'):
-    st.dataframe(df, width=0)
+    st.dataframe(demo_df, width=0)
 
 def main():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
 
-    if file is not None:
+    # If no file is uploaded, use the demo DataFrame
+    if file is None:
+        df = demo_df
+    else:
         if file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
             df = pd.read_excel(file)
         elif file.type == "text/csv":
