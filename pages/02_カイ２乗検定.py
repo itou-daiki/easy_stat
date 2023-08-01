@@ -23,16 +23,11 @@ st.write(
 st.write('<span style="color:red">欠損値を含むレコード（行）は自動で削除されます。</span>',
          unsafe_allow_html=True)
 
-# デモ用ファイル
-df = pd.read_excel('chi_square_demo.xlsx', sheet_name=0)
-
 # xlsx, csvファイルのアップロード
 upload_files = st.file_uploader("ファイルアップロード", type=['xlsx', 'csv'])
 
 # xlsx, csvファイルの読み込み → データフレームにセット
 if upload_files:
-    # dfを初期化
-    df.drop(range(len(df)))
     # ファイルの拡張子によって読み込み方法を変える
     if upload_files.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
         # xlsxファイルの読み込み → データフレームにセット
@@ -40,22 +35,28 @@ if upload_files:
     elif upload_files.type == 'text/csv':
         # csvファイルの読み込み → データフレームにセット
         df = pd.read_csv(upload_files)
-    # 欠損値を含むレコードを削除
-    df.dropna(how='any', inplace=True)
+else:
+    # デモ用ファイル
+    df = pd.read_excel('chi_square_demo.xlsx', sheet_name=0)
+
+# 欠損値を含むレコードを削除
+df.dropna(how='any', inplace=True)
 
 # データフレーム表示ボタン
 if st.checkbox('データフレームの表示（クリックで開きます）'):
     st.dataframe(df, width=0)
 
-# 変数選択フォーム
-with st.form(key='variable_form'):
-    st.subheader("分析に使用する変数の選択")
+# Check if dataframe exists
+if 'df' in locals():
+    # 変数選択フォーム
+    with st.form(key='variable_form'):
+        st.subheader("分析に使用する変数の選択")
 
-    # 複数選択（観測値）
-    Variables = st.multiselect('変数（複数選択可）', df.columns.tolist())
+        # 複数選択（観測値）
+        Variables = st.multiselect('変数（複数選択可）', df.columns.tolist())
 
-    # 確認ボタンの表示
-    CHECK_btn = st.form_submit_button('確認')
+        # 確認ボタンの表示
+        CHECK_btn = st.form_submit_button('確認')
 
 # 分析前の確認フォーム
 with st.form(key='check_form'):
