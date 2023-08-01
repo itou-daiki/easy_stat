@@ -320,7 +320,7 @@ with st.form(key='analyze_form'):
                 st.write(f'{iv}によって【'f'{dn}】には有意な差が生まれない')
 
             data = pd.DataFrame({
-            '群': [d0n, d1n],
+            '群': [DivideVariable[0], DivideVariable[1]],
             '平均値': [df1.iat[n, df1.columns.get_loc(DivideVariable[0] + "M")], df1.iat[n, df1.columns.get_loc(DivideVariable[1] + "M")]],
             '誤差': [df1.iat[n, df1.columns.get_loc(DivideVariable[0] + "S.D")], df1.iat[n, df1.columns.get_loc(DivideVariable[1] + "S.D")]]
             })
