@@ -81,10 +81,15 @@ with st.form(key='analyze_form'):
         # chi-square test
         chi2, p, dof, expected = chi2_contingency(df[Variables])
 
-        st.write('Chi-square statistic: ', chi2)
-        st.write('p-value: ', p)
-        st.write('Degrees of freedom: ', dof)
-        st.write('Expected counts: ', expected)
+        # Create dataframe
+        data = {'カイ２乗値': [chi2], 'p値': [p], '自由度': [dof]}
+        result_df = pd.DataFrame(data)
+
+        # Expected counts
+        expected_df = pd.DataFrame(expected, columns=Variables)
+
+        st.dataframe(result_df)
+        st.dataframe(expected_df)
 
     ANALYZE_btn = st.form_submit_button('OK')
 
