@@ -81,6 +81,7 @@ with st.form(key='analyze_form'):
         st.write('Degrees of freedom: ', dof)
         st.write('Expected counts: ', expected)
 
+
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
          'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
