@@ -1,9 +1,16 @@
 import streamlit as st
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 import seaborn as sns
 from PIL import Image
+
+# フォントのプロパティを設定
+font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")
+    
+# Matplotlibのデフォルトのフォントを変更
+mpl.rcParams['font.family'] = font_prop.get_name()
 
 st.set_page_config(page_title="相関分析", layout="wide")
 
