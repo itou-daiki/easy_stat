@@ -329,8 +329,9 @@ with st.form(key='analyze_form'):
             fig, ax = plt.subplots(figsize=(8, 6))
 
             # seaborn の barplot を使って棒グラフを描画
-            sns.barplot(x='群' y='平均値', data=data, ci='sd', capsize=0.1, errwidth=1.5, ax=ax)
-
+            sns.barplot(x='群', y='平均値', data=data, ax=ax, capsize=0.1, errcolor='black', errwidth=1)
+            ax.errorbar(x=data['群'], y=data['平均値'], yerr=data['誤差'], fmt='none', c='black', capsize=3)
+            
             # グラフのタイトルを設定
             ax.set_title(f'平均値の比較： {dn}')
 
