@@ -25,9 +25,7 @@ st.write("")
 # デモ用ファイル
 demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
-# データフレーム表示ボタン
-if st.checkbox('データフレームの表示（クリックで開きます）'):
-    st.dataframe(demo_df, width=0)
+
 
 # データのアップロード
 def upload_data():
@@ -49,7 +47,9 @@ def upload_data():
 
 # データの分析
 def analyze_data(df):
-    st.dataframe(df)
+    # データフレーム表示ボタン
+    if st.checkbox('データフレームの表示（クリックで開きます）'):
+        st.dataframe(demo_df, width=0)
     st.write("データの基本情報")
     st.write(df.describe())
 
