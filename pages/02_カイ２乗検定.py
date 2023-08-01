@@ -3,7 +3,8 @@ import streamlit as st
 import pandas as pd
 from scipy.stats import chi2_contingency
 from PIL import Image
-
+import japanize_matplotlib
+import matplotlib.pyplot as plt
 import matplotlib as mpl
 # フォントのプロパティを設定
 font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")

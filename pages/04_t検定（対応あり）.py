@@ -1,9 +1,9 @@
 import streamlit as st
 import math
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import japanize_matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
 from scipy import stats
 from PIL import Image
 from statistics import median, variance
