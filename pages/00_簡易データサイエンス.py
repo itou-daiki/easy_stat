@@ -23,11 +23,11 @@ st.write("iPad等でも分析を行うことができます")
 st.write("")
 
 # デモ用ファイル
-demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
+df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
 # データフレーム表示ボタン
 if st.checkbox('データフレームの表示（クリックで開きます）'):
-    st.dataframe(demo_df, width=0)
+    st.dataframe(df, width=0)
 
 def main():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
