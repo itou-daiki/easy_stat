@@ -246,7 +246,7 @@ with st.form(key='analyze_form'):
 
             # エラーバー付き棒グラフの作成
             fig, ax = plt.subplots(figsize=(8, 6))
-            sns.barplot(x='group', y='mean', yerr='error', data=data, ax=ax, capsize=0.1)
+            sns.barplot(x='group', y='mean', yerr='error', data=data, ax=ax, errwidth = 1.5, capsize=0.1)
             st.pyplot(fig)
 
             n += 1
