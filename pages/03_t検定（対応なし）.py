@@ -319,11 +319,17 @@ with st.form(key='analyze_form'):
             elif df1.iat[n, sign_n] == "n.s.":
                 st.write(f'{iv}によって【'f'{dn}】には有意な差が生まれない')
 
+            data = pd.DataFrame({
+            '群': [d0n, d1n],
+            '平均値': [df1.iat[n, df1.columns.get_loc(DivideVariable[0] + "M")], df1.iat[n, df1.columns.get_loc(DivideVariable[1] + "M")]],
+            '誤差': [df1.iat[n, df1.columns.get_loc(DivideVariable[0] + "S.D")], df1.iat[n, df1.columns.get_loc(DivideVariable[1] + "S.D")]]
+            })
+
             # グラフのサイズを設定し、FigureオブジェクトとAxesオブジェクトを取得
             fig, ax = plt.subplots(figsize=(8, 6))
 
             # seaborn の barplot を使って棒グラフを描画
-            sns.barplot(x=iv, y=dn, data=data, ci='sd', capsize=0.1, errwidth=1.5, ax=ax)
+            sns.barplot(x='群' y='平均値', data=data, ci='sd', capsize=0.1, errwidth=1.5, ax=ax)
 
             # グラフのタイトルを設定
             ax.set_title(f'平均値の比較： {dn}')
