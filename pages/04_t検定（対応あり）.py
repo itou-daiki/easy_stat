@@ -239,8 +239,8 @@ with st.form(key='analyze_form'):
                 st.write(f'{vn}には有意な差が生まれない')
 
             data = pd.DataFrame({
-                'group': ['観測値', '測定値'],
-                'mean': [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]],
+                '群': ['観測値', '測定値'],
+                '平均値': [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]],
                 'error': [df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]]
             })
 
