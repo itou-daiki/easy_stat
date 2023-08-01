@@ -239,14 +239,19 @@ with st.form(key='analyze_form'):
                 st.write(f'{vn}には有意な差が生まれない')
 
             data = pd.DataFrame({
-            'group': ['観測値', '測定値'],
-            'mean': [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]],
-            'error': [df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]]
+                'group': ['観測値', '測定値'],
+                'mean': [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]],
+                'error': [df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]]
             })
 
-            # エラーバー付き棒グラフの作成
             fig, ax = plt.subplots(figsize=(8, 6))
-            sns.barplot(x='group', y='mean', yerr='error', data=data, ax=ax, errwidth = 1.5, capsize=0.1)
+
+            # Seaborn barplot
+            sns.barplot(x='group', y='mean', data=data, ax=ax, capsize=0.1, errcolor='black', errwidth=1)
+
+            # Add error bars
+            ax.errorbar(x=data['group'], y=data['mean'], yerr=data['error'], fmt='none', c='black', capsize=3)
+
             st.pyplot(fig)
 
             n += 1
