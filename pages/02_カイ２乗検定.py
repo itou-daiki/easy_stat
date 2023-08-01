@@ -86,7 +86,7 @@ with st.form(key='analyze_form'):
         st.write('Degrees of freedom: ', dof)
         st.write('Expected counts: ', expected)
 
-ANALYZE_btn = st.form_submit_button('OK')
+    ANALYZE_btn = st.form_submit_button('OK')
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
          'まで')

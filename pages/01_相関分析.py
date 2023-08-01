@@ -170,6 +170,6 @@ with st.form(key='analyze_form'):
 
     ANALYZE_btn = st.form_submit_button('OK')
 
-    st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
+st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
              'まで')
-    st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
+st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
