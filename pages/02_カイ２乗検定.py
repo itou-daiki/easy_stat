@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 from scipy.stats import chi2_contingency
@@ -49,8 +50,8 @@ if st.checkbox('データフレームの表示（クリックで開きます）'
 
 # 変数選択フォーム
 with st.form(key='variable_form'):
-    st.subheader("分析に使用する変数（観測値、測定値）の選択")
-    # 複数選択（観測値）
+    st.subheader("分析に使用する変数の選択")
+    # 複数選択
     Variables = st.multiselect('変数（複数選択可）', df.columns.tolist())
 
     # 確認ボタンの表示
@@ -66,19 +67,18 @@ with st.form(key='check_form'):
         # 分析実行ボタンの表示
         CHISQUARE_btn = st.form_submit_button('分析実行')
 
-# 分析結果表示フォーム
-with st.form(key='analyze_form'):
-    if CHISQUARE_btn:
-        st.subheader('【分析結果】')
+        # 分析結果表示フォーム
+        with st.form(key='analyze_form'):
+            if CHISQUARE_btn:
+                st.subheader('【分析結果】')
 
-        # chi-square test
-        chi2, p, dof, expected = chi2_contingency(df[Variables])
+                # chi-square test
+                chi2, p, dof, expected = chi2_contingency(df[Variables])
 
-        st.write('Chi-square statistic: ', chi2)
-        st.write('p-value: ', p)
-        st.write('Degrees of freedom: ', dof)
-        st.write('Expected counts: ', expected)
-
+                st.write('Chi-square statistic: ', chi2)
+                st.write('p-value: ', p)
+                st.write('Degrees of freedom: ', dof)
+                st.write('Expected counts: ', expected)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
          'まで')
