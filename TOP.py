@@ -8,8 +8,8 @@ st.caption("Created by Daiki Ito")
 
 # Introduction
 st.markdown("""
-このウェブアプリケーションでは、ブラウザ上で統計分析を行うことができます。iPadなどのデバイスでも対応しています。具体的な機能は以下の通りです：
-""")
+このウェブアプリケーションでは、ブラウザ上で統計分析を行うことができます。iPadなどのデバイスでも対応しています。""")
+st.markdown("""具体的な機能は以下の通りです：""")
 
 # List of implemented tests
 st.markdown("""
