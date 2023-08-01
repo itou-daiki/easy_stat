@@ -53,6 +53,7 @@ with st.form(key='variable_form'):
     st.subheader("分析に使用する変数の選択")
     # 複数選択
     Variables = st.multiselect('変数（複数選択可）', df.columns.tolist())
+    vRange = len(Variables)
 
     # 確認ボタンの表示
     CHECK_btn = st.form_submit_button('確認')
@@ -62,7 +63,12 @@ with st.form(key='check_form'):
     if CHECK_btn:
         st.subheader('【分析前の確認】')
 
-        st.write('選択された変数：', Variables)
+        n = 0
+        for ViewCheck in range(vRange):
+            st.write(
+                f'● 【'f'{(Variables[n])}')
+            n += 1
+        st.write('    '+'これらの変数の出現度数に有意な差が生まれるか検定します。')
 
         # 分析実行ボタンの表示
         CHISQUARE_btn = st.form_submit_button('分析実行')
