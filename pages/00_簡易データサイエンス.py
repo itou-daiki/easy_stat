@@ -10,6 +10,7 @@ import matplotlib as mpl
 font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")
 # Matplotlibのデフォルトのフォントを変更
 mpl.rcParams['font.family'] = font_prop.get_name()
+sns.set(font='ipaexg.ttf')
 
 st.set_page_config(page_title="簡易データサイエンス", layout="wide")
 
@@ -21,6 +22,12 @@ st.write("iPad等でも分析を行うことができます")
 
 st.write("")
 
+# デモ用ファイル
+df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
+
+# データフレーム表示ボタン
+if st.checkbox('データフレームの表示（クリックで開きます）'):
+    st.dataframe(df, width=0)
 
 def main():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
