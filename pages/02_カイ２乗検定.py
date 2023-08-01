@@ -70,12 +70,12 @@ with st.form(key='check_form'):
             n += 1
         st.write('    '+'これらの変数の出現度数に有意な差が生まれるか検定します。')
 
-        # 分析実行ボタンの表示
-        CHISQUARE_btn = st.form_submit_button('分析実行')
+    # 分析実行ボタンの表示
+    ANALYZE_btn = st.form_submit_button('分析実行')
 
 # 分析結果表示フォーム
 with st.form(key='analyze_form'):
-    if CHISQUARE_btn:
+    if ANALYZE_btn:
         st.subheader('【分析結果】')
 
         # chi-square test
@@ -85,6 +85,8 @@ with st.form(key='analyze_form'):
         st.write('p-value: ', p)
         st.write('Degrees of freedom: ', dof)
         st.write('Expected counts: ', expected)
+
+ANALYZE_btn = st.form_submit_button('OK')
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
          'まで')
