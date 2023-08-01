@@ -21,6 +21,10 @@ st.write("")
 
 demo_df = pd.read_excel('data_science_demo.xlsx', sheet_name=0)
 
+# Convert columns to appropriate data types
+demo_df['勉強時間'] = pd.to_numeric(demo_df['勉強時間'], errors='coerce')
+demo_df['睡眠時間'] = pd.to_numeric(demo_df['睡眠時間'], errors='coerce')
+
 def upload_data():
     file = st.file_uploader("ExcelファイルまたはCSVファイルをアップロードしてください", type=['xlsx', 'csv'])
     use_demo = st.checkbox("デモ用データを使用する")
@@ -68,7 +72,10 @@ def analyze_data(df):
                 df[col].hist(ax=ax)
                 st.pyplot(fig)
             else:
-                st.write(f"{col}は数値データではないため、可視化できません。")
+                st.write(f"{col}は数値データではないため、ヒストグラムではなく出現度数を表示します。")
+                fig, ax = plt.subplots()
+                df[col].value_counts().plot(kind='bar', ax=ax)
+                st.pyplot(fig)
 
     if st.checkbox("数値データの相関行列とヒートマップの表示"):
         numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
