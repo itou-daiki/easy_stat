@@ -23,6 +23,11 @@ st.markdown("""
 st.header("更新履歴")
 
 st.markdown("""
+#### **2023/09/01**
+- リポジトリを移動しました。
+- 旧URL（https://dddd-onigiri-easy-stat-top-532p3c.streamlit.app/）            
+
+
 #### **2023/08/01**
 - 簡易データサイエンス機能を実装しました
 - UIとその他の軽微な修正を行いました
@@ -37,8 +42,9 @@ st.markdown("""
 # Contact and repository info
 st.header("リンク")
 st.markdown("""
+- [**音のデータサイエンス**](https://audiovisualizationanalysis-bpeekdjwymuf6nkqcb4cqy.streamlit.app/)
 - [**フィードバックはこちらまで**](https://forms.gle/G5sMYm7dNpz2FQtU9)
-- [**ソースコードはこちら（GitHub）**](https://github.com/dddd-onigiri/easy_stat)
+- [**ソースコードはこちら（GitHub）**](https://github.com/itou-daiki/easy_stat)
 """)
 
 # Copyright
