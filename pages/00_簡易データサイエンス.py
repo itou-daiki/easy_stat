@@ -50,16 +50,16 @@ def upload_data():
 
 def analyze_data(df):
     st.subheader('データの分析')
-    with st.expander('概要'):
-        # pandas-profilingのレポートを作成
-        profile = pdp.ProfileReport(df, explorative=True)
-        # Streamlitにレポートを表示
-        st.write("**Input DataFrame**")
-        st.write(df)
-        st.write('**Pandas Profiling Report**')
+    st.subheader('概要')
+    # pandas-profilingのレポートを作成
+    profile = pdp.ProfileReport(df, explorative=True)
+    # Streamlitにレポートを表示
+    st.write("**Input DataFrame**")
+    st.write(df)
+    st.write('**Pandas Profiling Report**')
     
-        # レポートをStreamlitに埋め込む
-        components.html(profile.to_html(), height=600, scrolling=True)
+    # レポートをStreamlitに埋め込む
+    components.html(profile.to_html(), height=600, scrolling=True)
 
     with st.expander('データフレームの表示'):
         st.dataframe(df, width=0)
