@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import pandas_profiling as pdp
+import streamlit.components.v1 as components
 import numpy as np
 import japanize_matplotlib
 import matplotlib.pyplot as plt
@@ -48,6 +50,17 @@ def upload_data():
 
 def analyze_data(df):
     st.subheader('データの分析')
+    with st.expander('概要'):
+        # pandas-profilingのレポートを作成
+        profile = pdp.ProfileReport(df, explorative=True)
+        # Streamlitにレポートを表示
+        st.write("**Input DataFrame**")
+        st.write(df)
+        st.write('**Pandas Profiling Report**')
+    
+        # レポートをStreamlitに埋め込む
+        components.html(profile.to_html(), height=600, scrolling=True)
+
     with st.expander('データフレームの表示'):
         st.dataframe(df, width=0)
 
