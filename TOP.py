@@ -10,6 +10,10 @@ st.caption("Created by Daiki Ito")
 st.markdown("""
 ## **概要**
 このウェブアプリケーションでは、ブラウザ上で統計分析を行うことができます。iPadなどのデバイスでも対応しています。""")
+
+st.markdown("""
+- [**情報探究ステップアップガイド**](https://thorn-rumba-3a4.notion.site/612d9665350544aa97a2a8514a03c77c?v=0266abc5c1384b44a757b9044469d6bd&pvs=4)""")
+
 st.markdown("""具体的な機能は以下の通りです：""")
 # List of implemented tests
 st.markdown("""
