@@ -30,7 +30,7 @@ else:
         else:
             df = pd.read_excel(uploaded_file)
 
-st.dataframe(df.head)
+st.dataframe(df.head())
 
 # データフレームが存在する場合にD-taleで表示
 if 'df' in locals() or 'df' in globals():
