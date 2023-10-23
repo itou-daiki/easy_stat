@@ -20,6 +20,7 @@ uploaded_file = st.file_uploader('ファイルをアップロードしてくだ�
 use_demo_data = st.checkbox('デモデータを使用')
 
 # データフレームの作成
+df = None
 if use_demo_data:
     df = pd.read_excel('eda_demo.xlsx', sheet_name=0)
     st.write(df.head())
