@@ -55,7 +55,7 @@ if df is not None:
         # カテゴリ×カテゴリ
         if var1 in categorical_cols and var2 in categorical_cols:
             cross_tab = pd.crosstab(df[var1], df[var2])
-            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'個数のカウント: {var1} × {var2}',annotation_text=cross_tab.to_numpy())
+            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'個数のカウント: {var1} × {var2}')
             st.plotly_chart(fig)
 
         # 数値×数値
