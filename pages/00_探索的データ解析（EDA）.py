@@ -67,9 +67,11 @@ if df is not None:
     # 変数選択
     selected_vars = st.multiselect('変数を選択してください:', df.columns.tolist())
 
-    if len(selected_vars) == 2:
+    if len(selected_vars) > 2:
+        st.error('2項目以上を選択することはできません。選択をクリアし、2項目のみを選択してください。')
+    elif len(selected_vars) == 2:
         var1, var2 = selected_vars
-        
+     
         # カテゴリ×カテゴリ
         if var1 in categorical_cols and var2 in categorical_cols:
             cross_tab = pd.crosstab(df[var1], df[var2])
