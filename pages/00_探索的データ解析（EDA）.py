@@ -14,6 +14,9 @@ st.subheader("簡易的な探索的データ解析（EDA）が実行できます
 st.write("iPad等でも分析を行うことができます")
 st.write("")
 
+# ファイルアップローダー
+uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
+
 # デモデータを使うかどうかのチェックボックス
 use_demo_data = st.checkbox('デモデータを使用')
 
@@ -21,12 +24,12 @@ use_demo_data = st.checkbox('デモデータを使用')
 if use_demo_data:
     df = pd.read_excel('eda_demo.xlsx', sheet_name=0)
 else:
-    uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
     if uploaded_file is not None:
         if uploaded_file.type == 'text/csv':
             df = pd.read_csv(uploaded_file)
         else:
             df = pd.read_excel(uploaded_file)
+
 
 # データフレームが存在する場合にD-taleで表示
 if 'df' in locals() or 'df' in globals():
