@@ -23,14 +23,15 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 if use_demo_data:
     df = pd.read_excel('eda_demo.xlsx', sheet_name=0)
+    st.write(df.head())
 else:
     if uploaded_file is not None:
         if uploaded_file.type == 'text/csv':
             df = pd.read_csv(uploaded_file)
+            st.write(df.head())
         else:
             df = pd.read_excel(uploaded_file)
-
-st.write(df.head())
+            st.write(df.head())
 
 # データフレームが存在する場合にD-taleで表示
 if 'df' in locals() or 'df' in globals():
