@@ -32,10 +32,14 @@ else:
 if 'df' in locals() or 'df' in globals():
     try:
         # D-taleインスタンスの作成
-        d = dtale.show(df)
+        d = dtale.show(df, host='0.0.0.0', port=40000)
         
         # D-taleアプリをiframe内に埋め込む
-        components.iframe(d._main_url, width=1000, height=500)
+        iframe_code = f'''
+            <iframe src="{d._main_url}" width="100%" height="500px" style="border:none;">
+            </iframe>
+        '''
+        st.markdown(iframe_code, unsafe_allow_html=True)
 
     except Exception as e:
         st.write(f'エラー: {e}')
