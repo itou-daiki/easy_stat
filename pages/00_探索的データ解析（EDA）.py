@@ -40,7 +40,7 @@ if 'df' in locals() or 'df' in globals():
         startup(data_id="1", data=df)
 
         # D-taleインスタンスの作成
-        d = dtale.show(df, host='0.0.0.0', port=30000)
+        d = dtale.show(df)
         
         # D-taleアプリをiframe内に埋め込む
         iframe_code = f'''
