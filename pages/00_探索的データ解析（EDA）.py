@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
-import dtale
+import pygwalker as pyg
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 import streamlit.components.v1 as components
-from dtale.views import startup
 
 st.set_page_config(page_title="探索的データ解析（EDA）", layout="wide")
 
@@ -34,23 +33,11 @@ else:
             df = pd.read_excel(uploaded_file)
             st.write(df.head())
 
-# データフレームが存在する場合にD-taleで表示
-if 'df' in locals() or 'df' in globals():
+# Graphic Walker 操作（メインパネル）
+if df is not None:
     try:
-        startup(data_id="1", data=df)
-
-        # D-taleインスタンスの作成
-        d = dtale.show(df)
-        
-        # D-taleアプリをiframe内に埋め込む
-        iframe_code = f'''
-            <iframe src="{d._main_url}" width="100%" height="500px" style="border:none;">
-            </iframe>
-        '''
-        st.markdown(iframe_code, unsafe_allow_html=True)
-
-        st.write(f'D-Tale URL: {d._main_url}')
-
+        output = pyg.walk(df, env='Streamlit')
+        st.write(output)
     except Exception as e:
         st.write(f'エラー: {e}')
 
