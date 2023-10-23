@@ -41,7 +41,7 @@ if 'df' in locals() or 'df' in globals():
         '''
         st.markdown(iframe_code, unsafe_allow_html=True)
 
-        st.write(f'D-Tale URL: {d_url}')
+        st.write(f'D-Tale URL: {d._main_url}')
 
     except Exception as e:
         st.write(f'エラー: {e}')
