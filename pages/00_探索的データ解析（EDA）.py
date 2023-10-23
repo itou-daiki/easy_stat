@@ -35,7 +35,7 @@ else:
 if 'df' in locals() or 'df' in globals():
     try:
         # D-taleインスタンスの作成
-        d = dtale.show(df, host='0.0.0.0', port=40000)
+        d = dtale.show(df)
 
         # D-taleアプリをiframe内に埋め込む
         components.iframe(d._main_url, width=1000, height=500)
