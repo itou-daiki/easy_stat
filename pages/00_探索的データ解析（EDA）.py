@@ -47,7 +47,7 @@ if df is not None:
     st.subheader('可視化')
 
     # 変数選択
-    selected_vars = st.multiselect('変数を選択してください:', df.columns.tolist(), default=df.columns.tolist())
+    selected_vars = st.multiselect('変数を選択してください:', df.columns.tolist())
 
     if len(selected_vars) == 2:
         var1, var2 = selected_vars
