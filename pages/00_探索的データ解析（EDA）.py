@@ -34,56 +34,44 @@ else:
             st.write(df.head())
 
 # カテゴリ変数と数値変数の選択
-if df is not None:
-    categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
-    numerical_cols = df.select_dtypes(include=['number']).columns.tolist()
+categorical_cols = df.select_dtypes(include=['object', 'category']).columns.tolist()
+numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
 
-    st.write("カテゴリ変数")
-    st.write(categorical_cols)
-    st.write("数値変数")
-    st.write(numerical_cols)
-
-else:
-    selected_categorical = []
-    selected_numerical = []
-
-# サマリー（要約統計量）の表示
-st.subheader('サマリー（要約統計量）')
-if selected_categorical:
-    st.write(df[selected_categorical].describe(include='object'))
-if selected_numerical:
-    st.write(df[selected_numerical].describe())
+# 要約統計量表示
+st.subheader('要約統計量')
+summary_df = df.describe(include='all').transpose()
+st.write(summary_df)
 
 # 可視化
-if len(selected_categorical) == 2 and len(selected_numerical) == 0:
-    # カテゴリ変数とカテゴリ変数の場合
-    count_df = df.groupby(selected_categorical).size().reset_index(name='count')
-    fig = px.bar(count_df, x=selected_categorical[0], y='count', color=selected_categorical[1], title=f'{selected_categorical[0]} vs {selected_categorical[1]}')
-    st.plotly_chart(fig)
+st.subheader('可視化')
 
-elif len(selected_categorical) == 0 and len(selected_numerical) == 2:
-    # 数値変数と数値変数の場合
-    fig = px.scatter(df, x=selected_numerical[0], y=selected_numerical[1], title=f'{selected_numerical[0]} vs {selected_numerical[1]}')
-    st.plotly_chart(fig)
-    st.write(f'相関係数: {df[selected_numerical].corr().iloc[0, 1]:.2f}')
+# 変数選択
+selected_vars = st.multiselect('変数を選択してください:', df.columns.tolist(), default=df.columns.tolist())
 
-elif len(selected_categorical) == 1 and len(selected_numerical) == 1:
-    # カテゴリ変数と数値変数の場合
-    fig = px.bar(df, x=selected_categorical[0], y=selected_numerical[0], title=f'{selected_categorical[0]} vs {selected_numerical[0]}')
-    st.plotly_chart(fig)
-
-# その他のEDA機能
-st.sidebar.subheader('その他のEDA機能')
-if st.sidebar.checkbox('ヒストグラムを表示'):
-    st.subheader('ヒストグラム')
-    fig = px.histogram(df, nbins=50)
-    st.plotly_chart(fig)
-
-if st.sidebar.checkbox('欠損値の確認'):
-    st.subheader('欠損値の確認')
-    missing_df = df.isnull().sum().reset_index()
-    missing_df.columns = ['Column', 'Missing Values']
-    st.write(missing_df)
+if len(selected_vars) == 2:
+    var1, var2 = selected_vars
+    
+    # カテゴリ×カテゴリ
+    if var1 in categorical_cols and var2 in categorical_cols:
+        cross_tab = pd.crosstab(df[var1], df[var2])
+        fig = px.imshow(cross_tab, labels=dict(color="Count"), title=f'個数のカウント: {var1} vs {var2}')
+        st.plotly_chart(fig)
+    
+    # 数値×数値
+    elif var1 in numerical_cols and var2 in numerical_cols:
+        fig = px.scatter(df, x=var1, y=var2, title=f'散布図: {var1} vs {var2}')
+        st.plotly_chart(fig)
+        st.write(f'相関係数: {df[var1].corr(df[var2]):.2f}')
+    
+    # カテゴリ×数値
+    else:
+        if var1 in categorical_cols:
+            cat_var, num_var = var1, var2
+        else:
+            cat_var, num_var = var2, var1
+        
+        fig = px.box(df, x=cat_var, y=num_var, title=f'棒グラフ: {cat_var} vs {num_var}')
+        st.plotly_chart(fig)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
