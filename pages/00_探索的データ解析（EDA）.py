@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 import streamlit.components.v1 as components
 
-st.server.enableCORS = true
+st.server.enableCORS = True
 
 st.set_page_config(page_title="探索的データ解析（EDA）", layout="wide")
 
