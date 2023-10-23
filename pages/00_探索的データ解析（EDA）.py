@@ -46,20 +46,24 @@ if df is not None:
 
     # 可視化
     st.subheader('可視化')
-    st.subheader(f'{selected_var} の可視化')
 
-    if selected_var in cols:
-        # カテゴリ変数は棒グラフに
-        value_counts = df[selected_var].value_counts()
-        fig = px.bar(x=value_counts.index, y=value_counts.values, labels={'x': selected_var, 'y': 'Count'})
-        st.plotly_chart(fig)
-    else:
-        # 数値変数はヒストグラムと箱ひげ図に
-        fig = px.histogram(df, x=selected_var)
+    # カテゴリ変数の可視化
+    for col in categorical_cols:
+        st.subheader(f'{col} の可視化 (カテゴリ変数)')
+        value_counts = df[col].value_counts()
+        fig = px.bar(x=value_counts.index, y=value_counts.values, labels={'x': col, 'y': 'Count'})
         st.plotly_chart(fig)
 
-        fig = px.box(df, x=selected_var)
+    # 数値変数の可視化
+    for col in numerical_cols:
+        st.subheader(f'{col} の可視化 (数値変数)')
+        fig = px.histogram(df, x=col)
         st.plotly_chart(fig)
+        fig = px.box(df, x=col)
+        st.plotly_chart(fig)
+    
+    st.subheader('選択した変数の可視化')
+    
     # 変数選択
     selected_vars = st.multiselect('変数を選択してください:', df.columns.tolist())
 
