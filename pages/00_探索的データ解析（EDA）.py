@@ -55,12 +55,12 @@ if df is not None:
         # カテゴリ×カテゴリ
         if var1 in categorical_cols and var2 in categorical_cols:
             cross_tab = pd.crosstab(df[var1], df[var2])
-            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'個数のカウント: {var1} vs {var2}',annotation_text=cross_tab.to_numpy())
+            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'個数のカウント: {var1} × {var2}',annotation_text=cross_tab.to_numpy())
             st.plotly_chart(fig)
-            
+
         # 数値×数値
         elif var1 in numerical_cols and var2 in numerical_cols:
-            fig = px.scatter(df, x=var1, y=var2, title=f'散布図: {var1} vs {var2}')
+            fig = px.scatter(df, x=var1, y=var2, title=f'散布図: {var1} × {var2}')
             st.plotly_chart(fig)
             st.write(f'相関係数: {df[var1].corr(df[var2]):.2f}')
         
@@ -71,7 +71,7 @@ if df is not None:
             else:
                 cat_var, num_var = var2, var1
             
-            fig = px.box(df, x=cat_var, y=num_var, title=f'棒グラフ: {cat_var} vs {num_var}')
+            fig = px.box(df, x=cat_var, y=num_var, title=f'箱ひげ図: {cat_var} × {num_var}')
             st.plotly_chart(fig)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
