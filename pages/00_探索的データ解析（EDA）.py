@@ -34,18 +34,19 @@ else:
             st.write(df.head())
 
 # カテゴリ変数と数値変数の選択
-st.sidebar.header('パラメータ設定')
 if df is not None:
     categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
     numerical_cols = df.select_dtypes(include=['number']).columns.tolist()
 
-    # 最初の2つのカテゴリ変数と数値変数を自動で選択
-    selected_categorical = categorical_cols[:2] if len(categorical_cols) >= 2 else categorical_cols
-    selected_numerical = numerical_cols[:2] if len(numerical_cols) >= 2 else numerical_cols
+    st.write("カテゴリ変数")
+    st.write(categorical_cols)
+    st.write("数値変数")
+    st.write(numerical_cols)
+
 else:
     selected_categorical = []
     selected_numerical = []
-    
+
 # サマリー（要約統計量）の表示
 st.subheader('サマリー（要約統計量）')
 if selected_categorical:
