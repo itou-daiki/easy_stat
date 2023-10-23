@@ -2,4 +2,5 @@
 base = "light"
 
 [server]
-enableCORS = true
+enableXsrfProtection = false
+enableCors = false
