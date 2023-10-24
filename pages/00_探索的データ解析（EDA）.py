@@ -88,7 +88,7 @@ if df is not None:
         st.plotly_chart(fig)
 
 
-    st.subheader('選択した変数の可視化')
+    st.subheader('選択した２変数の可視化')
     
     # 変数選択
     selected_vars = st.multiselect('変数を２つ選択してください:', df.columns.tolist())
