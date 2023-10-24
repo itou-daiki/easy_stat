@@ -138,8 +138,15 @@ if df is not None:
             x=cat_var1,
             y=num_var,
             color=cat_var2,
+            facet_col=cat_var2,
             labels={num_var: '平均 ' + num_var, cat_var1: cat_var1, cat_var2: cat_var2},
             title=f'【{cat_var1}】 と 【{cat_var2}】 による 【{num_var}】 の比較'
+        )
+        # グラフのレイアウトを更新（オプショナル）
+        fig.update_layout(
+            xaxis_title=cat_var1,
+            yaxis_title=f'平均 {num_var}',
+            margin=dict(l=0, r=0, t=30, b=0)
         )
 
         st.plotly_chart(fig)
