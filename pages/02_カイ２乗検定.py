@@ -56,6 +56,30 @@ if df is not None:
     crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
     st.subheader(f'【{selected_col1}】 と 【{selected_col2}】 のクロス表')
     st.write(crosstab)
+    
+    # カイ２乗検定の実行
+    chi2, p_value, dof, expected = stats.chi2_contingency(crosstab)
+
+    # 有意差を確認するための残差の計算
+    residuals = (crosstab - expected) / np.sqrt(expected)
+
+    # 有意水準0.05でのz値の閾値
+    threshold = stats.norm.ppf(1 - 0.05 / 2)
+
+    # 有意に差が出ているセルのマスキング
+    mask_significant = residuals.abs() > threshold
+
+    # セルに色を付ける
+    colors = mask_significant.applymap(lambda x: 'background-color: yellow' if x else '')
+
+    # ヒートマップの作成と表示
+    st.write('有意に差が出ているセルは黄色で表示されます:')
+    st.write(crosstab.style.apply(lambda x: colors, axis=None))
+
+    # カイ二乗検定の結果を表示
+    st.subheader('カイ二乗検定の結果')
+    st.write(f'カイ二乗統計量: {chi2:.2f}')
+    st.write(f'P値: {p_value:.2f}')
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
