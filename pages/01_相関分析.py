@@ -40,6 +40,7 @@ if df is not None:
     numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
 
     # 数値変数の選択
+    st.subheader("数値変数の選択")
     selected_cols = st.multiselect('数値変数を選択してください', numerical_cols, default=numerical_cols)
     
     if len(selected_cols) < 2:
@@ -49,7 +50,8 @@ if df is not None:
         corr_matrix = df[selected_cols].corr()
         
         # 相関マトリックスの表示
-        st.write('相関マトリックス:', corr_matrix)
+        st.subheader('相関マトリックス')
+        st.dataflame(corr_matrix)
         
         # ヒートマップの表示
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -57,7 +59,7 @@ if df is not None:
         st.pyplot(fig)
         
         # 相関の解釈
-        st.write('相関の解釈:')
+        st.subheader('相関の解釈:')
         for i, col1 in enumerate(selected_cols):
             for j, col2 in enumerate(selected_cols):
                 if i < j:
