@@ -90,8 +90,6 @@ if df is not None:
 
             # サマリ(df0)用のデータフレームのセット
             df0 = pd.DataFrame(index=summaryList, columns=summaryColumns)
-            # 有効桁数を調整
-            df0 = df0.round(2)
 
             # サマリ(df0)用のデータフレームに平均値と標準偏差を追加
             for summary in range(num_range):
@@ -108,6 +106,8 @@ if df is not None:
                 df0.at[df00.columns[n], '最大値'] = y.max()
                 n += 1
 
+            # 有効桁数を調整
+            df0 = df0.round(2)            
             # 要約統計量（サマリ）のデータフレームを表示
             st.dataframe(df0)
 
