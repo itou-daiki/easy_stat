@@ -53,10 +53,10 @@ if df is not None:
         st.subheader('相関マトリックス')
         st.dataframe(corr_matrix)
         
-        # ヒートマップの表示
-        fig, ax = plt.subplots(figsize=(6, 4))
-        sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm', ax=ax)
-        st.pyplot(fig)
+        # ヒートマップの表示 (plotly.expressを使用)
+        fig = px.imshow(corr_matrix, color_continuous_scale='coolwarm', labels=dict(color="相関係数"))
+        fig.update_layout(title="相関係数のヒートマップ")
+        st.plotly_chart(fig)
         
         # 相関の解釈
         st.subheader('解釈の補助')
