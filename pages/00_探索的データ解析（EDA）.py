@@ -72,6 +72,7 @@ if df is not None:
             labels={'x': col, 'y': 'Count'},
             title=f'{col} の可視化 （{sort_order}）'
         )
+        fig.update_layout(bargap=0.2)
         st.plotly_chart(fig)
 
     # 数値変数の可視化
