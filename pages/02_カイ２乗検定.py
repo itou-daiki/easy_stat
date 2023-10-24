@@ -85,10 +85,14 @@ if df is not None:
     # 期待度数のデータフレームの作成
     expected_df = pd.DataFrame(expected, columns=crosstab.columns, index=crosstab.index)
     expected_df = expected_df.round(2)  # 小数点第2位で四捨五入
+    expected_df = expected_df.iloc[:-1, :-1]  # 合計の行と列を削除
+
 
     # (観測度数 - 期待度数)^2 / 期待度数 の計算
     chi_square_value_df = ((crosstab - expected) ** 2) / expected
     chi_square_value_df = chi_square_value_df.round(2)  # 小数点第2位で四捨五入
+    chi_square_value_df = chi_square_value_df.iloc[:-1, :-1]  # 合計の行と列を削除
+
 
     # 有意差を確認するための残差の計算
     residuals = (crosstab - expected) / np.sqrt(expected)
