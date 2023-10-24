@@ -79,6 +79,7 @@ if df is not None:
     for col in numerical_cols:
         st.subheader(f'{col} の可視化 （数値変数）')
         fig = px.histogram(df, x=col)
+        fig.update_layout(bargap=0.2)
         st.plotly_chart(fig)
         fig = px.box(df, x=col)
         st.plotly_chart(fig)
