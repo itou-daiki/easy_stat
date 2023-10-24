@@ -84,9 +84,11 @@ if df is not None:
 
     # 期待度数のデータフレームの作成
     expected_df = pd.DataFrame(expected, columns=crosstab.columns, index=crosstab.index)
+    expected_df = expected_df.round(2)  # 小数点第2位で四捨五入
 
     # (観測度数 - 期待度数)^2 / 期待度数 の計算
     chi_square_value_df = ((crosstab - expected) ** 2) / expected
+    chi_square_value_df = chi_square_value_df.round(2)  # 小数点第2位で四捨五入
 
     # 有意差を確認するための残差の計算
     residuals = (crosstab - expected) / np.sqrt(expected)
@@ -107,10 +109,10 @@ if df is not None:
     st.write(crosstab.style.apply(lambda x: colors, axis=None))
 
     st.write('＜期待度数＞')
-    st.write(expected_df.style.apply(lambda x: colors, axis=None))
+    st.write(expected_df.style.apply(lambda x: colors, axis=None).format("{:.2f}"))
 
     st.write('＜(観測度数 - 期待度数)^2 / 期待度数＞')
-    st.write(chi_square_value_df.style.apply(lambda x: colors, axis=None))
+    st.write(chi_square_value_df.style.apply(lambda x: colors, axis=None).format("{:.2f}"))
 
     st.caption('有意に差が出ているセルは黄色で表示されます:')
 
