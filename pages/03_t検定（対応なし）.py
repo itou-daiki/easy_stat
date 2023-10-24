@@ -62,7 +62,8 @@ if df is not None:
         # 独立変数から重複のないデータを抽出し、リストに変換
         xcat_var_d = df[cat_var].iloc[:, 0].unique().tolist()
         st.subheader('【分析前の確認】')
-        st.write(f'{str(cat_var)}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
+        cat_var_str = str(cat_var)
+        st.write(f'{(cat_var_str)}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
 
         for num_var in num_vars:
             st.write(f'● {num_var}')
