@@ -51,7 +51,7 @@ if df is not None:
         
         # 相関マトリックスの表示
         st.subheader('相関マトリックス')
-        st.dataflame(corr_matrix)
+        st.dataframe(corr_matrix)
         
         # ヒートマップの表示
         fig, ax = plt.subplots(figsize=(10, 8))
