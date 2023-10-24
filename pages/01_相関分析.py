@@ -9,8 +9,7 @@ st.set_page_config(page_title="相関分析", layout="wide")
 
 st.title("相関分析ウェブアプリ")
 
-st.write("このウェブアプリケーションでは、アップロードしたデータセットの特定の変数間の相関分析を簡単に実行できます。\
-          さらに、相関係数のヒートマップを生成し、相関の強さを視覚的に確認できます。")
+st.write("相関係数のヒートマップを生成し、相関の強さを視覚的に確認できます。")
 
 # ファイルアップローダー
 uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
