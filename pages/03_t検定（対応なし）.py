@@ -56,6 +56,9 @@ if df is not None:
     if len(df[cat_var].iloc[:, 0].unique()) != 2:
         st.error("独立変数が2群になっていないため、分析を実行できません")
     
+    elif numerical_cols is None:
+        st.error("変数は少なくとも１つずつ選択してください")
+    
     else:
         st.success("分析可能な変数を選択しました。分析を実行します。")
         
