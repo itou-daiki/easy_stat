@@ -99,14 +99,14 @@ if df is not None:
     # データフレームを表示
     st.subheader('データフレームの表示')
     
-    st.write('観測度数')
+    st.write('＜観測度数＞')
     st.write(crosstab.style.apply(lambda x: colors, axis=None))
 
-    st.write('期待度数')
-    st.write(expected_df)
+    st.write('＜期待度数＞')
+    st.write(expected_df.style.apply(lambda x: colors, axis=None))
 
-    st.write('(観測度数 - 期待度数)^2 / 期待度数')
-    st.write(chi_square_value_df)
+    st.write('＜(観測度数 - 期待度数)^2 / 期待度数＞')
+    st.write(chi_square_value_df.style.apply(lambda x: colors, axis=None))
 
     st.caption('有意に差が出ているセルは黄色で表示されます:')
 
