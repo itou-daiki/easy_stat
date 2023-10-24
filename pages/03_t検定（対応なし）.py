@@ -111,8 +111,8 @@ if df is not None:
                 n += 1
 
             # 有効桁数を調整
-            df0['標準偏差'] = df0['標準偏差'].round(2)
-            df0 = df0.round(2)            
+            numeric_columns = df0.select_dtypes(include=['float64', 'int64']).columns
+            df0[numeric_columns] = df0[numeric_columns].round(2)       
             # 要約統計量（サマリ）のデータフレームを表示
             st.dataframe(df0)
 
