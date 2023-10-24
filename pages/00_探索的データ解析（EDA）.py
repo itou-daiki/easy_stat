@@ -144,9 +144,8 @@ if df is not None:
         # グラフのレイアウトを更新（オプショナル）
         fig.update_layout(
             xaxis_title=cat_var1,
-            yaxis_title=f'AVE: {num_var}',
+            yaxis_title=f'AVE:  {num_var}',
             margin=dict(l=0, r=0, t=60, b=0),
-            xaxis=dict(showticklabels=False)  # x軸のラベルを非表示にする
         )
 
         st.plotly_chart(fig)
