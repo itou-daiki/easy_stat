@@ -24,7 +24,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('eda_demo.xlsx', sheet_name=0)
+    df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
     st.write(df.head())
 else:
     if uploaded_file is not None:
