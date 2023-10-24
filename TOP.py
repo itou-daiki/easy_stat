@@ -17,7 +17,7 @@ st.markdown("""
 st.markdown("""具体的な機能は以下の通りです：""")
 # List of implemented tests
 st.markdown("""
-- **簡易データサイエンス**
+- **探索的データ分析（EDA）**
 - **相関分析**
 - **ｔ検定（対応なし）**
 - **ｔ検定（対応あり）**
@@ -26,6 +26,12 @@ st.markdown("""
 # Updates and history
 st.header("更新履歴")
 
+st.markdown("""
+#### **2023/10/024**
+- 探索的データ分析（EDA）を実装しました
+- 相関分析を修正しました
+- カイ２乗分析を修正しました
+                        
 st.markdown("""
 #### **2023/09/01**
 - リポジトリを移動しました。
