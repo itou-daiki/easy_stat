@@ -120,36 +120,31 @@ if df is not None:
             fig = px.box(df, x=cat_var, y=num_var, title=f'箱ひげ図： 【{cat_var}】 × 【{num_var}】')
             st.plotly_chart(fig)
     
-    st.subheader('2つのカテゴリ変数と1つの数値変数を用いた棒グラフの可視化')
+    st.subheader('２つのカテゴリ変数と１つの数値変数による棒グラフ')
+
     # カテゴリ変数と数値変数の選択
-    cat_var_1 = st.selectbox('1つ目のカテゴリ変数を選択してください:', categorical_cols, key='cat_var_1')
-    cat_var_2 = st.selectbox('2つ目のカテゴリ変数を選択してください:', categorical_cols, key='cat_var_2')
-    num_var = st.selectbox('数値変数を選択してください:', numerical_cols, key='num_var')
+    cat_vars = st.multiselect('２つのカテゴリ変数を選択してください:', categorical_cols, key='cat_vars')
+    num_var = st.selectbox('１つの数値変数を選択してください:', numerical_cols, key='num_var')
 
-    # 選択された変数に基づいてデータを準備
-    grouped_data = df.groupby([cat_var_1, cat_var_2])[num_var].mean().unstack()
+    if len(cat_vars) == 2 and num_var:
+        cat_var1, cat_var2 = cat_vars
 
-    # 棒グラフを作成
-    fig = go.Figure()
+        # データの準備
+        grouped_df = df.groupby([cat_var1, cat_var2])[num_var].mean().reset_index()
 
-    for cat in grouped_data.columns:
-        fig.add_trace(
-            go.Bar(
-                x=grouped_data.index,
-                y=grouped_data[cat],
-                name=f'{cat_var_2}: {cat}'
-            )
+        # 棒グラフの作成
+        fig = px.bar(
+            grouped_df,
+            x=cat_var1,
+            y=num_var,
+            color=cat_var2,
+            labels={num_var: '平均 ' + num_var, cat_var1: cat_var1, cat_var2: cat_var2},
+            title=f'&#8203;``【oaicite:2】``&#8203; と &#8203;``【oaicite:1】``&#8203; による &#8203;``【oaicite:0】``&#8203; の比較'
         )
 
-    # グラフのタイトルと軸ラベルを設定
-    fig.update_layout(
-        title=f'【【{cat_var_1}】 と 【{cat_var_2}】による【{num_var}】の比較 ',
-        xaxis_title=cat_var_1,
-        yaxis_title=num_var,
-        barmode='group'  # グループ化された棒グラフを作成
-    )
-
-    st.plotly_chart(fig)
+        st.plotly_chart(fig)
+    else:
+        st.warning('２つのカテゴリ変数と１つの数値変数を選択してください。')
     
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
