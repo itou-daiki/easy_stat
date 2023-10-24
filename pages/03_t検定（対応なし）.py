@@ -1,347 +1,113 @@
 import streamlit as st
 import pandas as pd
+from scipy import stats
+from statistics import median, variance
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 import seaborn as sns
-from scipy import stats
 from PIL import Image
-from statistics import median, variance
-
 import matplotlib as mpl
-# フォントのプロパティを設定
-font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")
-# Matplotlibのデフォルトのフォントを変更
-mpl.rcParams['font.family'] = font_prop.get_name()
-sns.set(font='ipaexg.ttf')
 
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
-
 st.title("t検定(対応なし)")
 st.caption("Created by Daiki Ito")
-st.write("")
-st.subheader("ブラウザでt検定　→　表　→　解釈まで出力できるウェブアプリです。")
-st.write("iPad等でも分析を行うことができます")
+st.write("変数の選択　→　t検定　→　表　→　解釈の補助を行います")
 st.write("")
 
-st.subheader("【注意事項】")
-st.write('<span style="color:red">群分け変数に数値(0、1等)は使わないでください。</span>',
-         unsafe_allow_html=True)
-st.write("また、Excelファイルに不備があるとエラーが出ます")
-st.write('<span style="color:blue">デフォルトでデモ用データの分析ができます。</span>',
-         unsafe_allow_html=True)
-st.write(
-    '<span style="color:blue">ファイルをアップせずに「データフレームの表示」ボタンを押すと　'
-    'デモ用のデータを確認できます。</span>',
-    unsafe_allow_html=True)
-st.write('<span style="color:red">欠損値を含むレコード（行）は自動で削除されます。</span>',
-         unsafe_allow_html=True)
-
-code = '''
-#使用ライブラリ
-import streamlit as st
-import pandas as pd
-from scipy import stats
-from PIL import Image
-from statistics import median, variance
-'''
-
-st.code(code, language='python')
-
-# Excelデータの例
+# 分析のイメージ
 image = Image.open('ttest.png')
 st.image(image)
 
-# 変数設定の注意点
-if st.checkbox('注意点の表示（クリックで開きます）'):
-    attentionImage = Image.open('ttest_attention.png')
-    st.image(attentionImage)
+# ファイルアップローダー
+uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
 
-# デモ用ファイル
-df = pd.read_excel('ttest_demo.xlsx', sheet_name=0)
+# デモデータを使うかどうかのチェックボックス
+use_demo_data = st.checkbox('デモデータを使用')
 
-# xlsx, csvファイルのアップロード
-upload_files = st.file_uploader("ファイルアップロード", type=['xlsx', 'csv'])
+# データフレームの作成
+df = None
+if use_demo_data:
+    df = pd.read_excel('ttest_demo.xlsx', sheet_name=0)
+    st.write(df.head())
+else:
+    if uploaded_file is not None:
+        if uploaded_file.type == 'text/csv':
+            df = pd.read_csv(uploaded_file)
+            st.write(df.head())
+        else:
+            df = pd.read_excel(uploaded_file)
+            st.write(df.head())
 
-# xlsx, csvファイルの読み込み → データフレームにセット
-if upload_files:
-    # dfを初期化
-    df.drop(range(len(df)))
-    # ファイルの拡張子によって読み込み方法を変える
-    if upload_files.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-        # xlsxファイルの読み込み → データフレームにセット
-        df = pd.read_excel(upload_files, sheet_name=0)
-    elif upload_files.type == 'text/csv':
-        # csvファイルの読み込み → データフレームにセット
-        df = pd.read_csv(upload_files)
-    # 欠損値を含むレコードを削除
-    df.dropna(how='any', inplace=True)
+if df is not None:
+    # カテゴリ変数の抽出
+    categorical_cols = df.select_dtypes(include=['object', 'category']).columns.tolist()
+    # 数値変数の抽出
+    numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
 
-# データフレーム表示ボタン
-if st.checkbox('データフレームの表示（クリックで開きます）'):
-    st.dataframe(df, width=0)
+    # カテゴリ変数の選択
+    st.subheader("カテゴリ変数の選択")
+    cat_var = st.multiselect('カテゴリ変数を選択してください', categorical_cols)
 
-# 変数選択フォーム
-with st.form(key='variable_form'):
-    st.subheader("分析に使用する変数の選択")
-    st.write("")
-    st.write(
-        "ファイルをアップロードした場合、確認ボタンを２回押さないと独立変数の判定が出ません（アップデート予定）")
+    # 数値変数の選択
+    st.subheader("数値変数の選択")
+    num_vars = st.multiselect('数値変数を選択してください', numerical_cols)
 
-    # 独立変数と従属変数のセット
-    ivList = df.columns.tolist()
-    dvList = df.columns.tolist()
-
-    # セレクトボックス（独立変数）
-    IndependentVariable = st.selectbox(
-        '独立変数（群分け変数）※必ず２群にしてください',
-        ivList)
-
-    # 独立変数が２群になっているか確認
-    ivLen = len(df[IndependentVariable].unique())
-    ivType = df[IndependentVariable].dtypes
-
-    if ivLen != 2:
+    if cat_var != 2:
         st.error("独立変数が2群になっていないため、分析を実行できません")
-    elif ivType != 'object':
-        st.error("独立変数が数値になっているため、分析を実行できません")
-        st.write(
-            '<span style="color:red">独立変数を文字列にして、再度アップロードしてください。</span>',
-            unsafe_allow_html=True)
-        st.write(
-            '<span style="color:red">　例１）男性・女性</span>',
-            unsafe_allow_html=True)
-        st.write(
-            '<span style="color:red">　例２）１年・２年</span>',
-            unsafe_allow_html=True)
+    
     else:
-        st.success("分析可能な独立変数です")
-
-    # 従属変数のリストから独立変数を削除（独立変数を従属変数に入れないため）
-    # dvList.remove(IndependentVariable)
-
-    # 複数選択（従属変数）
-    DependentVariable = st.multiselect(
-        '従属変数（複数選択可）',
-        dvList)
-
-    st.write(
-        '<span style="color:blue">【注意】従属変数に数値以外のものがある場合、分析できません</span>',
-        unsafe_allow_html=True)
-
-    # 確認ボタンの表示
-    CHECK_btn = st.form_submit_button('確認')
-
-# 分析前の確認フォーム
-with st.form(key='check_form'):
-    if CHECK_btn:
+        st.success("分析可能な変数を選択しました。分析を実行します。")
+        
         # 独立変数から重複のないデータを抽出し、リストに変換
-        DivideVariable = df[IndependentVariable].unique().tolist()
-
+        xcat_var_d = df[cat_var].unique().tolist()
         st.subheader('【分析前の確認】')
-        st.write(
-            f'{IndependentVariable}'
-            f'（{DivideVariable[0]}・{DivideVariable[1]}）によって')
+        st.write(f'カテゴリ変数： {cat_var[0]}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、以下の数値変数に有意な差が生まれるか検定します。')
 
-        n = 0
-        dvRangeView = len(DependentVariable)
-        for dvListView in range(dvRangeView):
-            st.write(f'● 'f'{(DependentVariable[n])}')
-            n += 1
-        st.write('　に有意な差が生まれるか検定します。')
+        for num_var in num_vars:
+            st.write(f'● {num_var}')
 
-    # 分析実行ボタンの表示
-    TTEST_btn = st.form_submit_button('分析実行')
+        # t検定の実行
+        if st.button('t検定の実行'):
+            st.subheader('【分析結果】')
+            st.write('【要約統計量】')
 
-# 分析結果表示フォーム
-with st.form(key='analyze_form'):
-    if TTEST_btn:
-        st.subheader('【分析結果】')
-        st.write('【要約統計量】')
-        # 独立変数の要素の数を取得
-        dvRange = len(DependentVariable)
+            # 数値変数の要素の数を取得
+            num_range = len(num_vars)
 
-        # 各値の初期化
-        n = 1
-        summaryList = [DependentVariable]
-        summaryColumns = ["有効N", "平均値", "中央値", "標準偏差", "分散",
-                          "最小値", "最大値"]
+            # 各値の初期化
+            n = 1
+            summaryList = [num_vars]
+            summaryColumns = ["有効N", "平均値", "中央値", "標準偏差", "分散",
+                            "最小値", "最大値"]
 
-        # 目的変数、従属変数から作業用データフレームのセット
-        df00_list = [IndependentVariable]
-        df00_list = df00_list + DependentVariable
-        df00 = df[df00_list]
+            # 目的変数、従属変数から作業用データフレームのセット
+            df00_list = [cat_var]
+            df00_list = df00_list + num_vars
+            df00 = df[df00_list]
 
-        # サマリ(df0)用のデータフレームのセット
-        df0 = pd.DataFrame(index=summaryList, columns=summaryColumns)
+            # サマリ(df0)用のデータフレームのセット
+            df0 = pd.DataFrame(index=summaryList, columns=summaryColumns)
 
-        # サマリ(df0)用のデータフレームに平均値と標準偏差を追加
-        for summary in range(dvRange):
-            # 列データの取得（nは従属変数の配列番号）
-            y = df00.iloc[:, n]
+            # サマリ(df0)用のデータフレームに平均値と標準偏差を追加
+            for summary in range(num_range):
+                # 列データの取得（nは従属変数の配列番号）
+                y = df00.iloc[:, n]
 
-            # 従属変数の列データの計算処理
-            df0.at[df00.columns[n], '有効N'] = len(y)
-            df0.at[df00.columns[n], '平均値'] = y.mean()
-            df0.at[df00.columns[n], '中央値'] = median(y)
-            df0.at[df00.columns[n], '標準偏差'] = y.std()
-            df0.at[df00.columns[n], '分散'] = variance(y)
-            df0.at[df00.columns[n], '最小値'] = y.min()
-            df0.at[df00.columns[n], '最大値'] = y.max()
-            n += 1
+                # 従属変数の列データの計算処理
+                df0.at[df00.columns[n], '有効N'] = len(y)
+                df0.at[df00.columns[n], '平均値'] = y.mean()
+                df0.at[df00.columns[n], '中央値'] = median(y)
+                df0.at[df00.columns[n], '標準偏差'] = y.std()
+                df0.at[df00.columns[n], '分散'] = variance(y)
+                df0.at[df00.columns[n], '最小値'] = y.min()
+                df0.at[df00.columns[n], '最大値'] = y.max()
+                n += 1
 
-        # 要約統計量（サマリ）のデータフレームを表示
-        st.dataframe(df0)
+            # 要約統計量（サマリ）のデータフレームを表示
+            st.dataframe(df0)
 
-        st.write('【平均値の差の検定】')
 
-        DivideVariable = df00[IndependentVariable].unique().tolist()
-
-        # 独立変数の要素の数を取得
-        dvRange = len(DependentVariable)
-
-        # 各値の初期化
-        n = 1
-        summaryList = [DependentVariable]
-
-        # t検定結果用データフレーム（df1）の列を指定
-        summaryColumns = ['全体M', '全体S.D', DivideVariable[0] + "M",
-                          DivideVariable[0] + "S.D", DivideVariable[1] + "M",
-                          DivideVariable[1] + "S.D", 'df', 't', 'p', 'sign',
-                          'd']
-        df1 = pd.DataFrame(index=summaryList, columns=summaryColumns)
-
-        for summary in range(dvRange):
-            # 列データの取得（nは従属変数の配列番号）
-            y = df00.iloc[:, n]
-
-            # df（元データ）男性でフィルターしたデータフレームをセット
-            dv0 = df00[df00[IndependentVariable] == DivideVariable[0]]
-            dv1 = df00[df00[IndependentVariable] == DivideVariable[1]]
-
-            # フィルターした列データの取得（nは従属変数の配列番号）
-            dv0y = dv0.iloc[:, n]
-            dv1y = dv1.iloc[:, n]
-
-            # t値、p値、s（全体標準偏差）、d値（効果量）の取得
-            ttest = stats.ttest_ind(dv0y, dv1y, equal_var=False)
-            t = abs(ttest[0])
-            p = ttest[1]
-            s = y.std()
-            dv0ym = dv0y.mean()
-            dv1ym = dv1y.mean()
-            d_beta = dv0ym - dv1ym
-            d = abs(d_beta) / s
-
-            # p値の判定をsignに格納
-            sign = ""
-            if p < 0.01:
-                sign = "**"
-            elif p < 0.05:
-                sign = "*"
-            elif p < 0.1:
-                sign = "†"
-            else:
-                sign = "n.s."
-
-            # 従属変数の列データの計算処理
-            df1.at[df00.columns[n], '全体M'] = y.mean()
-            df1.at[df00.columns[n], '全体S.D'] = y.std()
-            df1.at[df00.columns[n], DivideVariable[0] + "M"] = dv0y.mean()
-            df1.at[df00.columns[n], DivideVariable[0] + "S.D"] = dv0y.std()
-            df1.at[df00.columns[n], DivideVariable[1] + "M"] = dv1y.mean()
-            df1.at[df00.columns[n], DivideVariable[1] + "S.D"] = dv1y.std()
-            df1.at[df00.columns[n], 'df'] = len(y) - 1
-            df1.at[df00.columns[n], 't'] = t
-            df1.at[df00.columns[n], 'p'] = p
-            df1.at[df00.columns[n], 'sign'] = sign
-            df1.at[df00.columns[n], 'd'] = d
-
-            n += 1
-
-        st.dataframe(df1)
-
-        # サンプルサイズの取得
-        sample_n = len(df00)
-        sample_0 = len(dv0)
-        sample_1 = len(dv1)
-
-        st.write('【サンプルサイズ】')
-        st.write(f'全体N ＝'f'{sample_n}')
-        st.write(f'● {DivideVariable[0]}：'f'{sample_0}')
-        st.write(f'● {DivideVariable[1]}：'f'{sample_1}')
-
-        st.write('【分析結果の解釈】')
-
-        # 各値の初期化、簡素化
-        n = 0
-        d0 = DivideVariable[0]
-        d1 = DivideVariable[1]
-        iv = IndependentVariable
-
-        # sign の列番号を取得
-        sign_n = df1.columns.get_loc('sign')
-        # DivideVariable[0] + 'M' の列番号を取得
-        d0n = df1.columns.get_loc(d0 + "M")
-        # DivideVariable[1] + 'M' の列番号を取得
-        d1n = df1.columns.get_loc(d1 + "M")
-
-        # Set the style of seaborn for better graphs
-        sns.set(style="whitegrid")
-
-        for interpretation in range(dvRange):
-            dn = DependentVariable[n]
-
-            # データフレームから独立変数と従属変数のデータを取得
-            data = df00[[iv, dn]]
-
-            if df1.iat[n, sign_n] == "**":
-                if df1.iat[n, d0n] > df1.iat[n, d1n]:
-                    st.write(
-                        f'{iv}によって【'f'{dn}】には有位な差が生まれる'f'（{d0}＞'f'{d1}）')
-                elif df1.iat[n, d0n] < df1.iat[n, d1n]:
-                    st.write(
-                        f'{iv}によって【'f'{dn}】には有意な差が生まれる'f'（{d1}＞'f'{d0}）')
-            elif df1.iat[n, sign_n] == "*":
-                if df1.iat[n, d0n] > df1.iat[n, d1n]:
-                    st.write(
-                        f'{iv}によって【'f'{dn}】には有意な差が生まれる'f'（{d0}＞'f'{d1}）')
-                elif df1.iat[n, d0n] < df1.iat[n, d1n]:
-                    st.write(
-                        f'{iv}によって【'f'{dn}】には有意な差が生まれる'f'（{d1}＞'f'{d0}）')
-            elif df1.iat[n, sign_n] == "†":
-                if df1.iat[n, d0n] > df1.iat[n, d1n]:
-                    st.write(
-                        f'{iv}によって【'f'{dn}】には有意な差が生まれる傾向にある'f'（{d0}＞'f'{d1}）')
-                elif df1.iat[n, d0n] < df1.iat[n, d1n]:
-                    st.write(
-                        f'{iv}によって【'f'{dn}】には有意な差が生まれる傾向にある'f'（{d1}＞'f'{d0}）')
-            elif df1.iat[n, sign_n] == "n.s.":
-                st.write(f'{iv}によって【'f'{dn}】には有意な差が生まれない')
-
-            data = pd.DataFrame({
-            '群': [DivideVariable[0], DivideVariable[1]],
-            '平均値': [df1.iat[n, df1.columns.get_loc(DivideVariable[0] + "M")], df1.iat[n, df1.columns.get_loc(DivideVariable[1] + "M")]],
-            '誤差': [df1.iat[n, df1.columns.get_loc(DivideVariable[0] + "S.D")], df1.iat[n, df1.columns.get_loc(DivideVariable[1] + "S.D")]]
-            })
-
-            # グラフのサイズを設定し、FigureオブジェクトとAxesオブジェクトを取得
-            fig, ax = plt.subplots(figsize=(8, 6))
-
-            # seaborn の barplot を使って棒グラフを描画
-            sns.barplot(x='群', y='平均値', data=data, ax=ax, capsize=0.1, errcolor='black', errwidth=1)
-            ax.errorbar(x=data['群'], y=data['平均値'], yerr=data['誤差'], fmt='none', c='black', capsize=3)
-            
-            # グラフのタイトルを設定
-            ax.set_title(f'平均値の比較： {dn}')
-
-            # streamlit を使ってグラフをウェブブラウザ上に表示
-            st.pyplot(fig)
-
-            n += 1
-
-        TTEST_btn = st.form_submit_button('OK')
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
