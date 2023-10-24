@@ -104,8 +104,8 @@ if df is not None:
                 df0.at[df00.columns[n], '有効N'] = len(y)
                 df0.at[df00.columns[n], '平均値'] = y.mean()
                 df0.at[df00.columns[n], '中央値'] = median(y)
-                df0.at[df00.columns[n], '標準偏差'] = y.std()
-                df0.at[df00.columns[n], '分散'] = variance(y)
+                df0.at[df00.columns[n], '標準偏差'] = y.std().round(2)
+                df0.at[df00.columns[n], '分散'] = variance(y).round(2)
                 df0.at[df00.columns[n], '最小値'] = y.min()
                 df0.at[df00.columns[n], '最大値'] = y.max()
                 n += 1
