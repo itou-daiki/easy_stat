@@ -59,7 +59,7 @@ if df is not None:
         st.pyplot(fig)
         
         # 相関の解釈
-        st.subheader('相関の解釈:')
+        st.subheader('解釈の補助')
         for i, col1 in enumerate(selected_cols):
             for j, col2 in enumerate(selected_cols):
                 if i < j:
