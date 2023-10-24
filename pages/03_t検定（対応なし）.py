@@ -55,8 +55,8 @@ if df is not None:
 
     st.write(cat_var)
 
-    if len(df[cat_var].unique()) != 2:
-        st.write(len(df[cat_var].unique()))
+    if len(df[cat_var].unique().tolist) != 2:
+        st.write(len(df[cat_var].unique().tolist))
         st.error("独立変数が2群になっていないため、分析を実行できません")
     
     else:
