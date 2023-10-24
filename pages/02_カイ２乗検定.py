@@ -57,7 +57,6 @@ if df is not None:
     # クロス表の作成と表示
     crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
     st.subheader(f'【{selected_col1}】 と 【{selected_col2}】 のクロス表')
-    st.write(crosstab)
 
     # カイ２乗検定の実行
     chi2, p_value, dof, expected = stats.chi2_contingency(crosstab)
