@@ -49,7 +49,7 @@ if df is not None:
 
     # カテゴリ変数の可視化
     for col in categorical_cols:
-        st.subheader(f'{col} の可視化 （カテゴリ変数）')
+        st.markdown(f'###{col} の可視化 （カテゴリ変数）')
 
         # 並び替えのオプションを選択するためのセレクトボックスを追加
         sort_order = st.selectbox(
@@ -77,7 +77,7 @@ if df is not None:
 
     # 数値変数の可視化
     for col in numerical_cols:
-        st.subheader(f'{col} の可視化 （数値変数）')
+        st.markdown(f'###{col} の可視化 （数値変数）')
         fig = px.histogram(df, x=col)
         fig.update_layout(bargap=0.2)
         st.plotly_chart(fig)
@@ -86,7 +86,7 @@ if df is not None:
 
     # アップロードされたデータセットに数値変数が含まれている場合
     if numerical_cols:
-        st.subheader('全ての数値変数の箱ひげ図')
+        st.markdown(f'###全ての数値変数の箱ひげ図')
         fig = px.box(df, x=numerical_cols, points="all")
         st.plotly_chart(fig)
 
