@@ -62,10 +62,12 @@ if df is not None:
         # 独立変数から重複のないデータを抽出し、リストに変換
         xcat_var_d = df[cat_var].iloc[:, 0].unique().tolist()
         st.subheader('【分析前の確認】')
-        st.write(f'カテゴリ変数： {cat_var}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、以下の数値変数に有意な差が生まれるか検定します。')
+        st.write(f'{cat_var}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
 
         for num_var in num_vars:
             st.write(f'● {num_var}')
+
+        st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
         # t検定の実行
         if st.button('t検定の実行'):
