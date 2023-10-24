@@ -126,6 +126,10 @@ if df is not None:
         title=f'【{selected_col1}】 と 【{selected_col2}】 の観測度数ヒートマップ'
     )
 
+    # ヒートマップに観測度数を表示
+    fig_heatmap.update_traces(text=crosstab.iloc[:-1, :-1].values, selector=dict(type='heatmap'))
+    fig_heatmap.update_layout(scene=dict(aspectmode="manual", aspectratio=dict(x=1, y=1, z=0.05)))
+
     # ヒートマップの表示
     st.plotly_chart(fig_heatmap)
 
