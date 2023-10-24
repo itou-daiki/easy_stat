@@ -54,7 +54,7 @@ if df is not None:
         st.dataframe(corr_matrix)
         
         # ヒートマップの表示
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig, ax = plt.subplots(figsize=(6, 4))
         sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm', ax=ax)
         st.pyplot(fig)
         
