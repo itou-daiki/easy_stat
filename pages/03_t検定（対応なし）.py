@@ -104,17 +104,15 @@ if df is not None:
                 df0.at[df00.columns[n], '有効N'] = len(y)
                 df0.at[df00.columns[n], '平均値'] = y.mean()
                 df0.at[df00.columns[n], '中央値'] = median(y)
-                df0.at[df00.columns[n], '標準偏差'] = y.std().round(2)
-                df0.at[df00.columns[n], '分散'] = variance(y).round(2)
+                df0.at[df00.columns[n], '標準偏差'] = y.std()
+                df0.at[df00.columns[n], '分散'] = variance(y)
                 df0.at[df00.columns[n], '最小値'] = y.min()
                 df0.at[df00.columns[n], '最大値'] = y.max()
                 n += 1
 
-            # 有効桁数を調整
-            numeric_columns = df0.select_dtypes(include=['float64', 'int64']).columns
-            df0[numeric_columns] = df0[numeric_columns].round(2)       
+      
             # 要約統計量（サマリ）のデータフレームを表示
-            st.dataframe(df0)
+            st.dataframe(df0.style.apply.format("{:.2f}"))
 
 
 
