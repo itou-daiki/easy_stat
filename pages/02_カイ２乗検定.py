@@ -50,21 +50,29 @@ if df is not None:
 
     # 選択した変数の度数分布のバープロット
     st.subheader(f'【{selected_col1}】 と 【{selected_col2}】 の度数分布')
-    count1 = df[selected_col1].value_counts()
-    count2 = df[selected_col2].value_counts()
+    
+    # クロス表の作成
+    crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
 
+    # クロス表を長い形式に変換
+    crosstab_long = crosstab.reset_index().melt(id_vars=selected_col1, value_name='度数')
+
+    # プロットの作成
     fig = px.bar(
-        x=count1.index.tolist() + count2.index.tolist(),
-        y=count1.values.tolist() + count2.values.tolist(),
-        color=['変数1'] * len(count1) + ['変数2'] * len(count2),
-        labels={'x': 'カテゴリ', 'y': '度数', 'color': '変数'},
+        crosstab_long,
+        x=selected_col2,
+        y='度数',
+        color=selected_col1,
+        barmode='group',
+        labels={selected_col1: 'カテゴリ', selected_col2: 'サブカテゴリ', '度数': '度数'},
         title=f'【{selected_col1}】 と 【{selected_col2}】 の度数分布'
     )
 
+    # グラフの表示
     st.plotly_chart(fig)
 
     # クロス表の作成と表示
-    crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
+    # crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
     st.subheader(f'【{selected_col1}】 と 【{selected_col2}】 のクロス表')
 
     # カイ２乗検定の実行
