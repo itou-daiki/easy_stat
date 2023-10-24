@@ -49,10 +49,19 @@ if df is not None:
     selected_col2 = st.selectbox('変数2を選択してください', categorical_cols, key='select2')
 
     # 選択した変数の度数分布のバープロット
-    for col in [selected_col1, selected_col2]:
-        st.subheader(f"【{col}】 の度数分布")
-        fig = px.bar(df, x=df[col].value_counts().index, y=df[col].value_counts().values, labels={df[col].name: '度数'})
-        st.plotly_chart(fig)
+    st.subheader(f'【{selected_col1}】 と 【{selected_col2}】 の度数分布')
+    count1 = df[selected_col1].value_counts()
+    count2 = df[selected_col2].value_counts()
+
+    fig = px.bar(
+        x=count1.index.tolist() + count2.index.tolist(),
+        y=count1.values.tolist() + count2.values.tolist(),
+        color=['変数1'] * len(count1) + ['変数2'] * len(count2),
+        labels={'x': 'カテゴリ', 'y': '度数', 'color': '変数'},
+        title=f'【{selected_col1}】 と 【{selected_col2}】 の度数分布'
+    )
+
+    st.plotly_chart(fig)
 
     # クロス表の作成と表示
     crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
