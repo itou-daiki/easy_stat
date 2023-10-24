@@ -53,8 +53,8 @@ if df is not None:
     st.subheader("数値変数の選択")
     num_vars = st.multiselect('数値変数を選択してください', numerical_cols)
 
-    if len(cat_var) != 2:
-        st.write(len(cat_var))
+    if len(cat_var.unique) != 2:
+        st.write(len(cat_var.unique))
         st.error("独立変数が2群になっていないため、分析を実行できません")
     
     else:
