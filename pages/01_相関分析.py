@@ -56,7 +56,24 @@ if df is not None:
         
         # ヒートマップの表示 (plotly.expressを使用)
         fig = px.imshow(corr_matrix, color_continuous_scale='rdbu', labels=dict(color="相関係数"))
-        fig.update_layout(title="相関係数のヒートマップ")
+
+        # アノテーションの追加 (相関係数の数値をセルに表示)
+        annotations = []
+        for i, row in enumerate(corr_matrix.values):
+            for j, value in enumerate(row):
+                annotations.append({
+                    'x': j,
+                    'y': i,
+                    'xref': 'x',
+                    'yref': 'y',
+                    'text': f"{value:.2f}",
+                    'showarrow': False,
+                    'font': {
+                        'color': 'black' if -0.5 < value < 0.5 else 'white'
+                    }
+                })
+
+        fig.update_layout(title="相関係数のヒートマップ", annotations=annotations)
         st.plotly_chart(fig)
         
         # 相関の解釈
