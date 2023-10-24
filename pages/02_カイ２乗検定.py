@@ -10,9 +10,10 @@ from PIL import Image
 
 st.set_page_config(page_title="カイ２乗分析", layout="wide")
 
-st.title("カイ２乗分析ウェブアプリ")
-
-st.write("度数の偏りを分析することができます")
+st.title("カイ２乗分析")
+st.caption("Created by Daiki Ito")
+st.write("２つの変数からクロス表やヒートマップを出力し、度数の偏りを解釈する補助を行います。")
+st.write("")
 
 # 分析のイメージ
 image = Image.open('chi_square.png')

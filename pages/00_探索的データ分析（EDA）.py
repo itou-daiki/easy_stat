@@ -4,13 +4,15 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 
+
+
+
+
 st.set_page_config(page_title="探索的データ解析（EDA）", layout="wide")
 
 st.title("探索的データ解析（EDA）")
 st.caption("Created by Daiki Ito")
-st.write("")
-st.subheader("簡易的な探索的データ解析（EDA）が実行できます")
-st.write("iPad等でも分析を行うことができます")
+st.write("簡易的な探索的データ解析（EDA）が実行できます")
 st.write("")
 
 # ファイルアップローダー

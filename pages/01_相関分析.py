@@ -6,11 +6,14 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 from PIL import Image
 
+
+
 st.set_page_config(page_title="相関分析", layout="wide")
 
-st.title("相関分析ウェブアプリ")
-
-st.write("相関係数のヒートマップを生成し、相関の強さを視覚的に確認できます。")
+st.title("相関分析")
+st.caption("Created by Daiki Ito")
+st.write("２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。")
+st.write("")
 
 # 分析のイメージ
 image = Image.open('correlation.png')
