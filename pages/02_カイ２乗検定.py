@@ -55,7 +55,14 @@ if df is not None:
             # カイ２乗分析
             crosstab = pd.crosstab(df[col], columns="count")
             chi2, p_value, dof, expected = stats.chi2_contingency(crosstab)
-            st.write(f"カイ２乗統計量: {chi2:.2f}")
-            st.write(f"P値: {p_value:.2f}")
+            
+            # 結果をデータフレームに格納
+            results_df = pd.DataFrame({
+                "項目": ["カイ二乗統計量", "P値", "自由度"],
+                "値": [chi2, p_value, dof]
+            })
+            
+            # 結果のデータフレームを表示
+            st.dataframe(results_df)
     else:
         st.warning('少なくとも1つのカテゴリ変数を選択してください。')
