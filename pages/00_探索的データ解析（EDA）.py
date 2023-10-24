@@ -79,13 +79,13 @@ if df is not None:
         st.subheader(f'{col} の可視化 （数値変数）')
         fig = px.histogram(df, x=col)
         st.plotly_chart(fig)
-        fig = px.box(df, x=col, meanline_visible=True)
+        fig = px.box(df, x=col)
         st.plotly_chart(fig)
 
     # アップロードされたデータセットに数値変数が含まれている場合
     if numerical_cols:
         st.subheader('全ての数値変数の箱ひげ図')
-        fig = px.box(df, x=numerical_cols, points="all", meanline_visible=True)
+        fig = px.box(df, x=numerical_cols, points="all")
         st.plotly_chart(fig)
 
 
