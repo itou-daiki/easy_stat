@@ -41,7 +41,7 @@ if df is not None:
 
     # 数値変数の選択
     st.subheader("数値変数の選択")
-    selected_cols = st.multiselect('数値変数を選択してください', numerical_cols, default=numerical_cols)
+    selected_cols = st.multiselect('数値変数を選択してください', numerical_cols)
     
     if len(selected_cols) < 2:
         st.write('少なくとも2つの変数を選択してください。')
