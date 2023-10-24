@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.figure_factory as ff
+import seaborn as sns
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 from PIL import Image
