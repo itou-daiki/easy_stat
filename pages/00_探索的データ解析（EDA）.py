@@ -75,10 +75,10 @@ if df is not None:
 
     # 数値変数の可視化
     for col in numerical_cols:
-        fig = px.histogram(df, x=col)
+        fig = px.histogram(df, x=col, title=f'{col} の可視化（ヒストグラム）')
         fig.update_layout(bargap=0.2)
         st.plotly_chart(fig)
-        fig = px.box(df, x=col, title=f'{col} の可視化')
+        fig = px.box(df, x=col, title=f'{col} の可視化（箱ひげ図）')
         st.plotly_chart(fig)
 
     # アップロードされたデータセットに数値変数が含まれている場合
