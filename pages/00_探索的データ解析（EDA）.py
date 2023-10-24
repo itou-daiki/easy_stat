@@ -51,7 +51,7 @@ if df is not None:
     for col in categorical_cols:
         # 並び替えのオプションを選択するためのセレクトボックスを追加
         sort_order = st.selectbox(
-            f'{col} の並び替え順を選択してください',
+            f'【{col}】 の並び替え順を選択してください',
             ('度数', '名前順'),
             key=col  # このキーは各カテゴリ変数に対してユニークであることを確保します
         )
@@ -68,23 +68,23 @@ if df is not None:
             x=value_counts.index,
             y=value_counts.values,
             labels={'x': col, 'y': 'Count'},
-            title=f'{col} の可視化 （{sort_order}）'
+            title=f'【{col}】 の可視化 （{sort_order}）'
         )
         fig.update_layout(bargap=0.2)
         st.plotly_chart(fig)
 
     # 数値変数の可視化
     for col in numerical_cols:
-        fig = px.histogram(df, x=col, title=f'{col} の可視化（ヒストグラム）')
+        fig = px.histogram(df, x=col, title=f'【{col}】 の可視化（ヒストグラム）')
         fig.update_layout(bargap=0.2)
         st.plotly_chart(fig)
-        fig = px.box(df, x=col, title=f'{col} の可視化（箱ひげ図）')
+        fig = px.box(df, x=col, title=f'【{col}】 の可視化（箱ひげ図）')
         st.plotly_chart(fig)
 
     # アップロードされたデータセットに数値変数が含まれている場合
     if numerical_cols:
         st.markdown(f'###全ての数値変数の箱ひげ図')
-        fig = px.box(df, x=numerical_cols, points="all", title=f'{col} の可視化')
+        fig = px.box(df, x=numerical_cols, points="all", title=f'【{col}】 の可視化')
         st.plotly_chart(fig)
 
 
@@ -101,12 +101,12 @@ if df is not None:
         # カテゴリ×カテゴリ
         if var1 in categorical_cols and var2 in categorical_cols:
             cross_tab = pd.crosstab(df[var1], df[var2])
-            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'度数： {var1} × {var2}')
+            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'度数： 【{var1}】 × 【{var2}】')
             st.plotly_chart(fig)
 
         # 数値×数値
         elif var1 in numerical_cols and var2 in numerical_cols:
-            fig = px.scatter(df, x=var1, y=var2, title=f'散布図： {var1} × {var2}')
+            fig = px.scatter(df, x=var1, y=var2, title=f'散布図： 【{var1}】 × 【{var2}】')
             st.plotly_chart(fig)
             st.write(f'相関係数： {df[var1].corr(df[var2]):.2f}')
         
@@ -117,7 +117,7 @@ if df is not None:
             else:
                 cat_var, num_var = var2, var1
             
-            fig = px.box(df, x=cat_var, y=num_var, title=f'箱ひげ図： {cat_var} × {num_var}')
+            fig = px.box(df, x=cat_var, y=num_var, title=f'箱ひげ図： 【{cat_var}】 × 【{num_var}】')
             st.plotly_chart(fig)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
