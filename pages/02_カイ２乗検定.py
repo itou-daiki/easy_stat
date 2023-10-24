@@ -42,38 +42,20 @@ if df is not None:
 
     # カテゴリ変数の選択
     st.subheader("カテゴリ変数の選択")
-    selected_cols = st.multiselect('カテゴリ変数を選択してください', categorical_cols)
+    selected_col1 = st.selectbox('変数1を選択してください', categorical_cols, key='select1')
+    categorical_cols.remove(selected_col1)  # 選択済みの変数をリストから削除
+    selected_col2 = st.selectbox('変数2を選択してください', categorical_cols, key='select2')
 
-    if len(selected_cols) > 0:
-        for col in selected_cols:
-            st.subheader(f"{col} の度数分布")
-            # 度数分布のバープロット (Plotlyを使用)
-            fig = px.bar(df, x=df[col].value_counts().index, y=df[col].value_counts().values, labels={df[col].name: '度数'})
-            st.plotly_chart(fig)
+    # 選択した変数の度数分布のバープロット
+    for col in [selected_col1, selected_col2]:
+        st.subheader(f"{col} の度数分布")
+        fig = px.bar(df, x=df[col].value_counts().index, y=df[col].value_counts().values, labels={df[col].name: '度数'})
+        st.plotly_chart(fig)
 
-            # カイ２乗分析
-            crosstab = pd.crosstab(df[col], columns="count")
-            chi2, p_value, dof, expected = stats.chi2_contingency(crosstab)
-            
-            # 結果をデータフレームに格納
-            results_df = pd.DataFrame({
-                "項目": ["カイ二乗統計量", "P値", "自由度"],
-                "値": [chi2, p_value, dof]
-            })
-
-            # クロス表を表示
-            st.write('クロス表:')
-            st.write(crosstab)
-            
-            # 結果のデータフレームを表示
-            st.write('カイ二乗分析結果:')
-            st.dataframe(results_df)
-            
-            # 有意差がある場合は、明示的に表示
-            if p_value < 0.05:
-                st.markdown(f'### {col} には **有意差** があります!')
-    else:
-        st.warning('少なくとも1つのカテゴリ変数を選択してください。')
+    # クロス表の作成と表示
+    crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
+    st.subheader(f'{selected_col1} と {selected_col2} のクロス表')
+    st.write(crosstab)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
