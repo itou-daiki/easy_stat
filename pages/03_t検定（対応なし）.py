@@ -53,10 +53,7 @@ if df is not None:
     st.subheader("数値変数の選択")
     num_vars = st.multiselect('数値変数を選択してください', numerical_cols)
 
-    st.write(df[cat_var])
-
     if len(df[cat_var].iloc[:, 0].unique()) != 2:
-        st.write(len(df[cat_var].iloc[:, 0].unique()))
         st.error("独立変数が2群になっていないため、分析を実行できません")
     
     else:
@@ -65,7 +62,7 @@ if df is not None:
         # 独立変数から重複のないデータを抽出し、リストに変換
         xcat_var_d = df[cat_var].unique().tolist()
         st.subheader('【分析前の確認】')
-        st.write(f'カテゴリ変数： {cat_var[0]}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、以下の数値変数に有意な差が生まれるか検定します。')
+        st.write(f'カテゴリ変数： {cat_var}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、以下の数値変数に有意な差が生まれるか検定します。')
 
         for num_var in num_vars:
             st.write(f'● {num_var}')
