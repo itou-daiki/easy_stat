@@ -90,6 +90,8 @@ if df is not None:
 
             # サマリ(df0)用のデータフレームのセット
             df0 = pd.DataFrame(index=summaryList, columns=summaryColumns)
+            # 有効桁数を調整
+            df0 = df0.round(2)
 
             # サマリ(df0)用のデータフレームに平均値と標準偏差を追加
             for summary in range(num_range):
