@@ -138,7 +138,8 @@ if df is not None:
             y=num_var,
             color=cat_var2,
             facet_col=cat_var2,
-            labels={num_var: '平均 ' + num_var, cat_var1: cat_var1, cat_var2: cat_var2},
+            labels={num_var: 'AVE: ' + num_var},
+            # , cat_var1: cat_var1, cat_var2: cat_var2
             title=f'【{cat_var1}】 と 【{cat_var2}】 による 【{num_var}】 の比較'
         )
         # グラフのレイアウトを更新（オプショナル）
