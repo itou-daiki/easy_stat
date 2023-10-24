@@ -11,61 +11,71 @@ st.title("相関分析ウェブアプリ")
 
 st.write("相関係数のヒートマップを生成し、相関の強さを視覚的に確認できます。")
 
+# 分析のイメージ
+image = Image.open('correlation.png')
+st.image(image)
+
 # ファイルアップローダー
 uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
 
-if uploaded_file is not None:
-    if uploaded_file.type == 'text/csv':
-        df = pd.read_csv(uploaded_file)
-    else:
-        df = pd.read_excel(uploaded_file)
+# デモデータを使うかどうかのチェックボックス
+use_demo_data = st.checkbox('デモデータを使用')
+
+# データフレームの作成
+df = None
+if use_demo_data:
+    df = pd.read_excel('eda_demo.xlsx', sheet_name=0)
+    st.write(df.head())
+else:
+    if uploaded_file is not None:
+        if uploaded_file.type == 'text/csv':
+            df = pd.read_csv(uploaded_file)
+            st.write(df.head())
+        else:
+            df = pd.read_excel(uploaded_file)
+            st.write(df.head())
+
+if df is not None:
+    # 数値変数の抽出
+    numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
 
     # 数値変数の選択
-    numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
-    if numerical_cols:
-        selected_vars = st.multiselect('数値変数を選択してください:', numerical_cols)
-        if selected_vars:
-            sub_df = df[selected_vars]
-            
-            # 相関マトリックスの計算
-            correlation_matrix = sub_df.corr()
-            
-            # データフレームとして相関マトリックスを表示
-            st.subheader('相関マトリックス')
-            st.write(correlation_matrix)
-            
-            # ヒートマップの表示
-            st.subheader('ヒートマップ')
-            fig, ax = plt.subplots(figsize=(10, 8))
-            sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', ax=ax)
-            st.pyplot(fig)
-            
-            # 分析結果の解釈
-            st.subheader('分析結果の解釈')
-            for v1 in selected_vars:
-                for v2 in selected_vars:
-                    if v1 != v2:
-                        r = round(correlation_matrix.loc[v1, v2], 2)
-                        if 0.7 <= r <= 1.0:
-                            st.markdown(f'&#8203;``【oaicite:13】``&#8203;と&#8203;``【oaicite:12】``&#8203;の間には「強い正の相関」がある（ r = {r} )')
-                        elif 0.4 <= r < 0.7:
-                            st.markdown(f'&#8203;``【oaicite:11】``&#8203;と&#8203;``【oaicite:10】``&#8203;の間には「正の相関」がある（ r = {r} )')
-                        elif 0.2 <= r < 0.4:
-                            st.markdown(f'&#8203;``【oaicite:9】``&#8203;と&#8203;``【oaicite:8】``&#8203;の間には「弱い正の相関」がある（ r = {r} )')
-                        elif -0.2 <= r < 0.2:
-                            st.write(f'&#8203;``【oaicite:7】``&#8203;と&#8203;``【oaicite:6】``&#8203;の間には「相関がない」（ r = {r} )')
-                        elif -0.4 <= r < -0.2:
-                            st.markdown(f'&#8203;``【oaicite:5】``&#8203;と&#8203;``【oaicite:4】``&#8203;の間には「弱い負の相関」がある（ r = {r} )')
-                        elif -0.7 <= r < -0.4:
-                            st.markdown(f'&#8203;``【oaicite:3】``&#8203;と&#8203;``【oaicite:2】``&#8203;の間には「負の相関」がある（ r = {r} )')
-                        elif -1.0 <= r < -0.7:
-                            st.markdown(f'&#8203;``【oaicite:1】``&#8203;と&#8203;``【oaicite:0】``&#8203;の間には「強い負の相関」がある（ r = {r} )')
-        else:
-            st.warning('少なくとも1つの数値変数を選択してください。')
+    selected_cols = st.multiselect('数値変数を選択してください', numerical_cols, default=numerical_cols)
+    
+    if len(selected_cols) < 2:
+        st.write('少なくとも2つの変数を選択してください。')
     else:
-        st.error('アップロードされたデータセットに数値変数は含まれていません。')
-else:
-    st.warning('データセットをアップロードしてください。')
+        # 相関マトリックスの計算
+        corr_matrix = df[selected_cols].corr()
+        
+        # 相関マトリックスの表示
+        st.write('相関マトリックス:', corr_matrix)
+        
+        # ヒートマップの表示
+        fig, ax = plt.subplots(figsize=(10, 8))
+        sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm', ax=ax)
+        st.pyplot(fig)
+        
+        # 相関の解釈
+        st.write('相関の解釈:')
+        for i, col1 in enumerate(selected_cols):
+            for j, col2 in enumerate(selected_cols):
+                if i < j:
+                    correlation = corr_matrix.loc[col1, col2]
+                    description = f'{col1}と{col2}は'
+                    if correlation > 0.7:
+                        description += f'強い正の相関がある (r={correlation:.2f})'
+                    elif correlation > 0.3:
+                        description += f'中程度の正の相関がある (r={correlation:.2f})'
+                    elif correlation > -0.3:
+                        description += f'ほとんど相関がない (r={correlation:.2f})'
+                    elif correlation > -0.7:
+                        description += f'中程度の負の相関がある (r={correlation:.2f})'
+                    else:
+                        description += f'強い負の相関がある (r={correlation:.2f})'
+                    st.write(description)
+
+
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
