@@ -50,8 +50,28 @@ if df is not None:
     # カテゴリ変数の可視化
     for col in categorical_cols:
         st.subheader(f'{col} の可視化 （カテゴリ変数）')
+
+        # 並び替えのオプションを選択するためのセレクトボックスを追加
+        sort_order = st.selectbox(
+            f'{col} の並び替え順を選択してください',
+            ('度数の大きい順', '名前順'),
+            key=col  # このキーは各カテゴリ変数に対してユニークであることを確保します
+        )
+
         value_counts = df[col].value_counts()
-        fig = px.bar(x=value_counts.index, y=value_counts.values, labels={'x': col, 'y': 'Count'})
+
+        # 選択された並び替え順に基づいてデータを並び替え
+        if sort_order == '名前順':
+            value_counts = value_counts.sort_index()
+        else:
+            value_counts = value_counts.sort_values(ascending=False)
+
+        fig = px.bar(
+            x=value_counts.index,
+            y=value_counts.values,
+            labels={'x': col, 'y': 'Count'},
+            title=f'{col} の可視化 （{sort_order}）'
+        )
         st.plotly_chart(fig)
 
     # 数値変数の可視化
