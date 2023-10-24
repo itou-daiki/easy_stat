@@ -147,7 +147,6 @@ if df is not None:
             xaxis_title=cat_var1,
             yaxis_title=f'平均 {num_var}',
             margin=dict(l=0, r=0, t=60, b=0),
-            facet_col_spacing=0.05  # 列間のスペースを増やす
         )
 
         st.plotly_chart(fig)
