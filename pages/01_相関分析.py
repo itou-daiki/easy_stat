@@ -56,7 +56,7 @@ if df is not None:
         st.dataframe(corr_matrix)
         
         # ヒートマップの表示 (plotly.expressを使用)
-        fig = px.imshow(corr_matrix, color_continuous_scale='coolwarm', labels=dict(color="相関係数"))
+        fig = px.imshow(corr_matrix, color_continuous_scale='rdbu', labels=dict(color="相関係数"))
         fig.update_layout(title="相関係数のヒートマップ")
         st.plotly_chart(fig)
         
