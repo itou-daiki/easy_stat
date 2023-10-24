@@ -54,10 +54,6 @@ if df is not None:
     # クロス表の作成
     crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
 
-    # 合計の行と列を追加
-    crosstab['合計'] = crosstab.sum(axis=1)  # 行の合計
-    crosstab.loc['合計'] = crosstab.sum()  # 列の合計
-
     # クロス表を長い形式に変換
     crosstab_long = crosstab.reset_index().melt(id_vars=selected_col1, value_name='度数')
 
@@ -74,6 +70,10 @@ if df is not None:
 
     # グラフの表示
     st.plotly_chart(fig)
+
+    # 合計の行と列を追加
+    crosstab['合計'] = crosstab.sum(axis=1)  # 行の合計
+    crosstab.loc['合計'] = crosstab.sum()  # 列の合計
 
     # クロス表の作成と表示
     # crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
