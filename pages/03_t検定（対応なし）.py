@@ -112,7 +112,7 @@ if df is not None:
 
       
             # 要約統計量（サマリ）のデータフレームを表示
-            st.dataframe(df0.style.apply.format("{:.2f}"))
+            st.write(df0.style.format("{:.2f}"))
 
 
 
