@@ -53,12 +53,13 @@ if df is not None:
     st.subheader("数値変数の選択")
     num_vars = st.multiselect('数値変数を選択してください', numerical_cols)
 
-    if len(df[cat_var].iloc[:, 0].unique()) != 2:
+    # エラー処理
+    if not cat_var:
+        st.error("カテゴリ変数を選択してください。")
+    elif not num_vars:
+        st.error("数値変数を選択してください。")
+    elif len(df[cat_var].iloc[:, 0].unique()) != 2:
         st.error("独立変数が2群になっていないため、分析を実行できません")
-    
-    elif numerical_cols is None:
-        st.error("変数は少なくとも１つずつ選択してください")
-    
     else:
         st.success("分析可能な変数を選択しました。分析を実行します。")
         
