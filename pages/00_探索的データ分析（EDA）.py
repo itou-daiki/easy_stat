@@ -83,7 +83,8 @@ if df is not None:
 
     # アップロードされたデータセットに数値変数が含まれている場合
     if numerical_cols:
-        fig = px.box(df, x=numerical_cols, points="all", title=f'すべての数値変数の可視化')
+        selected_cols = st.multiselect('数値変数を選択してください', numerical_cols, default =numerical_cols)
+        fig = px.box(df, x=selected_cols, points="all", title=f'選択した数値変数の可視化')
         st.plotly_chart(fig)
 
 
