@@ -64,7 +64,7 @@ if df is not None:
         y='度数',
         color=selected_col1,
         barmode='group',
-        labels={selected_col1: 'カテゴリ', selected_col2: 'サブカテゴリ', '度数': '度数'},
+        labels={selected_col1: 'elected_col1', selected_col2: 'selected_col2', '度数': '度数'},
         title=f'【{selected_col1}】 と 【{selected_col2}】 の度数分布'
     )
 
