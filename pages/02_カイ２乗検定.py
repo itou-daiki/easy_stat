@@ -48,13 +48,13 @@ if df is not None:
 
     # 選択した変数の度数分布のバープロット
     for col in [selected_col1, selected_col2]:
-        st.subheader(f"{col} の度数分布")
+        st.subheader(f"【{col}】 の度数分布")
         fig = px.bar(df, x=df[col].value_counts().index, y=df[col].value_counts().values, labels={df[col].name: '度数'})
         st.plotly_chart(fig)
 
     # クロス表の作成と表示
     crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
-    st.subheader(f'{selected_col1} と {selected_col2} のクロス表')
+    st.subheader(f'【{selected_col1}】 と 【{selected_col2}】 のクロス表')
     st.write(crosstab)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
