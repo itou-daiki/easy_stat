@@ -49,19 +49,26 @@ if df is not None:
 
     # カテゴリ変数の可視化
     for col in categorical_cols:
-        st.subheader(f'{col} の可視化 (カテゴリ変数)')
+        st.subheader(f'{col} の可視化 （カテゴリ変数）')
         value_counts = df[col].value_counts()
         fig = px.bar(x=value_counts.index, y=value_counts.values, labels={'x': col, 'y': 'Count'})
         st.plotly_chart(fig)
 
     # 数値変数の可視化
     for col in numerical_cols:
-        st.subheader(f'{col} の可視化 (数値変数)')
+        st.subheader(f'{col} の可視化 （数値変数）')
         fig = px.histogram(df, x=col)
         st.plotly_chart(fig)
         fig = px.box(df, x=col)
         st.plotly_chart(fig)
-    
+        
+    # アップロードされたデータセットに数値変数が含まれている場合
+    if numerical_cols:
+        st.subheader('全ての数値変数の箱ひげ図')
+        fig = px.box(df, x=numerical_cols, points="all", title='全ての数値変数の箱ひげ図')
+        st.plotly_chart(fig)
+
+
     st.subheader('選択した変数の可視化')
     
     # 変数選択
