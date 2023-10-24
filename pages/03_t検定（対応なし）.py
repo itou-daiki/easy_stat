@@ -86,7 +86,7 @@ if df is not None:
 
             # 目的変数、従属変数から作業用データフレームのセット
             df00_list = [cat_var]
-            df00_list = df00_list + num_vars
+            df00_list = df00_list + num_var
             df00 = df[df00_list]
 
             # サマリ(df0)用のデータフレームのセット
