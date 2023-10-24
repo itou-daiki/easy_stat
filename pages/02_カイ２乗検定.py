@@ -109,7 +109,8 @@ if df is not None:
     st.write('＜期待度数＞')
     st.write(expected_df.style.apply(lambda x: colors, axis=None).format("{:.2f}"))
 
-    st.write('＜(観測度数 - 期待度数)^2 / 期待度数＞')
+    st.write('＜カイ二乗値＞')
+    st.caption('(観測度数 - 期待度数)^2 / 期待度数')
     st.write(chi_square_value_df.style.apply(lambda x: colors, axis=None).format("{:.2f}"))
 
     st.caption('有意に差が出ているセルは黄色で表示されます:')
