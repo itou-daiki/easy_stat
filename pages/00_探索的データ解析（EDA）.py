@@ -94,7 +94,7 @@ if df is not None:
     st.subheader('選択した変数の可視化')
     
     # 変数選択
-    selected_vars = st.multiselect('変数を選択してください:', df.columns.tolist())
+    selected_vars = st.multiselect('変数を２つ選択してください:', df.columns.tolist())
 
     if len(selected_vars) > 2:
         st.error('2項目以上を選択することはできません。選択をクリアし、2項目のみを選択してください。')
