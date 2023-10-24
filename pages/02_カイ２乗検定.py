@@ -15,7 +15,7 @@ st.title("カイ２乗分析ウェブアプリ")
 st.write("度数の偏りを分析することができます")
 
 # 分析のイメージ
-image = Image.open('correlation.png')
+image = Image.open('chi_square.png')
 st.image(image)
 
 # ファイルアップローダー
@@ -53,6 +53,10 @@ if df is not None:
     
     # クロス表の作成
     crosstab = pd.crosstab(df[selected_col1], df[selected_col2])
+
+    # 合計の行と列を追加
+    crosstab['合計'] = crosstab.sum(axis=1)  # 行の合計
+    crosstab.loc['合計'] = crosstab.sum()  # 列の合計
 
     # クロス表を長い形式に変換
     crosstab_long = crosstab.reset_index().melt(id_vars=selected_col1, value_name='度数')
@@ -114,6 +118,16 @@ if df is not None:
     st.subheader('カイ二乗検定の結果')
     st.write(f'カイ二乗統計量: {chi2:.2f}')
     st.write(f'P値: {p_value:.2f}')
+
+    # ヒートマップの作成（合計を除く）
+    fig_heatmap = px.imshow(
+        crosstab.iloc[:-1, :-1],  # 合計の行と列を除外
+        labels=dict(x=selected_col2, y=selected_col1, color='観測度数'),
+        title=f'【{selected_col1}】 と 【{selected_col2}】 の観測度数ヒートマップ'
+    )
+
+    # ヒートマップの表示
+    st.plotly_chart(fig_heatmap)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
