@@ -64,7 +64,7 @@ if df is not None:
             for j, col2 in enumerate(selected_cols):
                 if i < j:
                     correlation = corr_matrix.loc[col1, col2]
-                    description = f'{col1}と{col2}は'
+                    description = f'【{col1}】と【{col2}】には'
                     if correlation > 0.7:
                         description += f'強い正の相関がある (r={correlation:.2f})'
                     elif correlation > 0.3:
