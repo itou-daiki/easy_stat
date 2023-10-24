@@ -49,8 +49,6 @@ if df is not None:
 
     # カテゴリ変数の可視化
     for col in categorical_cols:
-        st.markdown(f'###{col} の可視化 （カテゴリ変数）')
-
         # 並び替えのオプションを選択するためのセレクトボックスを追加
         sort_order = st.selectbox(
             f'{col} の並び替え順を選択してください',
@@ -77,17 +75,16 @@ if df is not None:
 
     # 数値変数の可視化
     for col in numerical_cols:
-        st.markdown(f'###{col} の可視化 （数値変数）')
         fig = px.histogram(df, x=col)
         fig.update_layout(bargap=0.2)
         st.plotly_chart(fig)
-        fig = px.box(df, x=col)
+        fig = px.box(df, x=col, title=f'{col} の可視化')
         st.plotly_chart(fig)
 
     # アップロードされたデータセットに数値変数が含まれている場合
     if numerical_cols:
         st.markdown(f'###全ての数値変数の箱ひげ図')
-        fig = px.box(df, x=numerical_cols, points="all")
+        fig = px.box(df, x=numerical_cols, points="all", title=f'{col} の可視化')
         st.plotly_chart(fig)
 
 
@@ -104,7 +101,7 @@ if df is not None:
         # カテゴリ×カテゴリ
         if var1 in categorical_cols and var2 in categorical_cols:
             cross_tab = pd.crosstab(df[var1], df[var2])
-            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'個数のカウント： {var1} × {var2}')
+            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'度数： {var1} × {var2}')
             st.plotly_chart(fig)
 
         # 数値×数値
