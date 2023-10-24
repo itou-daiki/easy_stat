@@ -139,7 +139,7 @@ if df is not None:
             y=num_var,
             color=cat_var2,
             labels={num_var: '平均 ' + num_var, cat_var1: cat_var1, cat_var2: cat_var2},
-            title=f'&#8203;``【oaicite:2】``&#8203; と &#8203;``【oaicite:1】``&#8203; による &#8203;``【oaicite:0】``&#8203; の比較'
+            title=f'【{cat_var1}】 と 【{cat_var2}】 による 【{num_var}】 の比較'
         )
 
         st.plotly_chart(fig)
