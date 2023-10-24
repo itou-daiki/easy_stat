@@ -162,7 +162,11 @@ if df is not None:
                 df_results.loc[var] = results_row
 
             # 結果の表示
-            st.write(df_results.style.format("{:.2f}"))
+            # 数値型の列だけを選択
+            numeric_columns = df_results.select_dtypes(include=['float64', 'int64']).columns
+            # 選択した列にのみ、スタイルを適用
+            styled_df = df_results.style.format({col: "{:.2f}" for col in numeric_columns})
+            st.write(styled_df)
 
             # サンプルサイズの表示
             st.write('サンプルサイズ')
