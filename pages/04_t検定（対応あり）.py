@@ -153,7 +153,9 @@ if df is not None:
                 result_df.at[idx, 'd'] = d
 
             # 結果のデータフレームを表示
-            st.write(result_df.style.format("{:.2f}")) 
+            r_numerical_cols = result_df.select_dtypes(exclude=['object', 'category']).columns.tolist()
+            styled_df = result_df.style.format({col: "{:.2f}" for col in r_numeric_cols})
+            st.write(styled_df) 
 
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
