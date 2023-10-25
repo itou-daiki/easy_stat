@@ -109,7 +109,6 @@ if df is not None:
     wordcloud = WordCloud(
         width=800, height=400, 
         max_words=max_words,
-        background_color='white', 
         collocations=False, 
         font_path=font_path,
         min_font_size=4,
