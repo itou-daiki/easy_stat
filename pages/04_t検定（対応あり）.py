@@ -132,14 +132,14 @@ if df is not None:
             st.subheader('【分析結果の解釈】')
             # 'sign'列、'観測値M'列、および'測定値M'列の列番号を取得
             sign_col = result_df.columns.get_loc('sign')
-            x1_mean_col = result_df.columns.get_loc("観測値M")
-            x2_mean_col = result_df.columns.get_loc("測定値M")
+            x_mean_col = result_df.columns.get_loc("観測値M")
+            y_mean_col = result_df.columns.get_loc("測定値M")
 
             # paired_variable_listを直接イテレートして、各変数に対して解釈を提供
             for vn, row in zip(paired_variable_list, result_df.itertuples()):
                 # p値の解釈を取得
                 interpretation = ""
-                comparison = "＞" if row[x1_mean_col] > row[x2_mean_col] else "＜"
+                comparison = "＞" if row[x_mean_col] > row[y_mean_col] else "＜"
                 if row[sign_col] == "**" or row[sign_col] == "*":
                     interpretation = f'{vn}には有位な差が生まれる（ 観測値　{comparison}　測定値 ）'
                 elif row[sign_col] == "†":
