@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
+from wordcloud import WordCloud
+import networkx as nx
 import nlplot
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import japanize_matplotlib
 from PIL import Image
-
-
+import MeCab
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
 st.title("テキストマイニング")
