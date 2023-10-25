@@ -25,7 +25,7 @@ st.write("カテゴリ変数と記述変数からワードクラウドや共起�
 st.write("")
 
 # 分析のイメージ
-image = Image.open('chi_square.png')
+image = Image.open('textmining.png')
 st.image(image)
 
 # ファイルアップローダー
