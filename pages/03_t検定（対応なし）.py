@@ -248,7 +248,9 @@ if df is not None:
                 ax.spines['right'].set_visible(False)  # 右の枠線を消す
                 ax.spines['left'].set_visible(False)  # 左の枠線を消す
                 ax.spines['bottom'].set_visible(False)  # 下の枠線を消す
-                
+
+                ax.yaxis.grid(True)  # y軸のグリッド（横線）を表示
+
             st.pyplot(fig)  # 結合されたフィギュアを表示
 
 
