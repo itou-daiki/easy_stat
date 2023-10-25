@@ -182,6 +182,21 @@ if df is not None:
             # グラフの描画
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
+
+            def add_bracket(ax, x1, x2, y, text):
+                bracket_length = 0.5
+                ax.annotate("", xy=(x1, y), xycoords='data',
+                            xytext=(x1, y + bracket_length), textcoords='data',
+                            arrowprops=dict(arrowstyle="-"))
+                ax.annotate("", xy=(x2, y), xycoords='data',
+                            xytext=(x2, y + bracket_length), textcoords='data',
+                            arrowprops=dict(arrowstyle="-"))
+                ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
+                            xytext=(x2, y + bracket_length), textcoords='data',
+                            arrowprops=dict(arrowstyle="-"))
+                ax.text((x1 + x2) / 2, y + bracket_length, text,
+                        horizontalalignment='center', verticalalignment='bottom')
+
             for var in num_vars:
                 data = pd.DataFrame({
                     '群': groups,
@@ -192,6 +207,7 @@ if df is not None:
                 fig, ax = plt.subplots(figsize=(8, 6))
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
                 ax.set_title(f'平均値の比較： {var}')
+                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 1, "p < 0.05")
                 st.pyplot(fig)
 
 
