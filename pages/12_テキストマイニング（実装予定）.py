@@ -114,7 +114,7 @@ if df is not None:
     try:
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=10)
         fig = npt.co_network(network, sizing=100,node_size='adjacency_frequency', color_palette='hls')
-        st.pyplot(fig)
+        st.write(fig)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
 
@@ -171,7 +171,7 @@ if df is not None:
         try:
             network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=10)
             fig = npt_group.co_network(network_group, sizing=100,node_size='adjacency_frequency', color_palette='hls')
-            st.pyplot(fig)
+            st.write(fig)
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
             
