@@ -134,7 +134,7 @@ if df is not None:
             width=1100,
             height=700,
             save=True)
-        st.plotly_chart(fig)
+        st.write(fig)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
     except Exception as e:
@@ -207,7 +207,7 @@ if df is not None:
                 width=1100,
                 height=700,
                 save=True)
-            st.plotly_chart(fig)
+            st.write(fig)
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
         except Exception as e:
