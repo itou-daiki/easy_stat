@@ -67,13 +67,13 @@ if df is not None:
     else:
         st.success("分析可能な変数を選択しました。分析を実行します。")
 
-    st.subheader("分析前の確認")
+        st.subheader("分析前の確認")
 
-    # pre_varsとpost_varsのリストを順番にイテレートし、それぞれの変数のペアを表示
-    for pre_var, post_var in zip(pre_vars, post_vars):
+        # pre_varsとpost_varsのリストを順番にイテレートし、それぞれの変数のペアを表示
+        for pre_var, post_var in zip(pre_vars, post_vars):
         st.write(f'● {pre_var} → {post_var}')
         
-    st.write("これらの数値変数に有意な差が生まれるか検定します。")
+        st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
         # t検定の実行
         if st.button('t検定の実行'):
