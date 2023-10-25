@@ -52,12 +52,13 @@ if df is not None:
 
     # 観測変数と測定変数の選択
     st.subheader("観測変数の選択")
-    pre_vars = st.multiselect('観測変数を選択してください', numerical_cols)
+    pre_vars = st.multiselect('観測変数を選択してください', numerical_cols, key='pre_vars')
 
-    numerical_cols.remove(pre_vars)  # 選択済みの変数をリストから削除
+    # 選択済みの変数をリストから削除
+    remaining_cols = [col for col in numerical_cols if col not in pre_vars]
     
     st.subheader("測定変数の選択")
-    post_vars = st.multiselect('測定変数を選択してください', numerical_cols)
+    post_vars = st.multiselect('測定変数を選択してください', remaining_cols, key='post_vars')
     
     # エラー処理
     if len(pre_vars) != len(post_vars):
