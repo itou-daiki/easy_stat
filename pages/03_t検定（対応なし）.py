@@ -179,7 +179,6 @@ if df is not None:
             st.write(f'● {groups[1]}： {len(group1_data)}')
 
             # グラフの描画
-            sns.set(style="whitegrid")
             for var in num_vars:
                 data = pd.DataFrame({
                     '群': groups,
@@ -188,15 +187,9 @@ if df is not None:
                 })
 
                 fig, ax = plt.subplots(figsize=(8, 6))
-                sns.barplot(x='群', y='平均値', data=data, ax=ax, capsize=0.1, errcolor='black', errwidth=1)
-                ax.errorbar(x=data['群'], y=data['平均値'], yerr=data['誤差'], fmt='none', c='black', capsize=3)
+                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
                 ax.set_title(f'平均値の比較： {var}')
                 st.pyplot(fig)
-
-
-
-
-
 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
