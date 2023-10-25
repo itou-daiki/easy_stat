@@ -189,13 +189,13 @@ if df is not None:
                 bracket_length = 1.5
                 ax.annotate("", xy=(x1, y), xycoords='data',
                             xytext=(x1, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1.5))
+                            arrowprops=dict(arrowstyle="-", linewidth=2))
                 ax.annotate("", xy=(x2, y), xycoords='data',
                             xytext=(x2, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1.5))
+                            arrowprops=dict(arrowstyle="-", linewidth=2))
                 ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
                             xytext=(x2, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1.5))
+                            arrowprops=dict(arrowstyle="-", linewidth=2))
                 ax.text((x1 + x2) / 2, y + bracket_length+1, text,
                         horizontalalignment='center', verticalalignment='bottom')
 
