@@ -233,7 +233,15 @@ if df is not None:
                     '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
                 })
 
-                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
+                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5, zorder=3)  # zorder parameter added
+                ax.yaxis.grid(True, zorder=1)  # y軸のグリッド（横線）を表示, zorder parameter added
+
+                # 軸の横線を繋げる（隣接する軸の横線を繋げる）
+                if i > 0:
+                    prev_ax = axs[i - 1]
+                    ylim = prev_ax.get_ylim()
+                    ax.set_ylim(ylim)
+
                 ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
                 if p_value < 0.01:
@@ -242,6 +250,7 @@ if df is not None:
                     significance_text = "p < 0.05 **"
                 else:
                     significance_text = "n.s."
+
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 ax.set_ylim([0, y_max + 20])  # 各図の縦軸の最大値を揃える
                 ax.spines['top'].set_visible(False)  # 上の枠線を消す
