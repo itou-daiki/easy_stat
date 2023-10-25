@@ -53,8 +53,10 @@ if df is not None:
 
     # カテゴリ変数の選択
     st.subheader("カテゴリ変数の選択")
-    selected_category = st.selectbox('カテゴリ変数を選択してください', categorical_cols)
+    selected_category = st.selectbox('カテゴリ変数を選択してください', categorical_cols, default=default_index)
     categorical_cols.remove(selected_category)  # 選択済みの変数をリストから削除
+    # デフォルトで最後のカラムを選択する
+    default_index = len(text_cols) - 1
     selected_text = st.selectbox('記述変数を選択してください', text_cols)
 
     # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
