@@ -80,6 +80,31 @@ if df is not None:
         # t検定の実行
         if st.button('t検定の実行'):
             st.subheader('【分析結果】')
+            st.write("【要約統計量】")
+            
+            # 数値変数のリスト
+            num_vars = numerical_cols
+
+            # サマリ用のデータフレームのセット
+            summaryColumns = ["有効N", "平均値", "中央値", "標準偏差", "分散",
+                              "最小値", "最大値"]
+            df_summary = pd.DataFrame(index=num_vars, columns=summaryColumns)
+
+            # サマリ用のデータフレームに平均値と標準偏差を追加
+            for var in num_vars:
+                y = df[var]
+                df_summary.at[var, '有効N'] = len(y)
+                df_summary.at[var, '平均値'] = y.mean()
+                df_summary.at[var, '中央値'] = median(y)
+                df_summary.at[var, '標準偏差'] = y.std()
+                df_summary.at[var, '分散'] = variance(y)
+                df_summary.at[var, '最小値'] = y.min()
+                df_summary.at[var, '最大値'] = y.max()
+
+            # 要約統計量（サマリ）のデータフレームを表示
+            st.write(df_summary.style.format("{:.2f}"))
+
+            st.write("【平均値の差の検定（対応あり）")
             
             # 検定結果のデータフレームを作成
             resultColumns = ["観測値" + "M", "観測値" + "S.D",
@@ -151,7 +176,7 @@ if df is not None:
                 # 解釈を表示
                 st.write(f'●{interpretation}（p={result_df.iat[idx, result_df.columns.get_loc("p")]:.2f}）')
 
-
+            st.subheader('【可視化】')
             for pre_var, post_var in zip(pre_vars, post_vars):
                 st.write(f'{pre_var} → {post_var}')
                 

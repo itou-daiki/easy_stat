@@ -116,7 +116,7 @@ if df is not None:
             # 要約統計量（サマリ）のデータフレームを表示
             st.write(df0.style.format("{:.2f}"))
 
-            st.write('【平均値の差の検定】')
+            st.write('【平均値の差の検定（対応なし）】')
             groups = df[cat_var].iloc[:, 0].unique().tolist()
 
             # 結果を保存するデータフレームの初期化
