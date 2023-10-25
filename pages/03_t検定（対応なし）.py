@@ -221,7 +221,7 @@ if df is not None:
                 st.pyplot(fig)
             
             # 全ての図を一つのフィギュアに結合して描画
-            fig, axs = plt.subplots(len(num_vars), 1, figsize=(8, 6*len(num_vars)))  # 各図を縦に並べる
+            fig, axs = plt.subplots(1, len(num_vars), figsize=(8*len(num_vars), 6))  # 各図を横に並べる
             for i, var in enumerate(num_vars):
                 ax = axs[i]  # 各図の座標軸を取得
                 data = pd.DataFrame({
