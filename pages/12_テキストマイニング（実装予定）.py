@@ -61,7 +61,7 @@ if df is not None:
     npt = nlplot.NLPlot(df, target_col=selected_text)
         
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
-    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を"])
+    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に"])
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
@@ -96,6 +96,7 @@ if df is not None:
     # ワードクラウドの作成と表示
     wordcloud = WordCloud(
         width=800, height=400, 
+        max_words=125,
         background_color='white', 
         collocations=False, 
         font_path=font_path,
@@ -109,8 +110,8 @@ if df is not None:
         
     # 共起ネットワークの作成と表示
     try:
-        network = npt.build_graph(min_edge_frequency=2)
-        fig = npt.co_network(network, size='deg')
+        network = npt.build_graph(stopwords=STOPWORDS,min_edge_frequency=2)
+        fig = npt.co_network(network, size='deg',node_size='adjacency_frequency', color_palette='hls')
         st.pyplot(plt.gcf())
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
@@ -142,6 +143,7 @@ if df is not None:
         # ワードクラウドの作成と表示 (カテゴリ別)
         wordcloud_group = WordCloud(
             width=800, height=400, 
+            max_words=125,
             background_color='white', 
             collocations=False, 
             font_path=font_path,
@@ -165,8 +167,8 @@ if df is not None:
             
         # 共起ネットワークの作成と表示
         try:
-            network_group = npt_group.build_graph(min_edge_frequency=2)
-            fig = npt_group.co_network(network_group, size='deg')
+            network_group = npt_group.build_graph(stopwords=STOPWORDS,min_edge_frequency=2)
+            fig = npt_group.co_network(network_group, size='deg',node_size='adjacency_frequency', color_palette='hls')
             st.pyplot(plt.gcf())
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
