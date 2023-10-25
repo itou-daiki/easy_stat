@@ -68,9 +68,7 @@ if df is not None:
     mecab = MeCab.Tagger("-Owakati")
     
 
-    # テキストデータの抽出と単語の分割
-    text_data = df[selected_text].str.cat(sep=' ')
-    words = extract_words(text_data) 
+
 
     # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
     npt = nlplot.NLPlot(df, target_col=selected_text)
@@ -100,6 +98,10 @@ if df is not None:
                 nouns.append(nodes.surface)
             nodes = nodes.next
         return Counter(nouns)
+    
+    # テキストデータの抽出と単語の分割
+    text_data = df[selected_text].str.cat(sep=' ')
+    words = extract_words(text_data) 
 
 
     st.subheader('【ワードクラウド】')
