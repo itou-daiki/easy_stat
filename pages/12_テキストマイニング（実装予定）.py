@@ -74,7 +74,7 @@ if df is not None:
         words = []
         while nodes:
             features = nodes.feature.split(",")
-            if features[0] not in ["助詞"] and nodes.surface not in STOPWORDS:
+            if features[0] not in ["助詞"] and nodes.surface not in stopwords:
                 if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
                     words.append(nodes.surface)
             nodes = nodes.next
