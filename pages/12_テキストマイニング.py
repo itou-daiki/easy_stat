@@ -100,7 +100,6 @@ if df is not None:
     text_data = df[selected_text].str.cat(sep=' ')
     words = extract_words(text_data) 
 
-
     st.subheader('【ワードクラウド】')
     # ワードクラウドのパラメータ
     max_words = st.slider('ワードクラウドの最大単語数', 50, 200, 125, key='max_words_all')
@@ -153,10 +152,11 @@ if df is not None:
     # カテゴリ変数で群分け
     st.subheader('カテゴリ別の分析')
     grouped = df.groupby(selected_category)
-    st.write(grouped)
     for name, group in grouped:
         st.subheader(f'＜カテゴリ： {name}＞')
-                        
+        
+        grouped_df = grouped[selected_text].apply(lambda group: ' '.join(group))
+        st.write(grouped_df)
         # テキストデータの抽出と単語の分割 (カテゴリ別)
         text_data_group = group[selected_text].str.cat(sep=' ')
         words_group = mecab.parse(text_data_group)
