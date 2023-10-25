@@ -14,7 +14,6 @@ import matplotlib as mpl
 import japanize_matplotlib
 from PIL import Image
 import MeCab
-%matplotlib inline
 
 font_path = "ipaexg.ttf"
 plt.rcParams['font.family'] = 'IPAexGothic'
@@ -128,7 +127,7 @@ if df is not None:
         min_edge_frequency = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
 
-        fig = npt.co_network(
+        fig_co_network = npt.co_network(
             sizing=100,
             node_size='adjacency_frequency', 
             color_palette='hls', 
@@ -137,7 +136,7 @@ if df is not None:
             save=True
             )
         
-        st.write(iplot(fig))
+        st.write(fig_co_network)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
 
