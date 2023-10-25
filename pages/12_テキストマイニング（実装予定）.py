@@ -111,6 +111,7 @@ if df is not None:
         
     # 共起ネットワークの作成と表示
     try:
+        STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は"])
         network = npt.build_graph(stopwords=STOPWORDS,min_edge_frequency=10)
         fig = npt.co_network(network, sizing=100,node_size='adjacency_frequency', color_palette='hls')
         st.pyplot(fig)
@@ -168,6 +169,7 @@ if df is not None:
             
         # 共起ネットワークの作成と表示
         try:
+            STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は"])
             network_group = npt_group.build_graph(stopwords=STOPWORDS,min_edge_frequency=10)
             fig = npt_group.co_network(network_group, sizing=100,node_size='adjacency_frequency', color_palette='hls')
             st.pyplot(fig)
