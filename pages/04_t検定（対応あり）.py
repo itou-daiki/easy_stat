@@ -155,7 +155,11 @@ if df is not None:
             # 結果のデータフレームを表示
             st.write(result_df)
 
-            st.subheader('【分析結果の解釈】')
+            # サンプルサイズの表示
+            st.write('【サンプルサイズ】')
+            st.write(f'全体N ＝ {len(df)}')
+
+            st.subheader('【解釈の補助】')
             # 'sign'列、'観測値M'列、および'測定値M'列の列番号を取得
             sign_col = result_df.columns.get_loc('sign')
             x_mean_col = result_df.columns.get_loc("観測値M")
