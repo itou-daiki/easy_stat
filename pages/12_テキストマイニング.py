@@ -155,7 +155,7 @@ if df is not None:
     st.subheader('カテゴリ別の分析')
     grouped = df.groupby(selected_category)
     for name, group in grouped:
-        st.write(f'＜カテゴリ： {name}＞')
+        st.subheader(f'＜カテゴリ： {name}＞')
                         
         # テキストデータの抽出と単語の分割 (カテゴリ別)
         text_data_group = group[selected_text].str.cat(sep=' ')
