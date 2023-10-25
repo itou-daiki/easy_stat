@@ -64,7 +64,7 @@ if df is not None:
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
     # STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は"])
     # stopwords_list = list(STOPWORDS) + npt.default_stopwords
-    stopwords = npt.get_stopword(top_n=2, min_freq=0)
+    STOPWORDS = npt.get_stopword(top_n=2, min_freq=0)
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
@@ -74,7 +74,7 @@ if df is not None:
         words = []
         while nodes:
             features = nodes.feature.split(",")
-            if features[0] not in ["助詞"] and nodes.surface not in stopwords:
+            if features[0] not in ["助詞"] and nodes.surface not in STOPWORDS:
                 if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
                     words.append(nodes.surface)
             nodes = nodes.next
@@ -113,7 +113,7 @@ if df is not None:
         
     # 共起ネットワークの作成と表示
     try:
-        network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=10)
+        network = npt.build_graph(stopwords=STOPWORDS,min_edge_frequency=10)
         fig = npt.co_network(network, sizing=100,node_size='adjacency_frequency', color_palette='hls')
         st.write(fig)
     except ValueError as e:
@@ -170,7 +170,7 @@ if df is not None:
             
         # 共起ネットワークの作成と表示
         try:
-            network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=10)
+            network_group = npt_group.build_graph(stopwords=STOPWORDS,min_edge_frequency=10)
             fig = npt_group.co_network(network_group, sizing=100,node_size='adjacency_frequency', color_palette='hls')
             st.write(fig)
         except ValueError as e:
