@@ -15,6 +15,9 @@ st.caption("Created by Daiki Ito")
 st.write("変数の選択　→　t検定　→　表　→　解釈の補助を行います")
 st.write("")
 
+# フォント設定
+plt.rcParams['font.family'] = 'ipaexg.ttf'
+
 # 分析のイメージ
 image = Image.open('ttest.png')
 st.image(image)
