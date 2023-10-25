@@ -104,7 +104,7 @@ if df is not None:
             # 要約統計量（サマリ）のデータフレームを表示
             st.write(df_summary.style.format("{:.2f}"))
 
-            st.write("【平均値の差の検定（対応あり）")
+            st.write("【平均値の差の検定（対応あり）】")
             
             # 検定結果のデータフレームを作成
             resultColumns = ["観測値" + "M", "観測値" + "S.D",
@@ -181,6 +181,11 @@ if df is not None:
                 st.write(f'●{interpretation}（p={result_df.iat[idx, result_df.columns.get_loc("p")]:.2f}）')
 
             st.subheader('【可視化】')
+
+            # グラフの描画
+            font_path = 'ipaexg.ttf'
+            plt.rcParams['font.family'] = 'IPAexGothic'
+
             # ブラケット付きの棒グラフを出力する機能の追加
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4
@@ -216,7 +221,49 @@ if df is not None:
                     significance_text = "n.s."
                 ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
-                st.pyplot(fig)            
+                st.pyplot(fig)
+
+            # 全ての図を一つのフィギュアに結合して描画
+            # 結合された図の縦軸を揃える
+            y_max = max([max(data['平均値']) + max(data['誤差']) + 20 for pre_var, post_var in zip(pre_vars, post_vars)])
+            fig, axs = plt.subplots(1, len(pre_vars), figsize=(8*len(pre_vars), 6), sharey=True)  # sharey=Trueで縦軸を揃える
+            for i, (pre_var, post_var) in enumerate(zip(pre_vars, post_vars)):
+                ax = axs[i]  # 各図の座標軸を取得
+                data = pd.DataFrame({
+                    '群': ['観測値', '測定値'],
+                    '平均値': [df[pre_var].mean(), df[post_var].mean()],
+                    '誤差': [df[pre_var].std(), df[post_var].std()]
+                })
+
+                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5, zorder=3)  # zorder parameter added
+                ax.yaxis.grid(True, zorder=1)  # y軸のグリッド（横線）を表示, zorder parameter added
+
+                # 軸の横線を繋げる（隣接する軸の横線を繋げる）
+                if i > 0:
+                    prev_ax = axs[i - 1]
+                    ylim = prev_ax.get_ylim()
+                    ax.set_ylim(ylim)
+
+                ax.set_title(f'平均値の比較： {pre_var} → {post_var}')
+                ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
+                p_value = ttest_result.pvalue
+                if p_value < 0.01:
+                    significance_text = "p < 0.01 **"
+                elif p_value < 0.05:
+                    significance_text = "p < 0.05 *"
+                else:
+                    significance_text = "n.s."
+
+                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
+                ax.set_ylim([0, y_max + 20])  # 各図の縦軸の最大値を揃える
+                ax.spines['top'].set_visible(False)  # 上の枠線を消す
+                ax.spines['right'].set_visible(False)  # 右の枠線を消す
+                ax.spines['left'].set_visible(False)  # 左の枠線を消す
+                ax.spines['bottom'].set_visible(False)  # 下の枠線を消す
+
+                ax.yaxis.grid(True)  # y軸のグリッド（横線）を表示
+
+            st.pyplot(fig)  # 結合されたフィギュアを表示
 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
