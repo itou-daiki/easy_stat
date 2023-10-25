@@ -194,7 +194,7 @@ if df is not None:
                             xytext=(x2, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
                 ax.annotate("", xy=(x1 + 0.02, y + bracket_length), xycoords='data',
-                            xytext=(x2 - 0.02a, y + bracket_length), textcoords='data',
+                            xytext=(x2 - 0.02, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
                 ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
                         horizontalalignment='center', verticalalignment='bottom')
