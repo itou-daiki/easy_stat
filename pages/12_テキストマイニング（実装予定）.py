@@ -64,7 +64,6 @@ if df is not None:
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
     STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は"])
     stopwords_list = list(STOPWORDS) + npt.default_stopwords
-    st.write(stopwords_list)
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
@@ -115,7 +114,7 @@ if df is not None:
     try:
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=10)
         fig = npt.co_network(network, sizing=100,node_size='adjacency_frequency', color_palette='hls', save=True)
-        st.write(fig)
+        st.write(iplot(fig))
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
 
