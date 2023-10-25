@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from wordcloud import WordCloud
 import networkx as nx
-import nlplot
 import cufflinks as cf
 import plotly.express as px
 import plotly
@@ -14,6 +13,7 @@ import matplotlib as mpl
 import japanize_matplotlib
 from PIL import Image
 import MeCab
+import nlplot
 
 font_path = "ipaexg.ttf"
 plt.rcParams['font.family'] = 'IPAexGothic'
