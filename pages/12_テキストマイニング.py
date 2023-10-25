@@ -5,6 +5,9 @@ import networkx as nx
 import nlplot
 import cufflinks as cf
 import plotly.express as px
+import plotly
+from plotly.subplots import make_subplots
+from plotly.offline import iplot
 from collections import Counter
 import matplotlib.pyplot as plt
 import matplotlib as mpl
