@@ -219,6 +219,30 @@ if df is not None:
                 ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 st.pyplot(fig)
+            
+            # 全ての図を一つのフィギュアに結合して描画
+            fig, axs = plt.subplots(len(num_vars), 1, figsize=(8, 6*len(num_vars)))  # 各図を縦に並べる
+            for i, var in enumerate(num_vars):
+                ax = axs[i]  # 各図の座標軸を取得
+                data = pd.DataFrame({
+                    '群': groups,
+                    '平均値': [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']],
+                    '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D'
+                })
+            
+                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
+                ax.set_title(f'平均値の比較： {var}')
+                p_value = df_results.at[var, 'p']
+                if p_value < 0.01:
+                    significance_text = "p < 0.01 **"
+                elif p_value < 0.05:
+                    significance_text = "p < 0.05 **"
+                else:
+                    significance_text = "n.s."
+                ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
+                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
+            
+            st.pyplot(fig)  # 結合されたフィギュアを表示
 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
