@@ -57,12 +57,15 @@ if df is not None:
         
     # ワードクラウドの作成と表示
     wordcloud = npt.wordcloud(width=800, height=400)
-    st.pyplot(wordcloud)
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud, interpolation="bilinear")
+    ax.axis('off')
+    st.pyplot(fig)
         
     # 共起ネットワークの作成と表示
     network = npt.build_graph(min_edge_frequency=2)
     fig = npt.co_network(network, size='deg')
-    st.pyplot(fig)
+    st.pyplot(plt.gcf())
 
     # カテゴリ変数で群分け
     st.subheader('カテゴリ別の分析')
@@ -75,12 +78,15 @@ if df is not None:
             
         # ワードクラウドの作成と表示
         wordcloud_group = npt_group.wordcloud(width=800, height=400)
-        st.pyplot(wordcloud_group)
+        fig, ax = plt.subplots()
+        ax.imshow(wordcloud_group, interpolation="bilinear")
+        ax.axis('off')
+        st.pyplot(fig)
             
         # 共起ネットワークの作成と表示
         network_group = npt_group.build_graph(min_edge_frequency=2)
         fig = npt_group.co_network(network_group, size='deg')
-        st.pyplot(fig)
+        st.pyplot(plt.gcf())
             
 else:
     st.error('データフレームがありません。ファイルをアップロードするか、デモデータを使用してください。')
