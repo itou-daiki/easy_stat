@@ -57,7 +57,7 @@ if df is not None:
     categorical_cols.remove(selected_category)  # 選択済みの変数をリストから削除
     # デフォルトで最後のカラムを選択する
     default_index = len(text_cols) - 1
-    selected_text = st.selectbox('記述変数を選択してください', text_cols, default = default_index)
+    selected_text = st.selectbox('記述変数を選択してください', text_cols, index = default_index)
 
     # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
     st.subheader('全体の分析')
