@@ -68,8 +68,6 @@ if df is not None:
     mecab = MeCab.Tagger("-Owakati")
     
 
-
-
     # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
     npt = nlplot.NLPlot(df, target_col=selected_text)
 
