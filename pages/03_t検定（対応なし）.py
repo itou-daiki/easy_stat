@@ -66,6 +66,17 @@ if df is not None:
     else:
         st.success("分析可能な変数を選択しました。分析を実行します。")
 
+        # 独立変数から重複のないデータを抽出し、リストに変換
+        xcat_var_d = df[cat_var].iloc[:, 0].unique().tolist()
+        st.subheader('【分析前の確認】')
+        cat_var_str = str(cat_var)
+        st.write(f'{(cat_var_str)}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
+
+        for num_var in num_vars:
+            st.write(f'● {num_var}')
+
+        st.write("これらの数値変数に有意な差が生まれるか検定します。")
+
         # t検定の実行
         if st.button('t検定の実行'):
             st.subheader('【分析結果】')
@@ -159,6 +170,20 @@ if df is not None:
             # 選択した列にのみ、スタイルを適用
             styled_df = df_results.style.format({col: "{:.2f}" for col in numeric_columns})
             st.write(styled_df)
+
+            # sign_captionを初期化
+            sign_caption = ''
+
+            # 各記号に対するチェックを実行
+            if df_results['sign'].str.contains('\*\*').any():
+                sign_caption += 'p<0.01** '
+            if df_results['sign'].str.contains('\*').any():
+                sign_caption += 'p<0.05* '
+            if df_results['sign'].str.contains('†').any():
+                sign_caption += 'p<0.1† '
+            
+            st.caption(sign_caption)
+
 
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
