@@ -112,7 +112,7 @@ if df is not None:
         
     # 共起ネットワークの作成と表示
     try:
-        network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=1)
+        network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=1, cutoff=0.5)
         fig = npt.co_network(network, sizing=100,node_size='adjacency_frequency', color_palette='hls', save=True)
         st.plotly_chart(fig)
     except ValueError as e:
@@ -169,7 +169,7 @@ if df is not None:
             
         # 共起ネットワークの作成と表示
         try:
-            network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=1)
+            network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=1, cutoff=0.5)
             fig = npt_group.co_network(network_group, sizing=100,node_size='adjacency_frequency', color_palette='hls', save=True)
             st.plotly_chart(fig)
         except ValueError as e:
