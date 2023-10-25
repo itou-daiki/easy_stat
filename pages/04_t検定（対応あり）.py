@@ -149,7 +149,7 @@ if df is not None:
                 elif result_df.iat[idx, sign_col] == "n.s.":
                     interpretation = f'{vn}には有意な差が生まれない'
                 # 解釈を表示
-                st.write(f'●{interpretation}（p={result_df.iat[idx, p]}）')
+                st.write(f'●{interpretation}（p=）')
 
             for pre_var, post_var in zip(pre_vars, post_vars):
                 st.write(f'{pre_var} → {post_var}')
