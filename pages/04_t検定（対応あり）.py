@@ -181,21 +181,42 @@ if df is not None:
                 st.write(f'●{interpretation}（p={result_df.iat[idx, result_df.columns.get_loc("p")]:.2f}）')
 
             st.subheader('【可視化】')
-            for pre_var, post_var in zip(pre_vars, post_vars):
-                st.write(f'{pre_var} → {post_var}')
-                
-                # t検定
-                ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
-                
-                # 結果の表示
-                st.write(f't値: {ttest_result.statistic:.2f}')
-                st.write(f'p値: {ttest_result.pvalue:.2f}')
+            # ブラケット付きの棒グラフを出力する機能の追加
+            def add_bracket(ax, x1, x2, y, text):
+                bracket_length = 4
+                ax.annotate("", xy=(x1, y), xycoords='data',
+                            xytext=(x1, y + bracket_length), textcoords='data',
+                            arrowprops=dict(arrowstyle="-", linewidth=1))
+                ax.annotate("", xy=(x2, y), xycoords='data',
+                            xytext=(x2, y + bracket_length), textcoords='data',
+                            arrowprops=dict(arrowstyle="-", linewidth=1))
+                ax.annotate("", xy=(x1 - 0.01, y + bracket_length - 0.5), xycoords='data',
+                            xytext=(x2 + 0.01, y + bracket_length - 0.5), textcoords='data',
+                            arrowprops=dict(arrowstyle="-", linewidth=1))
+                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
+                        horizontalalignment='center', verticalalignment='bottom')
 
-                # グラフの描画
-                fig, ax = plt.subplots()
-                ax.boxplot([df[pre_var], df[post_var]])
-                ax.set_xticklabels([pre_var, post_var])
-                st.pyplot(fig)
+            for pre_var, post_var in zip(pre_vars, post_vars):
+                data = pd.DataFrame({
+                    '群': ['観測値', '測定値'],
+                    '平均値': [df[pre_var].mean(), df[post_var].mean()],
+                    '誤差': [df[pre_var].std(), df[post_var].std()]
+                })
+
+                fig, ax = plt.subplots(figsize=(8, 6))
+                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
+                ax.set_title(f'平均値の比較： {pre_var} → {post_var}')
+                ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
+                p_value = ttest_result.pvalue
+                if p_value < 0.01:
+                    significance_text = "p < 0.01 **"
+                elif p_value < 0.05:
+                    significance_text = "p < 0.05 *"
+                else:
+                    significance_text = "n.s."
+                ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
+                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
+                st.pyplot(fig)            
 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
