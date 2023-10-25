@@ -124,7 +124,7 @@ if df is not None:
     try:
         st.subheader('【共起ネットワーク】')
         # 共起ネットワークのパラメータ
-        min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key='co_network_all')
+        min_edge_frequency = st.slider('最小エッジ頻度', 0.1, 1, 0.5, key='co_network_all')
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
         fig = npt.co_network(
             # sizing=100,
