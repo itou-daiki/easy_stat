@@ -72,7 +72,7 @@ if df is not None:
     npt = nlplot.NLPlot(df, target_col=selected_text)
 
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
-    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます","が"])
+    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます","が","て","で"])
     stopwords_list = list(STOPWORDS) + npt.default_stopwords
 
     def extract_words(text):
