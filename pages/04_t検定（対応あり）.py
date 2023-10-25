@@ -78,7 +78,7 @@ if df is not None:
 
         # t検定の実行
         if st.button('t検定の実行'):
-            st.subheader('&#8203;``【oaicite:0】``&#8203;')
+            st.subheader('【分析結果】')
             
             # 検定結果のデータフレームを作成
             resultColumns = ["観測値" + "M", "観測値" + "S.D",
