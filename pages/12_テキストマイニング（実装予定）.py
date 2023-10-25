@@ -68,7 +68,7 @@ if df is not None:
         words = []
         while nodes:
             features = nodes.feature.split(",")
-            if features[0] in ["名詞", "動詞", "形容詞"] or (features[0] == "名詞" and features[1] == "固有名詞") or features[0] == "感動詞":
+            if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
                 words.append(nodes.surface)
             nodes = nodes.next
         return " ".join(words)
