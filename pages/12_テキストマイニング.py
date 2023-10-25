@@ -63,10 +63,6 @@ if df is not None:
     selected_text = st.selectbox('記述変数を選択してください', text_cols, index = default_index)
 
     st.subheader('全体の分析')
-        
-    # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
-    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます"])
-    stopwords_list = list(STOPWORDS) + npt.default_stopwords
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
@@ -100,6 +96,9 @@ if df is not None:
 
     # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
     npt = nlplot.NLPlot(df, target_col=selected_text)
+    # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
+    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます"])
+    stopwords_list = list(STOPWORDS) + npt.default_stopwords
 
     st.subheader('【ワードクラウド】')
     # ワードクラウドのパラメータ
