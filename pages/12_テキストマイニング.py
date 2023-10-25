@@ -134,7 +134,7 @@ if df is not None:
             # height=700,
             # save=True
             )
-        st.write(npt.co_network())
+        st.write(fig)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
     except Exception as e:
