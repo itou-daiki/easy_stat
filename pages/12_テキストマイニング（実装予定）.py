@@ -3,6 +3,8 @@ import pandas as pd
 from wordcloud import WordCloud
 import networkx as nx
 import nlplot
+import plotly.express as px
+from collections import Counter
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import japanize_matplotlib
@@ -74,6 +76,17 @@ if df is not None:
                     words.append(nodes.surface)
             nodes = nodes.next
         return " ".join(words)
+    
+    # 名詞の度数をカウントする関数
+    def count_nouns(text):
+        nodes = mecab.parseToNode(text)
+        nouns = []
+        while nodes:
+            features = nodes.feature.split(",")
+            if features[0] == "名詞" and nodes.surface not in STOPWORDS:
+                nouns.append(nodes.surface)
+            nodes = nodes.next
+        return Counter(nouns)
 
 
     # テキストデータの抽出と単語の分割
@@ -102,6 +115,17 @@ if df is not None:
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
 
+    # 全体のテキストデータから名詞の度数をカウント
+    nouns_frequency = count_nouns(text_data)
+
+    # 名詞の度数をデータフレームに変換
+    df_nouns = pd.DataFrame(nouns_frequency.items(), columns=['Noun', 'Frequency']).sort_values(by='Frequency', ascending=False)
+
+    # 名詞の度数を棒グラフで表示
+    fig = px.bar(df_nouns.head(20), x='Noun', y='Frequency', title="名詞の出現度数")
+    st.plotly_chart(fig)
+
+
     # カテゴリ変数で群分け
     st.subheader('カテゴリ別の分析')
     grouped = df.groupby(selected_category)
@@ -128,6 +152,16 @@ if df is not None:
         ax.imshow(wordcloud_group, interpolation="bilinear")
         ax.axis('off')
         st.pyplot(fig)
+
+        # カテゴリ別のテキストデータから名詞の度数をカウント
+        nouns_frequency_group = count_nouns(text_data_group)
+
+        # 名詞の度数をデータフレームに変換
+        df_nouns_group = pd.DataFrame(nouns_frequency_group.items(), columns=['Noun', 'Frequency']).sort_values(by='Frequency', ascending=False)
+
+        # 名詞の度数を棒グラフで表示
+        fig = px.bar(df_nouns_group.head(20), x='Noun', y='Frequency', title=f"名詞の出現度数　カテゴリ： {name}")
+        st.plotly_chart(fig)
             
         # 共起ネットワークの作成と表示
         try:
