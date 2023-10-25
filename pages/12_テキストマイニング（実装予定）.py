@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
-from wordcloud import WordCloud
-import networkx as nx
+import nlplot
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import japanize_matplotlib
-import MeCab
 from PIL import Image
+
 
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
@@ -50,4 +49,43 @@ if df is not None:
     selected_category = st.selectbox('カテゴリ変数を選択してください', categorical_cols)
     categorical_cols.remove(selected_category)  # 選択済みの変数をリストから削除
     selected_text = st.selectbox('記述変数を選択してください', text_cols)
+
+    # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
+    st.subheader('全体の分析')
+    npt = nlplot.NLPlot(df, target_col=selected_text)
+        
+    # ワードクラウドの作成と表示
+    wordcloud = npt.wordcloud(width=800, height=400)
+    st.pyplot(wordcloud)
+        
+    # 共起ネットワークの作成と表示
+    network = npt.build_graph(min_edge_frequency=2)
+    fig = npt.co_network(network, size='deg')
+    st.pyplot(fig)
+
+    # カテゴリ変数で群分け
+    st.subheader('カテゴリ別の分析')
+    grouped = df.groupby(selected_category)
+    for name, group in grouped:
+        st.write(f'Category: {name}')
+            
+        # ワードクラウドと共起ネットワークの作成と表示 (カテゴリ別)
+        npt_group = nlplot.NLPlot(group, target_col=selected_text)
+            
+        # ワードクラウドの作成と表示
+        wordcloud_group = npt_group.wordcloud(width=800, height=400)
+        st.pyplot(wordcloud_group)
+            
+        # 共起ネットワークの作成と表示
+        network_group = npt_group.build_graph(min_edge_frequency=2)
+        fig = npt_group.co_network(network_group, size='deg')
+        st.pyplot(fig)
+            
+else:
+    st.error('データフレームがありません。ファイルをアップロードするか、デモデータを使用してください。')
+
+
+
+
+
 
