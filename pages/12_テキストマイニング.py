@@ -62,9 +62,7 @@ if df is not None:
     default_index = len(text_cols) - 1
     selected_text = st.selectbox('記述変数を選択してください', text_cols, index = default_index)
 
-    # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
     st.subheader('全体の分析')
-    npt = nlplot.NLPlot(df, target_col=selected_text)
         
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
     STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます"])
@@ -99,6 +97,9 @@ if df is not None:
     # テキストデータの抽出と単語の分割
     text_data = df[selected_text].str.cat(sep=' ')
     words = extract_words(text_data) 
+
+    # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
+    npt = nlplot.NLPlot(df, target_col=selected_text)
 
     st.subheader('【ワードクラウド】')
     # ワードクラウドのパラメータ
@@ -152,13 +153,13 @@ if df is not None:
     grouped = df.groupby(selected_category)
     for name, group in grouped:
         st.write(f'＜カテゴリ： {name}＞')
-            
-        # ワードクラウドと共起ネットワークの作成と表示 (カテゴリ別)
-        npt_group = nlplot.NLPlot(group, target_col=selected_text)
-            
+                        
         # テキストデータの抽出と単語の分割 (カテゴリ別)
         text_data_group = group[selected_text].str.cat(sep=' ')
         words_group = mecab.parse(text_data_group)
+
+        # ワードクラウドと共起ネットワークの作成と表示 (カテゴリ別)
+        npt_group = nlplot.NLPlot(group, target_col=selected_text)
 
         st.subheader('【ワードクラウド】')
 
