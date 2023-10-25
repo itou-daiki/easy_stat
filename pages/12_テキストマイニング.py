@@ -137,6 +137,8 @@ if df is not None:
         st.plotly_chart(fig)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
+    except Exception as e:
+        st.error(f'予期しないエラーが発生しました: {str(e)}')
 
     # 全体のテキストデータから名詞の度数をカウント
     nouns_frequency = count_nouns(text_data)
@@ -208,6 +210,8 @@ if df is not None:
             st.plotly_chart(fig)
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
+        except Exception as e:
+            st.error(f'予期しないエラーが発生しました: {str(e)}')
             
 else:
     st.error('データフレームがありません。ファイルをアップロードするか、デモデータを使用してください。')
