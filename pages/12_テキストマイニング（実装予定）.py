@@ -8,6 +8,9 @@ import matplotlib as mpl
 import japanize_matplotlib
 from PIL import Image
 import MeCab
+
+font_path = "ipaexg.ttf"
+
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
 st.title("テキストマイニング")
@@ -65,7 +68,7 @@ if df is not None:
     words = mecab.parse(text_data).strip()
 
     # ワードクラウドの作成と表示
-    wordcloud = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path='/usr/share/fonts/truetype/fonts-japanese-gothic.ttf').generate(words)
+    wordcloud = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path=font_path).generate(words)
     fig, ax = plt.subplots()
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis('off')
@@ -93,7 +96,7 @@ if df is not None:
         words_group = mecab.parse(text_data_group).strip()
 
         # ワードクラウドの作成と表示 (カテゴリ別)
-        wordcloud_group = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path='/usr/share/fonts/truetype/fonts-japanese-gothic.ttf').generate(words_group)
+        wordcloud_group = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path=font_path).generate(words_group)
         fig, ax = plt.subplots()
         ax.imshow(wordcloud_group, interpolation="bilinear")
         ax.axis('off')
