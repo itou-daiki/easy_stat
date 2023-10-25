@@ -186,7 +186,7 @@ if df is not None:
 
 
             def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 1
+                bracket_length = 3
                 ax.annotate("", xy=(x1 - 0.1, y), xycoords='data',
                             xytext=(x1 - 0.1, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
