@@ -171,11 +171,21 @@ if df is not None:
             st.write(styled_df)
 
             # サンプルサイズの表示
-            st.write('サンプルサイズ')
+            st.write('【サンプルサイズ】')
             st.write(f'全体N ＝ {len(df)}')
             st.write(f'● {groups[0]}： {len(group0_data)}')
             st.write(f'● {groups[1]}： {len(group1_data)}')
 
+            st.subheader('【解釈の補助】')
+            
+            for index, row in df_results.iterrows():
+                comparison = " < " if row[f'{groups[0]}M'] < row[f'{groups[1]}M'] else " > "
+                p_value = row['p']
+                st.write(f'{cat_var_str}によって、{index}には有意な差が生まれる（{xcat_var_d[0]}{comparison}{xcat_var_d[1]}）（p= {p_value:.2f}）')
+
+
+
+            st.subheader('【可視化】')
             # グラフの描画
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
