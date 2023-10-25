@@ -158,6 +158,20 @@ if df is not None:
             # styled_df = result_df.style.format({col: "{:.2f}" for col in r_numerical_cols})
             st.write(result_df) 
 
+            # sign_captionを初期化
+            sign_caption = ''
+
+            # 各記号に対するチェックを実行
+            if result_df['sign'].str.contains('\*\*').any():
+                sign_caption += 'p<0.01** '
+            if result_df['sign'].str.contains('\*').any():
+                sign_caption += 'p<0.05* '
+            if result_df['sign'].str.contains('†').any():
+                sign_caption += 'p<0.1† '
+
+            # Streamlitアプリケーションに表示
+            st.caption(sign_caption)
+
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
             st.write(f'全体N ＝ {len(df)}')

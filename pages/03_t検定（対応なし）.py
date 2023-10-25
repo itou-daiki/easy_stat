@@ -65,17 +65,6 @@ if df is not None:
         st.error("独立変数が2群になっていないため、分析を実行できません")
     else:
         st.success("分析可能な変数を選択しました。分析を実行します。")
-        
-        # 独立変数から重複のないデータを抽出し、リストに変換
-        xcat_var_d = df[cat_var].iloc[:, 0].unique().tolist()
-        st.subheader('【分析前の確認】')
-        cat_var_str = str(cat_var)
-        st.write(f'{(cat_var_str)}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
-
-        for num_var in num_vars:
-            st.write(f'● {num_var}')
-
-        st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
         # t検定の実行
         if st.button('t検定の実行'):
