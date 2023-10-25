@@ -10,7 +10,7 @@ st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
 st.title("t検定(対応なし)")
 st.caption("Created by Daiki Ito")
-st.write("変数の選択　→　t検定　→　表　→　解釈の補助を行います")
+st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
 st.write("")
 
 # フォント設定
