@@ -115,7 +115,7 @@ if df is not None:
         words_group = mecab.parse(text_data_group)
 
         # ワードクラウドの作成と表示 (カテゴリ別)
-        wordcloud = WordCloud(
+        wordcloud_group = WordCloud(
             width=800, height=400, 
             background_color='white', 
             collocations=False, 
