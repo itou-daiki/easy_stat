@@ -65,6 +65,7 @@ if df is not None:
     # STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は"])
     # stopwords_list = list(STOPWORDS) + npt.default_stopwords
     STOPWORDS = npt.get_stopword(top_n=2, min_freq=0)
+    st.write(STOPWORDS)
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
