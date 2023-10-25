@@ -64,14 +64,14 @@ if df is not None:
     mecab = MeCab.Tagger("-Owakati")
 
     def extract_words(text):
-    nodes = mecab.parseToNode(text)
-    words = []
-    while nodes:
-        features = nodes.feature.split(",")
-        if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
-            words.append(nodes.surface)
-        nodes = nodes.next
-    return " ".join(words)
+        nodes = mecab.parseToNode(text)
+        words = []
+        while nodes:
+            features = nodes.feature.split(",")
+            if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
+                words.append(nodes.surface)
+            nodes = nodes.next
+        return " ".join(words)
 
 
     # テキストデータの抽出と単語の分割
