@@ -216,7 +216,7 @@ if df is not None:
                 else:
                     significance_text = "n.s."
                 ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 1, significance_text)
+                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 st.pyplot(fig)
 
 
