@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from scipy import stats
 import math
 from statistics import median, variance
@@ -139,8 +140,7 @@ if df is not None:
             for vn, row in zip(paired_variable_list, result_df.itertuples()):
                 # p値の解釈を取得
                 interpretation = ""
-                # comparison = "＞" if row[x_mean_col] > row[y_mean_col] else "＜"
-                comparison = "＞" if float(row[x1_mean_col]) > float(row[x2_mean_col]) else "＜"
+                comparison = "＞" if row[x_mean_col] > row[y_mean_col] else "＜"
                 if row[sign_col] == "**" or row[sign_col] == "*":
                     interpretation = f'{vn}には有位な差が生まれる（ 観測値　{comparison}　測定値 ）'
                 elif row[sign_col] == "†":
