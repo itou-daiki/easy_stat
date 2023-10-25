@@ -154,6 +154,7 @@ if df is not None:
 
             # 結果のデータフレームを表示
             r_numerical_cols = result_df.select_dtypes(exclude=['object', 'category']).columns.tolist()
+            result_df[r_numerical_cols] = result_df[r_numerical_cols].apply(pd.to_numeric, errors='coerce')
             styled_df = result_df.style.format({col: "{:.2f}" for col in r_numerical_cols})
             st.write(styled_df) 
 
