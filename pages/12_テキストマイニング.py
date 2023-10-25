@@ -97,6 +97,7 @@ if df is not None:
     text_data = df[selected_text].str.cat(sep=' ')
     words = extract_words(text_data) 
 
+    st.subheader('【ワードクラウド】')
     # ワードクラウドのパラメータ
     max_words = st.slider('ワードクラウドの最大単語数', 50, 200, 125)
 
@@ -117,6 +118,7 @@ if df is not None:
         
     # 共起ネットワークの作成と表示
     try:
+        st.subheader('【共起ネットワーク】')
         # 共起ネットワークのパラメータ
         min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1)
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
@@ -149,6 +151,8 @@ if df is not None:
         text_data_group = group[selected_text].str.cat(sep=' ')
         words_group = mecab.parse(text_data_group)
 
+        st.subheader('【ワードクラウド】')
+
         # ワードクラウドのパラメータ
         max_words = st.slider('ワードクラウドの最大単語数', 50, 200, 125)
 
@@ -179,6 +183,7 @@ if df is not None:
             
         # 共起ネットワークの作成と表示
         try:
+            st.subheader('【共起ネットワーク】')
             # 共起ネットワークのパラメータ
             min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1)
             network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
