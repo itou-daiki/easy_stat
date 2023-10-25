@@ -127,20 +127,16 @@ if df is not None:
         min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key='co_network_all')
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
 
-        display(
-            npt.node_df.head(), npt.node_df.shape,
-            npt.edge_df.head(), npt.edge_df.shape
-            )
 
         fig = npt.co_network(
-            # sizing=100,
-            # node_size='adjacency_frequency', 
-            # color_palette='hls', 
-            # width=1100,
-            # height=700,
-            # save=True
+            sizing=100,
+            node_size='adjacency_frequency', 
+            color_palette='hls', 
+            width=1100,
+            height=700,
+            save=True
             )
-        st.write(fig)
+        st.write(iplot(fig))
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
     except Exception as e:
