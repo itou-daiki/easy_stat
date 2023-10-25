@@ -58,7 +58,8 @@ if df is not None:
     st.subheader('全体の分析')
     npt = nlplot.NLPlot(df, target_col=selected_text)
         
-    # ワードクラウドの作成と表示
+    # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
+    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる",])
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
@@ -68,8 +69,9 @@ if df is not None:
         words = []
         while nodes:
             features = nodes.feature.split(",")
-            if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
-                words.append(nodes.surface)
+            if len(nodes.surface) > 1 and nodes.surface not in STOPWORDS:
+                if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
+                    words.append(nodes.surface)
             nodes = nodes.next
         return " ".join(words)
 
@@ -79,7 +81,13 @@ if df is not None:
     words = extract_words(text_data) 
 
     # ワードクラウドの作成と表示
-    wordcloud = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path=font_path).generate(words)
+    wordcloud = WordCloud(
+        width=800, height=400, 
+        background_color='white', 
+        collocations=False, 
+        font_path=font_path,
+        min_font_size=4
+        ).generate(words)
     fig, ax = plt.subplots()
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis('off')
@@ -107,7 +115,13 @@ if df is not None:
         words_group = mecab.parse(text_data_group)
 
         # ワードクラウドの作成と表示 (カテゴリ別)
-        wordcloud_group = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path=font_path).generate(words_group)
+        wordcloud = WordCloud(
+            width=800, height=400, 
+            background_color='white', 
+            collocations=False, 
+            font_path=font_path,
+            min_font_size=4
+            ).generate(words)
         fig, ax = plt.subplots()
         ax.imshow(wordcloud_group, interpolation="bilinear")
         ax.axis('off')
