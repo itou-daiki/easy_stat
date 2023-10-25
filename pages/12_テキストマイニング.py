@@ -155,7 +155,7 @@ if df is not None:
     for name, group in grouped:
         st.subheader(f'＜カテゴリ： {name}＞')
         
-        grouped_df = grouped[selected_text].apply(lambda group: ' '.join(group))
+        grouped_df = grouped.apply(lambda g: g[selected_text])
         st.write(grouped_df)
         # テキストデータの抽出と単語の分割 (カテゴリ別)
         text_data_group = group[selected_text].str.cat(sep=' ')
