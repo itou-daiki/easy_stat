@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from scipy import stats
+import math
 from statistics import median, variance
 import matplotlib.pyplot as plt
 import japanize_matplotlib

@@ -1,131 +1,89 @@
 import streamlit as st
-import math
 import pandas as pd
-import japanize_matplotlib
-import matplotlib.pyplot as plt
-import seaborn as sns
 from scipy import stats
-from PIL import Image
+import math
 from statistics import median, variance
-
-import matplotlib as mpl
-# フォントのプロパティを設定
-font_prop = mpl.font_manager.FontProperties(fname="ipaexg.ttf")
-# Matplotlibのデフォルトのフォントを変更
-mpl.rcParams['font.family'] = font_prop.get_name()
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+from PIL import Image
 
 st.set_page_config(page_title="t検定(対応あり)", layout="wide")
 
 st.title("t検定(対応あり)")
 st.caption("Created by Daiki Ito")
-st.write("")
-st.subheader("ブラウザでt検定　→　表　→　解釈まで出力できるウェブアプリです。")
-st.write("iPad等でも分析を行うことができます")
+st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
 st.write("")
 
-st.subheader("【注意事項】")
-st.write("Excelファイルに不備があるとエラーが出ます")
-st.write('<span style="color:blue">デフォルトでデモ用データの分析ができます。</span>',
-         unsafe_allow_html=True)
-st.write(
-    '<span style="color:blue">ファイルをアップせずに「データフレームの表示」ボタンを押すと　'
-    'デモ用のデータを確認できます。</span>',
-    unsafe_allow_html=True)
-st.write('<span style="color:red">欠損値を含むレコード（行）は自動で削除されます。</span>',
-         unsafe_allow_html=True)
+# フォント設定
+plt.rcParams['font.family'] = 'ipaexg.ttf'
 
-code = '''
-#使用ライブラリ
-import streamlit as st
-import pandas as pd
-from scipy import stats
-from PIL import Image
-from statistics import median, variance
-'''
-
-st.code(code, language='python')
-
-# Excelデータの例
+# 分析のイメージ
 image = Image.open('ttest_rel.png')
 st.image(image)
+
+# ファイルアップローダー
+uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
+
+# デモデータを使うかどうかのチェックボックス
+use_demo_data = st.checkbox('デモデータを使用')
+
+# データフレームの作成
+df = None
+if use_demo_data:
+    df = pd.read_excel('ttest_rel_demo.xlsx', sheet_name=0)
+    st.write(df.head())
+else:
+    if uploaded_file is not None:
+        if uploaded_file.type == 'text/csv':
+            df = pd.read_csv(uploaded_file)
+            st.write(df.head())
+        else:
+            df = pd.read_excel(uploaded_file)
+            st.write(df.head())
 
 # 変数設定の注意点
 if st.checkbox('注意点の表示（クリックで開きます）'):
     attentionImage = Image.open('ttest_rel_attention.png')
     st.image(attentionImage)
 
-# デモ用ファイル
-df = pd.read_excel('ttest_rel_demo.xlsx', sheet_name=0)
+if df is not None:
+    # 数値変数の抽出
+    numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
 
-# xlsx, csvファイルのアップロード
-upload_files = st.file_uploader("ファイルアップロード", type=['xlsx', 'csv'])
-
-# xlsx, csvファイルの読み込み → データフレームにセット
-if upload_files:
-    # dfを初期化
-    df.drop(range(len(df)))
-    # ファイルの拡張子によって読み込み方法を変える
-    if upload_files.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-        # xlsxファイルの読み込み → データフレームにセット
-        df = pd.read_excel(upload_files, sheet_name=0)
-    elif upload_files.type == 'text/csv':
-        # csvファイルの読み込み → データフレームにセット
-        df = pd.read_csv(upload_files)
-    # 欠損値を含むレコードを削除
-    df.dropna(how='any', inplace=True)
-
-# データフレーム表示ボタン
-if st.checkbox('データフレームの表示（クリックで開きます）'):
-    st.dataframe(df, width=0)
-
-# 変数選択フォーム
-with st.form(key='variable_form'):
-    st.subheader("分析に使用する変数（観測値、測定値）の選択")
-
-    # 観測値と測定値のセット
-    ovList = df.columns.tolist()
-    mvList = df.columns.tolist()
-
-    # 複数選択（観測値）
-    ObservedVariable = st.multiselect('観測値（複数選択可）', ovList)
-
-    # 複数選択（測定値）
-    MeasuredVariable = st.multiselect('測定値（複数選択可）', mvList)
-
-    st.write(
-        '<span style="color:blue">【注意】従属変数に数値以外のものがある場合、分析できません</span>',
-        unsafe_allow_html=True)
-
-    # 変数の個数があってないときの処理
-    ovRange = len(ObservedVariable)
-    mvRange = len(MeasuredVariable)
-
-    if ovRange != mvRange:
-        st.write(
-            '<span style="color:red">観測値の数と測定値の数を合わせてください</span>',
-            unsafe_allow_html=True)
+    # 観測変数と測定変数の選択
+    st.subheader("観測変数の選択")
+    pre_vars = st.multiselect('観測変数を選択してください', numerical_cols)
+    
+    st.subheader("測定変数の選択")
+    post_vars = st.multiselect('測定変数を選択してください', numerical_cols)
+    
+    # エラー処理
+    if len(pre_vars) != len(post_vars):
+        st.error("観測変数と測定変数の数は同じでなければなりません。")
+    elif not pre_vars or not post_vars:
+        st.error("観測変数と測定変数を選択してください。")
     else:
-        st.write(
-            '<span style="color:green">分析可能です</span>',
-            unsafe_allow_html=True)
+        st.success("分析可能な変数を選択しました。分析を実行します。")
 
-    # 確認ボタンの表示
-    CHECK_btn = st.form_submit_button('確認')
+        # t検定の実行
+        if st.button('t検定の実行'):
+            st.subheader('&#8203;``【oaicite:0】``&#8203;')
+            
+            for pre_var, post_var in zip(pre_vars, post_vars):
+                st.write(f'{pre_var} → {post_var}')
+                
+                # t検定
+                ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
+                
+                # 結果の表示
+                st.write(f't値: {ttest_result.statistic:.2f}')
+                st.write(f'p値: {ttest_result.pvalue:.2f}')
 
-# 分析前の確認フォーム
-with st.form(key='check_form'):
-    if CHECK_btn:
-        st.subheader('【分析前の確認】')
-
-        n = 0
-        for ViewCheck in range(ovRange):
-            st.write(
-                f'● 【'f'{(ObservedVariable[n])}'f'】　→　【'f'{(MeasuredVariable[n])}】')
-            n += 1
-        st.write('    '+'これらの観測値と実測値の間に有意な差が生まれるか検定します。')
-
-    # 分析実行ボタンの表示
-    TTEST_btn = st.form_submit_button('分析実行')
+                # グラフの描画
+                fig, ax = plt.subplots()
+                ax.boxplot([df[pre_var], df[post_var]])
+                ax.set_xticklabels([pre_var, post_var])
+                st.pyplot(fig)
 
 # 分析結果表示フォーム
 with st.form(key='analyze_form'):
@@ -153,7 +111,7 @@ with st.form(key='analyze_form'):
         # 各値の初期化
         n = 0
         # t検定結果用データフレーム（df1）の列を指定
-        summaryColumns = ["観測値" + "M", "観測値" + "S.D",
+        resultColumns = ["観測値" + "M", "観測値" + "S.D",
                           "測定値" + "M", "測定値" + "S.D",
                           'df', 't', 'p', 'sign', 'd']
 
