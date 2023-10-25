@@ -66,6 +66,18 @@ if df is not None:
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
+    
+
+    # テキストデータの抽出と単語の分割
+    text_data = df[selected_text].str.cat(sep=' ')
+    words = extract_words(text_data) 
+
+    # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
+    npt = nlplot.NLPlot(df, target_col=selected_text)
+
+    # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
+    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます"])
+    stopwords_list = list(STOPWORDS) + npt.default_stopwords
 
     def extract_words(text):
         nodes = mecab.parseToNode(text)
@@ -89,16 +101,6 @@ if df is not None:
             nodes = nodes.next
         return Counter(nouns)
 
-
-    # テキストデータの抽出と単語の分割
-    text_data = df[selected_text].str.cat(sep=' ')
-    words = extract_words(text_data) 
-
-    # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
-    npt = nlplot.NLPlot(df, target_col=selected_text)
-    # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
-    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます"])
-    stopwords_list = list(STOPWORDS) + npt.default_stopwords
 
     st.subheader('【ワードクラウド】')
     # ワードクラウドのパラメータ
