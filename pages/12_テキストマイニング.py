@@ -154,7 +154,7 @@ if df is not None:
         st.subheader('【ワードクラウド】')
 
         # ワードクラウドのパラメータ
-        max_words = st.slider('ワードクラウドの最大単語数', 50, 200, 125,key='max_words_group')
+        max_words = st.slider('ワードクラウドの最大単語数', 50, 200, 125,key=f'max_words_group_{name}')
 
         # ワードクラウドの作成と表示 (カテゴリ別)
         wordcloud_group = WordCloud(
@@ -185,7 +185,7 @@ if df is not None:
         try:
             st.subheader('【共起ネットワーク】')
             # 共起ネットワークのパラメータ
-            min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key='co_network_group')
+            min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key=f'co_network_group_{name}')
             network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
             fig = npt_group.co_network(network_group, sizing=100,node_size='adjacency_frequency', color_palette='hls', save=True)
             st.plotly_chart(fig)
