@@ -119,6 +119,21 @@ if df is not None:
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis('off')
     st.pyplot(fig)
+
+    # ワードクラウドの作成と表示
+    wordcloud1 = npt.wordcloud(
+        width=800, height=400, 
+        max_words=max_words,
+        background_color='white', 
+        collocations=False, 
+        font_path=font_path,
+        min_font_size=4,
+        stopwords=stopwords_list
+        )
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud1, interpolation="bilinear")
+    ax.axis('off')
+    st.pyplot(fig)
         
     # 共起ネットワークの作成と表示
     try:
