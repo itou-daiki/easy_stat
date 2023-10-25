@@ -69,6 +69,54 @@ if df is not None:
         if st.button('t検定の実行'):
             st.subheader('&#8203;``【oaicite:0】``&#8203;')
             
+            # 検定結果のデータフレームを作成
+            resultColumns = ["観測値" + "M", "観測値" + "S.D",
+                            "測定値" + "M", "測定値" + "S.D",
+                            'df', 't', 'p', 'sign', 'd']
+
+            # indexにpre → post となるようにデータフレームを記載
+            index = [f'{pre_var} → {post_var}' for pre_var, post_var in zip(pre_vars, post_vars)]
+            result_df = pd.DataFrame(index=index, columns=resultColumns)
+
+            for pre_var, post_var, idx in zip(pre_vars, post_vars, index):
+                # t値、p値、s（全体標準偏差）、d値（効果量）の取得
+                x, y = df[pre_var], df[post_var]
+                ttest = stats.ttest_rel(x, y)
+                t = abs(ttest.statistic)
+                p = ttest.pvalue
+                xs, ys = x.std(), y.std()
+                xm, ym = x.mean(), y.mean()
+                d_beta = xm - ym
+                xdf, ydf = len(x), len(y)
+                px, py = pow(xs, 2), pow(ys, 2)
+                ds = math.sqrt(((xdf * px) + (ydf * py)) / (xdf + ydf))
+                d = abs(d_beta / ds)
+
+                # p値の判定をsignに格納
+                sign = ""
+                if p < 0.01:
+                    sign = "**"
+                elif p < 0.05:
+                    sign = "*"
+                elif p < 0.1:
+                    sign = "†"
+                else:
+                    sign = "n.s."
+
+                # 従属変数の列データの計算処理
+                result_df.at[idx, '観測値M'] = xm
+                result_df.at[idx, '観測値S.D'] = xs
+                result_df.at[idx, '測定値M'] = ym
+                result_df.at[idx, '測定値S.D'] = ys
+                result_df.at[idx, 'df'] = len(x) - 1
+                result_df.at[idx, 't'] = t
+                result_df.at[idx, 'p'] = p
+                result_df.at[idx, 'sign'] = sign
+                result_df.at[idx, 'd'] = d
+
+            # 結果のデータフレームを表示
+            st.write(result_df)
+
             for pre_var, post_var in zip(pre_vars, post_vars):
                 st.write(f'{pre_var} → {post_var}')
                 
@@ -85,142 +133,6 @@ if df is not None:
                 ax.set_xticklabels([pre_var, post_var])
                 st.pyplot(fig)
 
-# 分析結果表示フォーム
-with st.form(key='analyze_form'):
-    if TTEST_btn:
-        st.subheader('【分析結果】')
-
-        # 各値の初期化
-        n = 1
-        m = 0
-        # リストの名前を取得
-        VariableList = []
-        for ListAppend in range(ovRange):
-            VariableList.append(
-                f'【'f'{(ObservedVariable[m])}'f'】　→　【'f'{(MeasuredVariable[m])}】')
-            m += 1
-
-        # 観測値、測定値から作業用データフレームのセット
-        # df00_list = [ovList]
-        # df00_list = df00_list + mvList
-        dfOv = df[ObservedVariable]
-        dfMv = df[MeasuredVariable]
-
-        st.write('【平均値の差の検定（対応あり）】')
-
-        # 各値の初期化
-        n = 0
-        # t検定結果用データフレーム（df1）の列を指定
-        resultColumns = ["観測値" + "M", "観測値" + "S.D",
-                          "測定値" + "M", "測定値" + "S.D",
-                          'df', 't', 'p', 'sign', 'd']
-
-        df1 = pd.DataFrame(index=VariableList, columns=summaryColumns)
-
-        for ttest_rel in range(ovRange):
-            # 列データの取得（nは変数の配列番号）
-            x = dfOv.iloc[:, n]
-            y = dfMv.iloc[:, n]
-
-            # t値、p値、s（全体標準偏差）、d値（効果量）の取得
-            ttest = stats.ttest_rel(x, y)
-            t = abs(ttest[0])
-            p = ttest[1]
-            xs = x.std()
-            ys = y.std()
-            xm = x.mean()
-            ym = y.mean()
-            d_beta = xm - ym
-            xdf = len(x)
-            ydf = len(y)
-            px = pow(xs, 2)
-            py = pow(ys, 2)
-            ds = math.sqrt(((xdf * px) + (ydf * py)) / (xdf + ydf))
-            d = abs(d_beta / ds)
-
-            # p値の判定をsignに格納
-            sign = ""
-            if p < 0.01:
-                sign = "**"
-            elif p < 0.05:
-                sign = "*"
-            elif p < 0.1:
-                sign = "†"
-            else:
-                sign = "n.s."
-
-            # 従属変数の列データの計算処理
-            df1.at[VariableList[n], '観測値M'] = xm
-            df1.at[VariableList[n], '観測値S.D'] = xs
-            df1.at[VariableList[n], '測定値M'] = ym
-            df1.at[VariableList[n], '測定値S.D'] = ys
-            df1.at[VariableList[n], 'df'] = len(x) - 1
-            df1.at[VariableList[n], 't'] = t
-            df1.at[VariableList[n], 'p'] = p
-            df1.at[VariableList[n], 'sign'] = sign
-            df1.at[VariableList[n], 'd'] = d
-
-            n += 1
-
-        st.dataframe(df1)
-
-        # サンプルサイズの取得
-        sample_n = len(dfOv)
-
-        st.write('【サンプルサイズ】')
-        st.write(f'全体N ＝'f'{sample_n}')
-
-        st.write('【分析結果の解釈】')
-        # 各値の初期化、簡素化
-        n = 0
-        vn = VariableList[n]
-
-        # sign の列番号を取得
-        sign_n = df1.columns.get_loc('sign')
-        # DivideVariable[0] + 'M' の列番号を取得
-        xn = df1.columns.get_loc("観測値M")
-        # DivideVariable[1] + 'M' の列番号を取得
-        yn = df1.columns.get_loc("測定値M")
-
-        for interpretation in range(ovRange):
-            vn = VariableList[n]
-            if df1.iat[n, sign_n] == "**":
-                if df1.iat[n, xn] > df1.iat[n, yn]:
-                    st.write(f'{vn}には有位な差が生まれる（ 観測値　＞　測定値 ）')
-                elif df1.iat[n, xn] < df1.iat[n, yn]:
-                    st.write(f'{vn}には有位な差が生まれる（ 観測値　＜　測定値 ）')
-            elif df1.iat[n, sign_n] == "*":
-                if df1.iat[n, xn] > df1.iat[n, yn]:
-                    st.write(f'{vn}には有位な差が生まれる（ 観測値　＞　測定値 ）')
-                elif df1.iat[n, xn] < df1.iat[n, yn]:
-                    st.write(f'{vn}には有位な差が生まれる（ 観測値　＜　測定値 ）')
-            elif df1.iat[n, sign_n] == "†":
-                if df1.iat[n, xn] > df1.iat[n, yn]:
-                    st.write(f'{vn}には有意な差が生まれる傾向にある（ 観測値　＞　測定値 ）')
-                elif df1.iat[n, xn] < df1.iat[n, yn]:
-                    st.write(f'{vn}には有意な差が生まれる傾向にある（ 観測値　＜　測定値 ）')
-            elif df1.iat[n, sign_n] == "n.s.":
-                st.write(f'{vn}には有意な差が生まれない')
-
-            data = pd.DataFrame({
-            '群': [ObservedVariable[n], MeasuredVariable[n]],
-            '平均値': [df1.iat[n, df1.columns.get_loc("観測値M")], df1.iat[n, df1.columns.get_loc("測定値M")]],
-            '誤差': [df1.iat[n, df1.columns.get_loc("観測値S.D")], df1.iat[n, df1.columns.get_loc("測定値S.D")]]
-            })
-
-            fig, ax = plt.subplots(figsize=(8, 6))
-
-            # Seaborn barplot
-            sns.barplot(x='群', y='平均値', data=data, ax=ax, capsize=0.1, errcolor='black', errwidth=1)
-
-            # Add error bars
-            ax.errorbar(x=data['群'], y=data['平均値'], yerr=data['誤差'], fmt='none', c='black', capsize=3)
-
-            st.pyplot(fig)
-
-            n += 1
-
-    TTEST_btn = st.form_submit_button('OK')
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
          'まで')
