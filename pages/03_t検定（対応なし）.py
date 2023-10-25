@@ -242,13 +242,13 @@ if df is not None:
                     significance_text = "p < 0.05 **"
                 else:
                     significance_text = "n.s."
-                    ax.set_ylim([0, y_max + 20])  # 各図の縦軸の最大値を揃える
-                    ax.spines['top'].set_visible(False)  # 上の枠線を消す
-                    ax.spines['right'].set_visible(False)  # 右の枠線を消す
-                    ax.spines['left'].set_visible(False)  # 左の枠線を消す
-                    ax.spines['bottom'].set_visible(False)  # 下の枠線を消す
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
-
+                ax.set_ylim([0, y_max + 20])  # 各図の縦軸の最大値を揃える
+                ax.spines['top'].set_visible(False)  # 上の枠線を消す
+                ax.spines['right'].set_visible(False)  # 右の枠線を消す
+                ax.spines['left'].set_visible(False)  # 左の枠線を消す
+                ax.spines['bottom'].set_visible(False)  # 下の枠線を消す
+                
             st.pyplot(fig)  # 結合されたフィギュアを表示
 
 
