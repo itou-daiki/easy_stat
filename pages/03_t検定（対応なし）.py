@@ -5,6 +5,7 @@ from statistics import median, variance
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import seaborn as sns
+from matplotlib import font_manager
 import japanize_matplotlib
 from PIL import Image
 
@@ -179,6 +180,8 @@ if df is not None:
             st.write(f'● {groups[1]}： {len(group1_data)}')
 
             # グラフの描画
+            font_path = 'ipaexg.ttf'
+            plt.rcParams['font.family'] = 'IPAexGothic'
             for var in num_vars:
                 data = pd.DataFrame({
                     '群': groups,
