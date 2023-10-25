@@ -123,11 +123,12 @@ if df is not None:
     # 共起ネットワークの作成と表示
     try:
         st.subheader('【共起ネットワーク】')
+        npt = nlplot.NLPlot(df, target_col=selected_text)
         # 共起ネットワークのパラメータ
         min_edge_frequency = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
 
-        fig_co_network = npt.co_network(
+        fig_co_network_all = npt.co_network(
             sizing=100,
             node_size='adjacency_frequency', 
             color_palette='hls', 
@@ -135,8 +136,7 @@ if df is not None:
             height=700,
             save=True
             )
-        
-        st.write(fig_co_network)
+        st.write(fig_co_network_all)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
 
@@ -201,14 +201,14 @@ if df is not None:
             # 共起ネットワークのパラメータ
             min_edge_frequency = st.slider('最小エッジ頻度', 1, 100, 1, key=f'co_network_group_{name}')
             network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
-            fig = npt_group.co_network(
+            fig_co_network_grouped = npt_group.co_network(
                 sizing=100,
                 node_size='adjacency_frequency', 
                 color_palette='hls', 
                 width=1100,
                 height=700,
                 save=True)
-            st.write(fig)
+            st.write(fig_co_network_grouped)
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
             
