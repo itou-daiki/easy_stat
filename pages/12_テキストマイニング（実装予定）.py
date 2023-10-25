@@ -121,7 +121,7 @@ if df is not None:
             collocations=False, 
             font_path=font_path,
             min_font_size=4
-            ).generate(words)
+            ).generate(words_group)
         fig, ax = plt.subplots()
         ax.imshow(wordcloud_group, interpolation="bilinear")
         ax.axis('off')
