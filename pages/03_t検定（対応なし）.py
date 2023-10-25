@@ -187,16 +187,16 @@ if df is not None:
 
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4
-                ax.annotate("", xy=(x1, y), xycoords='data',
-                            xytext=(x1, y + bracket_length), textcoords='data',
+                ax.annotate("", xy=(x1 - 0.1, y), xycoords='data',
+                            xytext=(x1 - 0.1, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x2, y), xycoords='data',
-                            xytext=(x2, y + bracket_length), textcoords='data',
+                ax.annotate("", xy=(x2 + 0.1, y), xycoords='data',
+                            xytext=(x2 + 0.1, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
-                            xytext=(x2, y + bracket_length), textcoords='data',
+                ax.annotate("", xy=(x1 - 0.1, y + bracket_length), xycoords='data',
+                            xytext=(x2 + 0.1, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.text((x1 + x2) / 2, y + bracket_length, text,
+                ax.text((x1 + x2) / 2, y + bracket_length + 0.5, text,
                         horizontalalignment='center', verticalalignment='bottom')
 
             for var in num_vars:
