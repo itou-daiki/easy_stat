@@ -123,6 +123,7 @@ if df is not None:
     # 共起ネットワークの作成と表示
     try:
         st.subheader('【共起ネットワーク】')
+        st.write(df)
         # 共起ネットワークのパラメータ
         min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key='co_network_all')
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
