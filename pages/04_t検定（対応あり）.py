@@ -71,7 +71,7 @@ if df is not None:
 
         # pre_varsとpost_varsのリストを順番にイテレートし、それぞれの変数のペアを表示
         for pre_var, post_var in zip(pre_vars, post_vars):
-        st.write(f'● {pre_var} → {post_var}')
+            st.write(f'● {pre_var} → {post_var}')
         
         st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
