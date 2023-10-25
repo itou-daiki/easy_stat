@@ -3,10 +3,11 @@ import pandas as pd
 from scipy import stats
 from statistics import median, variance
 import matplotlib.pyplot as plt
-import japanize_matplotlib
-import seaborn as sns
-from PIL import Image
 import matplotlib as mpl
+import seaborn as sns
+import japanize_matplotlib
+from PIL import Image
+
 
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
