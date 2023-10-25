@@ -119,10 +119,10 @@ if df is not None:
     nouns_frequency = count_nouns(text_data)
 
     # 名詞の度数をデータフレームに変換
-    df_nouns = pd.DataFrame(nouns_frequency.items(), columns=['Noun', 'Frequency']).sort_values(by='Frequency', ascending=False)
+    df_nouns = pd.DataFrame(nouns_frequency.items(), columns=['名詞', '度数']).sort_values(by='度数', ascending=False)
 
     # 名詞の度数を棒グラフで表示
-    fig = px.bar(df_nouns.head(20), x='Noun', y='Frequency', title="名詞の出現度数")
+    fig = px.bar(df_nouns.head(20), x='名詞', y='度数', title="名詞の出現度数")
     st.plotly_chart(fig)
 
 
@@ -157,10 +157,10 @@ if df is not None:
         nouns_frequency_group = count_nouns(text_data_group)
 
         # 名詞の度数をデータフレームに変換
-        df_nouns_group = pd.DataFrame(nouns_frequency_group.items(), columns=['Noun', 'Frequency']).sort_values(by='Frequency', ascending=False)
+        df_nouns_group = pd.DataFrame(nouns_frequency_group.items(), columns=['名詞', '度数']).sort_values(by='度数', ascending=False)
 
         # 名詞の度数を棒グラフで表示
-        fig = px.bar(df_nouns_group.head(20), x='Noun', y='Frequency', title=f"名詞の出現度数　カテゴリ： {name}")
+        fig = px.bar(df_nouns_group.head(20), x='名詞', y='度数', title=f"名詞の出現度数　カテゴリ： {name}")
         st.plotly_chart(fig)
             
         # 共起ネットワークの作成と表示
