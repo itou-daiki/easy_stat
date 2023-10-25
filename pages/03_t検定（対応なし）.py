@@ -193,8 +193,8 @@ if df is not None:
                 ax.annotate("", xy=(x2, y), xycoords='data',
                             xytext=(x2, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
-                            xytext=(x2, y + bracket_length), textcoords='data',
+                ax.annotate("", xy=(x1 + 0.02, y + bracket_length), xycoords='data',
+                            xytext=(x2 - 0.02a, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
                 ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
                         horizontalalignment='center', verticalalignment='bottom')
@@ -211,9 +211,9 @@ if df is not None:
                 ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
                 if p_value < 0.01:
-                    significance_text = "p < 0.01"
+                    significance_text = "p < 0.01 **"
                 elif p_value < 0.05:
-                    significance_text = "p < 0.05"
+                    significance_text = "p < 0.05 **"
                 else:
                     significance_text = "n.s."
                 ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
