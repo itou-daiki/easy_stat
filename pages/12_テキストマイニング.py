@@ -127,7 +127,6 @@ if df is not None:
         min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key='co_network_all')
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
 
-
         fig = npt.co_network(
             sizing=100,
             node_size='adjacency_frequency', 
@@ -136,11 +135,10 @@ if df is not None:
             height=700,
             save=True
             )
+        
         st.write(iplot(fig))
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
-    except Exception as e:
-        st.error(f'予期しないエラーが発生しました: {str(e)}')
 
     # 全体のテキストデータから名詞の度数をカウント
     nouns_frequency = count_nouns(text_data)
@@ -213,8 +211,6 @@ if df is not None:
             st.write(fig)
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
-        except Exception as e:
-            st.error(f'予期しないエラーが発生しました: {str(e)}')
             
 else:
     st.error('データフレームがありません。ファイルをアップロードするか、デモデータを使用してください。')
