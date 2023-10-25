@@ -59,7 +59,7 @@ if df is not None:
     npt = nlplot.NLPlot(df, target_col=selected_text)
         
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
-    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","から","で","た","に"])
+    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる"])
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
@@ -69,7 +69,7 @@ if df is not None:
         words = []
         while nodes:
             features = nodes.feature.split(",")
-            if len(nodes.surface) > 1 and nodes.surface not in STOPWORDS:
+            if features[0] not in ["助詞"] and nodes.surface not in STOPWORDS:
                 if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
                     words.append(nodes.surface)
             nodes = nodes.next
