@@ -63,9 +63,12 @@ if df is not None:
     st.pyplot(fig)
         
     # 共起ネットワークの作成と表示
-    network = npt.build_graph(min_edge_frequency=2)
-    fig = npt.co_network(network, size='deg')
-    st.pyplot(plt.gcf())
+    try:
+        network = npt.build_graph(min_edge_frequency=2)
+        fig = npt.co_network(network, size='deg')
+        st.pyplot(plt.gcf())
+    except ValueError as e:
+        st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
 
     # カテゴリ変数で群分け
     st.subheader('カテゴリ別の分析')
@@ -84,9 +87,12 @@ if df is not None:
         st.pyplot(fig)
             
         # 共起ネットワークの作成と表示
-        network_group = npt_group.build_graph(min_edge_frequency=2)
-        fig = npt_group.co_network(network_group, size='deg')
-        st.pyplot(plt.gcf())
+        try:
+            network_group = npt_group.build_graph(min_edge_frequency=2)
+            fig = npt_group.co_network(network_group, size='deg')
+            st.pyplot(plt.gcf())
+        except ValueError as e:
+            st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
             
 else:
     st.error('データフレームがありません。ファイルをアップロードするか、デモデータを使用してください。')
