@@ -230,7 +230,7 @@ if df is not None:
             for i, (pre_var, post_var) in enumerate(zip(pre_vars, post_vars)):
                 ax = axs[i]  # 各図の座標軸を取得
                 data = pd.DataFrame({
-                    '群': ['観測値', '測定値'],
+                    '群': ['pre_var', 'post_var'],
                     '平均値': [df[pre_var].mean(), df[post_var].mean()],
                     '誤差': [df[pre_var].std(), df[post_var].std()]
                 })
