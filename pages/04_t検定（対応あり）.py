@@ -137,17 +137,16 @@ if df is not None:
             y_mean_col = result_df.columns.get_loc("測定値M")
 
             # paired_variable_listを直接イテレートして、各変数に対して解釈を提供
-            for vn, row in zip(paired_variable_list, result_df.itertuples()):
+            for idx, vn in enumerate(paired_variable_list):
                 # p値の解釈を取得
                 interpretation = ""
-                # comparison = "＞" if row[x_mean_col] > row[y_mean_col] else "＜"
-                comparison = "＞" if np.sign(row[x_mean_col] - row[y_mean_col]) > 0 else "＜"
+                comparison = "＞" if result_df.iat[idx, x_mean_col] > result_df.iat[idx, y_mean_col] else "＜"
 
-                if row[sign_col] == "**" or row[sign_col] == "*":
+                if result_df.iat[idx, sign_col] == "**" or result_df.iat[idx, sign_col] == "*":
                     interpretation = f'{vn}には有位な差が生まれる（ 観測値　{comparison}　測定値 ）'
-                elif row[sign_col] == "†":
+                elif result_df.iat[idx, sign_col] == "†":
                     interpretation = f'{vn}には有意な差が生まれる傾向にある（ 観測値　{comparison}　測定値 ）'
-                elif row[sign_col] == "n.s.":
+                elif result_df.iat[idx, sign_col] == "n.s.":
                     interpretation = f'{vn}には有意な差が生まれない'
                 # 解釈を表示
                 st.write(interpretation)
