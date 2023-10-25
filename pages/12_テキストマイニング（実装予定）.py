@@ -62,10 +62,9 @@ if df is not None:
     npt = nlplot.NLPlot(df, target_col=selected_text)
         
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
-    # STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は"])
-    # stopwords_list = list(STOPWORDS) + npt.default_stopwords
-    STOPWORDS = npt.get_stopword(top_n=2, min_freq=0)
-    st.write(STOPWORDS)
+    STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は"])
+    stopwords_list = list(STOPWORDS) + npt.default_stopwords
+    st.write(stopwords_list)
 
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
@@ -75,7 +74,7 @@ if df is not None:
         words = []
         while nodes:
             features = nodes.feature.split(",")
-            if features[0] not in ["助詞"] and nodes.surface not in STOPWORDS:
+            if features[0] not in ["助詞"] and nodes.surface not in stopwords_list:
                 if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
                     words.append(nodes.surface)
             nodes = nodes.next
@@ -87,7 +86,7 @@ if df is not None:
         nouns = []
         while nodes:
             features = nodes.feature.split(",")
-            if features[0] == "名詞" and nodes.surface not in STOPWORDS:
+            if features[0] == "名詞" and nodes.surface not in stopwords_list:
                 nouns.append(nodes.surface)
             nodes = nodes.next
         return Counter(nouns)
@@ -105,7 +104,7 @@ if df is not None:
         collocations=False, 
         font_path=font_path,
         min_font_size=4,
-        stopwords=STOPWORDS
+        stopwords=stopwords_list
         ).generate(words)
     fig, ax = plt.subplots()
     ax.imshow(wordcloud, interpolation="bilinear")
@@ -114,7 +113,7 @@ if df is not None:
         
     # 共起ネットワークの作成と表示
     try:
-        network = npt.build_graph(stopwords=STOPWORDS,min_edge_frequency=10)
+        network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=10)
         fig = npt.co_network(network, sizing=100,node_size='adjacency_frequency', color_palette='hls')
         st.write(fig)
     except ValueError as e:
@@ -152,7 +151,7 @@ if df is not None:
             collocations=False, 
             font_path=font_path,
             min_font_size=4,
-            stopwords=STOPWORDS
+            stopwords=stopwords_list
             ).generate(words_group)
         fig, ax = plt.subplots()
         ax.imshow(wordcloud_group, interpolation="bilinear")
@@ -171,7 +170,7 @@ if df is not None:
             
         # 共起ネットワークの作成と表示
         try:
-            network_group = npt_group.build_graph(stopwords=STOPWORDS,min_edge_frequency=10)
+            network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=10)
             fig = npt_group.co_network(network_group, sizing=100,node_size='adjacency_frequency', color_palette='hls')
             st.write(fig)
         except ValueError as e:
