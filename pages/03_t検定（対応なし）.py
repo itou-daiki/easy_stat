@@ -185,7 +185,7 @@ if df is not None:
             plt.rcParams['font.family'] = 'IPAexGothic'
 
             def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 0.5
+                bracket_length = 1.5
                 ax.annotate("", xy=(x1, y), xycoords='data',
                             xytext=(x1, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-"))
