@@ -68,7 +68,8 @@ if df is not None:
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
     
-
+    # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
+    npt = nlplot.NLPlot(df, target_col=selected_text)
 
     # ストップワードの定義 (KH Coderのデフォルトの日本語ストップワードを参考に簡易的に定義)
     STOPWORDS = set(["する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", "やる", "れる", "られる","の","を","し","に","です","は","その","ます","が","て","で","と","も"])
@@ -118,9 +119,7 @@ if df is not None:
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis('off')
     st.pyplot(fig)
-    
-    # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
-    npt = nlplot.NLPlot(df, target_col=selected_text)
+        
     # 共起ネットワークの作成と表示
     try:
         st.subheader('【共起ネットワーク】')
@@ -135,7 +134,7 @@ if df is not None:
             # height=700,
             # save=True
             )
-        st.write(fig)
+        st.write(npt.co_network())
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
     except Exception as e:
