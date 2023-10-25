@@ -153,11 +153,10 @@ if df is not None:
                 result_df.at[idx, 'd'] = d
 
             # 結果のデータフレームを表示
-            r_numerical_cols = result_df.select_dtypes(exclude=['object', 'category']).columns.tolist()
-            result_df[r_numerical_cols] = result_df[r_numerical_cols].apply(pd.to_numeric, errors='coerce')
-            styled_df = result_df.style.format("{:.2f}")
+            # r_numerical_cols = result_df.select_dtypes(exclude=['object', 'category']).columns.tolist()
+            # result_df[r_numerical_cols] = result_df[r_numerical_cols].apply(pd.to_numeric, errors='coerce')
             # styled_df = result_df.style.format({col: "{:.2f}" for col in r_numerical_cols})
-            st.write(styled_df) 
+            st.write(result_df) 
 
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
