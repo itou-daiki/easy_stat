@@ -8,7 +8,8 @@ import seaborn as sns
 from matplotlib import font_manager
 import japanize_matplotlib
 from PIL import Image
-
+from vistats import annotate_brackets
+from vistats.util import ttest_result2asterisk_tuples
 
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
