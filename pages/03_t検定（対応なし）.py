@@ -3,13 +3,8 @@ import pandas as pd
 from scipy import stats
 from statistics import median, variance
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-import seaborn as sns
-from matplotlib import font_manager
 import japanize_matplotlib
 from PIL import Image
-from vistats import annotate_brackets
-from vistats.util import ttest_result2asterisk_tuples
 
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
