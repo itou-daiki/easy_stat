@@ -16,7 +16,7 @@ from PIL import Image
 import MeCab
 
 font_path = "ipaexg.ttf"
-plt.rcParams['font.family'] = 'ipaexg.ttf'
+plt.rcParams['font.family'] = 'IPAexGothic'
 
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
