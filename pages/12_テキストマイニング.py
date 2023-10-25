@@ -14,6 +14,7 @@ import matplotlib as mpl
 import japanize_matplotlib
 from PIL import Image
 import MeCab
+%matplotlib inline
 
 font_path = "ipaexg.ttf"
 plt.rcParams['font.family'] = 'IPAexGothic'
