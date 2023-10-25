@@ -86,7 +86,8 @@ if df is not None:
         background_color='white', 
         collocations=False, 
         font_path=font_path,
-        min_font_size=4
+        min_font_size=4,
+        stopwords=STOPWORDS
         ).generate(words)
     fig, ax = plt.subplots()
     ax.imshow(wordcloud, interpolation="bilinear")
@@ -120,7 +121,8 @@ if df is not None:
             background_color='white', 
             collocations=False, 
             font_path=font_path,
-            min_font_size=4
+            min_font_size=4,
+            stopwords=STOPWORDS
             ).generate(words_group)
         fig, ax = plt.subplots()
         ax.imshow(wordcloud_group, interpolation="bilinear")
