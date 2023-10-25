@@ -128,6 +128,26 @@ if df is not None:
             # 結果のデータフレームを表示
             st.write(result_df)
 
+            st.subheader('【分析結果の解釈】')
+            # 'sign'列、'観測値M'列、および'測定値M'列の列番号を取得
+            sign_col = result_df.columns.get_loc('sign')
+            x1_mean_col = result_df.columns.get_loc("観測値M")
+            x2_mean_col = result_df.columns.get_loc("測定値M")
+
+            # VariableListを直接イテレートして、各変数に対して解釈を提供
+            for vn, row in zip(VariableList, df1.itertuples()):
+                # p値の解釈を取得
+                interpretation = ""
+                comparison = "＞" if row[x1_mean_col] > row[x2_mean_col] else "＜"
+                if row[sign_col] == "**" or row[sign_col] == "*":
+                    interpretation = f'{vn}には有位な差が生まれる（ 観測値　{comparison}　測定値 ）'
+                elif row[sign_col] == "†":
+                    interpretation = f'{vn}には有意な差が生まれる傾向にある（ 観測値　{comparison}　測定値 ）'
+                elif row[sign_col] == "n.s.":
+                    interpretation = f'{vn}には有意な差が生まれない'
+                # 解釈を表示
+                st.write(interpretation)
+
             for pre_var, post_var in zip(pre_vars, post_vars):
                 st.write(f'{pre_var} → {post_var}')
                 
