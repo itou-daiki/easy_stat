@@ -124,7 +124,6 @@ if df is not None:
     wordcloud1 = npt.wordcloud(
         width=800, height=400, 
         max_words=max_words,
-        font_path=font_path,
         min_font_size=4,
         stopwords=stopwords_list
         )
