@@ -153,7 +153,7 @@ if df is not None:
                 result_df.at[idx, 'd'] = d
 
             # 結果のデータフレームを表示
-            st.write(result_df)
+            st.write(result_df.style.format("{:.2f}")) 
 
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
