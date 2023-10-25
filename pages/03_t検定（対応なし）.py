@@ -159,20 +159,6 @@ if df is not None:
             # 選択した列にのみ、スタイルを適用
             styled_df = df_results.style.format({col: "{:.2f}" for col in numeric_columns})
             st.write(styled_df)
-            
-            # sign_captionを初期化
-            sign_caption = ''
-
-            # 各記号に対するチェックを実行
-            if df_results['sign'].str.contains('\*\*').any():
-                sign_caption += 'p<0.01** '
-            if df_results['sign'].str.contains('\*').any():
-                sign_caption += 'p<0.05* '
-            if df_results['sign'].str.contains('†').any():
-                sign_caption += 'p<0.1† '
-            
-            st.caption(sign_caption)
-
 
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
