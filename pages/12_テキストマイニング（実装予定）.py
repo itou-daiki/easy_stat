@@ -63,9 +63,20 @@ if df is not None:
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
 
+    def extract_words(text):
+    nodes = mecab.parseToNode(text)
+    words = []
+    while nodes:
+        features = nodes.feature.split(",")
+        if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
+            words.append(nodes.surface)
+        nodes = nodes.next
+    return " ".join(words)
+
+
     # テキストデータの抽出と単語の分割
     text_data = df[selected_text].str.cat(sep=' ')
-    words = mecab.parse(text_data).strip()
+    words = extract_words(text_data) 
 
     # ワードクラウドの作成と表示
     wordcloud = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path=font_path).generate(words)
@@ -93,7 +104,7 @@ if df is not None:
             
         # テキストデータの抽出と単語の分割 (カテゴリ別)
         text_data_group = group[selected_text].str.cat(sep=' ')
-        words_group = mecab.parse(text_data_group).strip()
+        words_group = mecab.parse(text_data_group)
 
         # ワードクラウドの作成と表示 (カテゴリ別)
         wordcloud_group = WordCloud(width=800, height=400, background_color='white', collocations=False, font_path=font_path).generate(words_group)
