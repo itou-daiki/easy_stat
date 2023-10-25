@@ -195,7 +195,7 @@ if df is not None:
                 ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
                             xytext=(x2, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-"))
-                ax.text((x1 + x2) / 2, y + bracket_length+5, text,
+                ax.text((x1 + x2) / 2, y + bracket_length+1, text,
                         horizontalalignment='center', verticalalignment='bottom')
 
             for var in num_vars:
