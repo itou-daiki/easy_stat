@@ -169,7 +169,6 @@ if df is not None:
             if result_df['sign'].str.contains('†').any():
                 sign_caption += 'p<0.1† '
 
-            # Streamlitアプリケーションに表示
             st.caption(sign_caption)
 
             # サンプルサイズの表示
