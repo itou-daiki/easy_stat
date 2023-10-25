@@ -53,6 +53,8 @@ if df is not None:
     # 観測変数と測定変数の選択
     st.subheader("観測変数の選択")
     pre_vars = st.multiselect('観測変数を選択してください', numerical_cols)
+
+    numerical_cols.remove(pre_vars)  # 選択済みの変数をリストから削除
     
     st.subheader("測定変数の選択")
     post_vars = st.multiselect('測定変数を選択してください', numerical_cols)
@@ -64,6 +66,14 @@ if df is not None:
         st.error("観測変数と測定変数を選択してください。")
     else:
         st.success("分析可能な変数を選択しました。分析を実行します。")
+
+    st.subheader("分析前の確認")
+
+    # pre_varsとpost_varsのリストを順番にイテレートし、それぞれの変数のペアを表示
+    for pre_var, post_var in zip(pre_vars, post_vars):
+        st.write(f'● {pre_var} → {post_var}')
+        
+    st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
         # t検定の実行
         if st.button('t検定の実行'):
