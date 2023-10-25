@@ -67,7 +67,6 @@ if df is not None:
     # MeCabの初期化
     mecab = MeCab.Tagger("-Owakati")
     
-
     # ワードクラウドと共起ネットワークの作成と表示 (全体の分析)
     npt = nlplot.NLPlot(df, target_col=selected_text)
 
@@ -154,6 +153,7 @@ if df is not None:
     # カテゴリ変数で群分け
     st.subheader('カテゴリ別の分析')
     grouped = df.groupby(selected_category)
+    st.write(grouped)
     for name, group in grouped:
         st.subheader(f'＜カテゴリ： {name}＞')
                         
