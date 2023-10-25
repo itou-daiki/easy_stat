@@ -125,7 +125,13 @@ if df is not None:
         # 共起ネットワークのパラメータ
         min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key='co_network_all')
         network = npt.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
-        fig = npt.co_network(network, sizing=100,node_size='adjacency_frequency', color_palette='hls', save=True)
+        fig = npt.co_network(
+            sizing=100,
+            node_size='adjacency_frequency', 
+            color_palette='hls', 
+            width=1100,
+            height=700,
+            save=True)
         st.plotly_chart(fig)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
@@ -190,7 +196,13 @@ if df is not None:
             # 共起ネットワークのパラメータ
             min_edge_frequency = st.slider('最小エッジ頻度', 1, 10, 1, key=f'co_network_group_{name}')
             network_group = npt_group.build_graph(stopwords=stopwords_list,min_edge_frequency=min_edge_frequency)
-            fig = npt_group.co_network(network_group, sizing=100,node_size='adjacency_frequency', color_palette='hls', save=True)
+            fig = npt_group.co_network(
+                sizing=100,
+                node_size='adjacency_frequency', 
+                color_palette='hls', 
+                width=1100,
+                height=700,
+                save=True)
             st.plotly_chart(fig)
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
