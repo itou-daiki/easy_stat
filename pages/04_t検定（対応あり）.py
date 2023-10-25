@@ -88,6 +88,7 @@ if df is not None:
             # indexにpre → post となるようにデータフレームを記載
             index = [f'{pre_var} → {post_var}' for pre_var, post_var in zip(pre_vars, post_vars)]
             result_df = pd.DataFrame(index=index, columns=resultColumns)
+            paired_variable_list = [f'{pre_var} → {post_var}' for pre_var, post_var in zip(pre_vars, post_vars)]
 
             for pre_var, post_var, idx in zip(pre_vars, post_vars, index):
                 # t値、p値、s（全体標準偏差）、d値（効果量）の取得
@@ -134,8 +135,8 @@ if df is not None:
             x1_mean_col = result_df.columns.get_loc("観測値M")
             x2_mean_col = result_df.columns.get_loc("測定値M")
 
-            # VariableListを直接イテレートして、各変数に対して解釈を提供
-            for vn, row in zip(VariableList, df1.itertuples()):
+            # paired_variable_listを直接イテレートして、各変数に対して解釈を提供
+            for vn, row in zip(paired_variable_list, result_df.itertuples()):
                 # p値の解釈を取得
                 interpretation = ""
                 comparison = "＞" if row[x1_mean_col] > row[x2_mean_col] else "＜"
