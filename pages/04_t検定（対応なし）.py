@@ -250,7 +250,7 @@ if df is not None:
             # 全ての図を一つのフィギュアに結合して描画
 
             # 結合された図の縦軸を揃える
-            y_max = max([max(data['平均値']) + max(data['誤差']) + 20 for var in num_vars])
+            y_max = max([max(data['平均値']) + max(data['誤差']) *1.1 for var in num_vars])
             fig, axs = plt.subplots(1, len(num_vars), figsize=(8*len(num_vars), 6), sharey=True)  # sharey=Trueで縦軸を揃える
             for i, var in enumerate(num_vars):
                 ax = axs[i]  # 各図の座標軸を取得
