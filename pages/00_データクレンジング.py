@@ -57,12 +57,16 @@ if uploaded_file is not None:
         st.write(processed_data)
 
         file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
+
+        # アップロードされたファイル名から拡張子を削除し、'_processed'を追加して新しいファイル名を作成
+        download_file_name = f"{uploaded_file.name.rsplit('.', 1)[0]}_processed"
+        
         if file_format == 'CSV':
             csv_data = processed_data.to_csv(index=False)
             st.download_button(
                 label="処理済みデータをダウンロード",
                 data=csv_data,
-                file_name=f'processed_data.csv',
+                file_name=f'{download_file_name}.csv'
                 mime='text/csv'
             )
         else:
@@ -72,7 +76,7 @@ if uploaded_file is not None:
             st.download_button(
                 label="処理済みデータをダウンロード",
                 data=excel_data,
-                file_name=f'processed_data.xlsx',
+                file_name=f'{download_file_name}.xlsx',
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
     
