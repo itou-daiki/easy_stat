@@ -28,7 +28,7 @@ if uploaded_file is not None:
 
     remove_outliers_option = st.checkbox('外れ値の削除')
     data_cleansing_option = st.checkbox('欠損値の削除')
-    remove_empty_columns_option = st.checkbox('値が入っていないカラムの削除')
+    remove_empty_columns_option = st.checkbox('値が入っていないカラム（列）の削除')
 
     if st.button('データ処理'):
         process_history = {}  # 処理の履歴を格納する辞書
@@ -41,7 +41,7 @@ if uploaded_file is not None:
                 IQR = Q3 - Q1
                 outlier_condition = ((data[num_cols] < (Q1 - 1.5 * IQR)) | (data[num_cols] > (Q3 + 1.5 * IQR)))
                 data = data[~outlier_condition.any(axis=1)]
-                process_history['【外れ値の削除】'] = f'外れ値を削除したカラム: {", ".join(num_cols)}'
+                process_history['【外れ値の削除】'] = f'外れ値を削除したカラム:\n{",\n".join(num_cols)}'
             else:
                 st.warning('外れ値を削除する数値列がありません')
 
@@ -53,14 +53,14 @@ if uploaded_file is not None:
         if remove_empty_columns_option:
             empty_columns = data.columns[data.isna().all()].tolist()
             data = data.dropna(axis=1, how='all')
-            process_history['【値が入っていないカラムの削除】'] = f'削除されたカラム: {", ".join(empty_columns)}'
+            process_history['【値が入っていないカラム（列）の削除】'] = f'削除されたカラム:\n{",\n".join(empty_columns)}'
 
         st.write('処理済みのデータ')
         st.write(data)
 
         st.write('処理の履歴')
         for process, details in process_history.items():
-            st.write(f'{process}: {details}')
+            st.write(f'{process}:\n{details}')
 
         file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
         st.download_button(
