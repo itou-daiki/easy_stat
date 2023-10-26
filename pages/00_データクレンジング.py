@@ -62,20 +62,20 @@ if uploaded_file is not None:
 
         with st.expander("処理の履歴"):  # アコーディオンウィジェットを使用
             # 外れ値の削除のテーブル
-            if '外れ値の削除' in process_history:
+            if '【外れ値の削除】' in process_history:
                 st.write('＜外れ値の削除＞')
-                outlier_cols = process_history['&#8203;``【oaicite:4】``&#8203;'].split('\n')[1].split('、')
+                outlier_cols = process_history['【外れ値の削除】'].split('\n')[1].split('、')
                 st.table(pd.DataFrame(outlier_cols, columns=['外れ値を削除したカラム（列）']))
             
             # 欠損値の削除のテーブル
-            if '欠損値の削除' in process_history:
+            if '【欠損値の削除】' in process_history:
                 st.write('＜欠損値の削除＞')
-                st.table(pd.DataFrame(columns=['詳細'], data=[process_history['&#8203;``【oaicite:2】``&#8203;']]))
+                st.table(pd.DataFrame(columns=['詳細'], data=[process_history['【欠損値の削除】']]))
             
             # 値が入っていないカラム（列）の削除のテーブル
-            if '値が入っていないカラム（列）の削除' in process_history:
+            if '【値が入っていないカラム（列）の削除】' in process_history:
                 st.write('＜値が入っていないカラム（列）の削除＞')
-                empty_cols = process_history['&#8203;``【oaicite:0】``&#8203;'].split('\n')[1].split('、')
+                empty_cols = process_history['【値が入っていないカラム（列）の削除】'].split('\n')[1].split('、')
                 st.table(pd.DataFrame(empty_cols, columns=['削除されたカラム']))
 
         file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
