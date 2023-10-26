@@ -213,13 +213,13 @@ if df is not None:
             
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                show_title = st.checkbox('グラフタイトルを表示する', value=True)
+                show_title = st.checkbox('グラフタイトルの表示', value=True)
             with col2:
-                italic_p = st.checkbox('ブラケット上のpをイタリックにする', value=True)
+                italic_p = st.checkbox('「p」や「n.s.」をイタリックに', value=True)
             with col3:
-                show_label = st.checkbox('データラベルを表示する', value=False)
+                show_label = st.checkbox('データラベルの表示する', value=False)
             with col4:
-                font_size = st.number_input('フォントサイズを入力してください', min_value=5, value=5, step=1)
+                font_size = st.number_input('フォントサイズ', min_value=5, value=5, step=1)
 
 
             def add_bracket(ax, x1, x2, y, text):
