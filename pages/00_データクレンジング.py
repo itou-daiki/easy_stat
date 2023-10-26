@@ -66,7 +66,7 @@ if uploaded_file is not None:
             st.download_button(
                 label="処理済みデータをダウンロード",
                 data=csv_data,
-                file_name=f'{download_file_name}.csv'
+                file_name=f'{download_file_name}.csv',  # 更新されたファイル名
                 mime='text/csv'
             )
         else:
@@ -76,7 +76,7 @@ if uploaded_file is not None:
             st.download_button(
                 label="処理済みデータをダウンロード",
                 data=excel_data,
-                file_name=f'{download_file_name}.xlsx',
+                file_name=f'{download_file_name}.xlsx',  # 更新されたファイル名
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
     
