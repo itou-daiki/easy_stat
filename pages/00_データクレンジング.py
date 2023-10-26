@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-
+import io
 
 
 
@@ -63,12 +63,24 @@ if uploaded_file is not None:
             st.text(f'{process}:\n{details}') 
 
         file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
-        st.download_button(
-            label="処理済みデータをダウンロード",
-            data=data.to_csv(index=False) if file_format == 'CSV' else data.to_excel(index=False),  # Convert data to CSV or Excel
-            file_name=f'processed_data.{file_format.lower()}',  # Name of the file to be downloaded
-            mime='text/csv' if file_format == 'CSV' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+        if file_format == 'CSV':
+            csv_data = data.to_csv(index=False)
+            st.download_button(
+                label="処理済みデータをダウンロード",
+                data=csv_data,
+                file_name=f'processed_data.csv',
+                mime='text/csv'
+            )
+        else:
+            excel_io = io.BytesIO()  # BytesIOオブジェクトを作成
+            data.to_excel(excel_io, index=False)  # ExcelデータをBytesIOオブジェクトに書き込む
+            excel_data = excel_io.getvalue()  # BytesIOオブジェクトからバイトデータを取得
+            st.download_button(
+                label="処理済みデータをダウンロード",
+                data=excel_data,
+                file_name=f'processed_data.xlsx',
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
     
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
