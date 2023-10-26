@@ -61,6 +61,14 @@ if uploaded_file is not None:
         st.subheader('処理の履歴')
         for process, details in process_history.items():
             st.text(f'{process}:\n{details}') 
+
+        file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
+        st.download_button(
+            label="処理済みデータをダウンロード",
+            data=data.to_csv(index=False) if file_format == 'CSV' else data.to_excel(index=False),
+            file_name=f'processed_data.{file_format.lower()}',
+            mime='text/csv' if file_format == 'CSV' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
     
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
