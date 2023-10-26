@@ -41,7 +41,7 @@ if uploaded_file is not None:
                 IQR = Q3 - Q1
                 outlier_condition = ((data[num_cols] < (Q1 - 1.5 * IQR)) | (data[num_cols] > (Q3 + 1.5 * IQR)))
                 data = data[~outlier_condition.any(axis=1)]
-                process_history['【外れ値の削除】'] = f'外れ値を削除したカラム:\n{",\n".join(num_cols)}'
+                process_history['【外れ値の削除】'] = '外れ値を削除したカラム（列）:\n{}'.format(",\n".join(num_cols))
             else:
                 st.warning('外れ値を削除する数値列がありません')
 
@@ -53,7 +53,7 @@ if uploaded_file is not None:
         if remove_empty_columns_option:
             empty_columns = data.columns[data.isna().all()].tolist()
             data = data.dropna(axis=1, how='all')
-            process_history['【値が入っていないカラム（列）の削除】'] = f'削除されたカラム:\n{",\n".join(empty_columns)}'
+            process_history['【値が入っていないカラム（列）の削除】'] = '削除されたカラム:\n{}'.format(",\n".join(empty_columns))
 
         st.write('処理済みのデータ')
         st.write(data)
@@ -61,14 +61,6 @@ if uploaded_file is not None:
         st.write('処理の履歴')
         for process, details in process_history.items():
             st.write(f'{process}:\n{details}')
-
-        file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
-        st.download_button(
-            label="処理済みデータをダウンロード",
-            data=data.to_csv(index=False) if file_format == 'CSV' else data.to_excel(index=False),
-            file_name=f'processed_data.{file_format.lower()}',
-            mime='text/csv' if file_format == 'CSV' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
     
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
