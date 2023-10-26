@@ -6,7 +6,7 @@ from fbprophet.plot import plot_plotly
 import plotly.offline as py
 
 # タイトルを設定
-st.title('時系列分析アプリ')
+st.title('因子分析アプリ')
 
 # CSVまたはExcelファイルのアップロード
 uploaded_file = st.file_uploader("CSVまたはExcelファイルをアップロードしてください", type=["csv", "xlsx"])
