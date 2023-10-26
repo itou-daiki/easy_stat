@@ -72,7 +72,7 @@ if df is not None:
         cat_var_str = str(cat_var)
         
         # xcat_var_dの要素をst.writeで表示
-        st.write(f'{(cat_var_str)}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
+        st.write(f'{(cat_var_str)}（{xcat_var_d[0]}）によって、')
 
         for num_var in num_vars:
             st.write(f'● {num_var}')
@@ -119,52 +119,47 @@ if df is not None:
             # 要約統計量（サマリ）のデータフレームを表示
             st.write(df0.style.format("{:.2f}"))
 
-            st.write('【平均値の差の検定（対応なし）】')
-            groups = df[cat_var].iloc[:, 0].unique().tolist()
+            st.write('【分散分析（対応なし）】')
+            
+            # ANOVAの実行
+            groups = [df[df[cat_var[0]] == group][num_var] for group in df[cat_var[0]].unique()]
+            fval, pval = stats.f_oneway(*groups)
+            anova_results = stats.f_oneway(*groups)
+            df_between = len(df[cat_var[0]].unique()) - 1
+            df_within = len(df) - len(df[cat_var[0]].unique())
+            ss_between = df_between * sum([(group.mean() - overall_mean)**2 for group in groups])
+            ss_total = sum([(value - overall_mean)**2 for group in groups for value in group])
+            ms_within = (ss_total - ss_between) / df_within
 
-            # 結果を保存するデータフレームの初期化
-            columns = ['全体M', '全体S.D', f'{groups[0]}M', f'{groups[0]}S.D',
-                    f'{groups[1]}M', f'{groups[1]}S.D', 'df', 't', 'p', 'sign', 'd']
-            df_results = pd.DataFrame(columns=columns)
+            # 効果量の計算
+            eta_squared = ss_between / ss_total
+            omega_squared = (ss_between - (df_between * ms_within)) / (ss_total + ms_within)
+            
+            
+            # 結果の表作成
+            columns = ['全体M', '全体S.D'] + [f'{group}M' for group in df[cat_var[0]].unique()] + \
+                          [f'{group}S.D' for group in df[cat_var[0]].unique()] + ['df', 'F', 'p', 'sign', 'd']
+            df_results = pd.DataFrame(columns=columns, index=[num_var])
 
-            for var in num_vars:
-                series = df[var]
-                group0_data = df[df[cat_var[0]] == groups[0]][var]
-                group1_data = df[df[cat_var[0]] == groups[1]][var]
+            overall_mean = df[num_var].mean()
+            overall_std = df[num_var].std()
 
-                ttest_result = stats.ttest_ind(group0_data, group1_data, equal_var=False)
-                overall_mean = series.mean()
-                overall_std = series.std()
-                g0_mean = group0_data.mean()
-                g0_std = group0_data.std()
-                g1_mean = group1_data.mean()
-                g1_std = group1_data.std()
-                effect_size = abs(g0_mean - g1_mean) / overall_std
+            means = [group.mean() for group in groups]
+            stds = [group.std() for group in groups]
+            
+            df_results = pd.DataFrame(columns=columns, index=[num_var])
+            df_results['η²'] = eta_squared
+            df_results['ω²'] = omega_squared
+            
 
-                if ttest_result.pvalue < 0.01:
-                    significance = '**'
-                elif ttest_result.pvalue < 0.05:
-                    significance = '*'
-                elif ttest_result.pvalue < 0.1:
-                    significance = '†'
-                else:
-                    significance = 'n.s.'
+            # 効果量（Cohen's d）の計算
+            pooled_std = np.sqrt(sum([(len(group) - 1) * (group.std() ** 2) for group in groups]) / (len(df) - len(df[cat_var[0]].unique())))
+            ds = [(mean - overall_mean) / pooled_std for mean in means]
 
-                results_row = {
-                    '全体M': overall_mean,
-                    '全体S.D': overall_std,
-                    f'{groups[0]}M': g0_mean,
-                    f'{groups[0]}S.D': g0_std,
-                    f'{groups[1]}M': g1_mean,
-                    f'{groups[1]}S.D': g1_std,
-                    'df': len(series) - 1,
-                    't': abs(ttest_result.statistic),
-                    'p': ttest_result.pvalue,
-                    'sign': significance,
-                    'd': effect_size
-                }
+            sign = '**' if pval < 0.01 else '*' if pval < 0.05 else 'n.s.'
 
-                df_results.loc[var] = results_row
+            df_results.loc[num_var] = [overall_mean, overall_std] + means + stds + [len(df) - len(df[cat_var[0]].unique()), fval, pval, sign, max(ds)]
+            st.write(df_results)
 
             # 結果の表示
             # 数値型の列だけを選択
@@ -188,15 +183,15 @@ if df is not None:
 
 
             # サンプルサイズの表示
-            st.write('【サンプルサイズ】')
+            st.write('サンプルサイズ')
             st.write(f'全体N ＝ {len(df)}')
-            st.write(f'● {groups[0]}： {len(group0_data)}')
-            st.write(f'● {groups[1]}： {len(group1_data)}')
+            for group_name in df[cat_var[0]].unique():
+                st.write(f'● {group_name}： {len(df[df[cat_var[0]] == group_name])}')
 
             st.subheader('【解釈の補助】')
 
             for index, row in df_results.iterrows():
-                comparison = " < " if row[f'{groups[0]}M'] < row[f'{groups[1]}M'] else " > "
+                comparisons = "、".join([f'{xcat_var_d[i]} < {xcat_var_d[j]}' for i in range(len(xcat_var_d)) for j in range(i+1, len(xcat_var_d))])
                 sign = row['sign']
                 if sign in ['**', '*']:
                     significance = "有意な差が生まれる"
