@@ -190,7 +190,7 @@ if df is not None:
                 else:
                     significance = "有意な差が生まれない"
                 p_value = row['p']
-                st.write(f'{cat_var_str}によって、{index}には{significance}（{xcat_var_d[0]}{comparison}{xcat_var_d[1]}）（p= {p_value:.2f}）')
+                st.write(f'{cat_var_str}によって、{index}には{significance}（{comparisons}）（p= {p_value:.2f}）')  # comparisonをcomparisonsに変更
 
 
             st.subheader('【可視化】')
