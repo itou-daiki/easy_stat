@@ -219,7 +219,7 @@ if df is not None:
             with col3:
                 show_label = st.checkbox('データラベルを表示する', value=False)
             with col4:
-                font_size = st.number_input('フォントサイズを入力してください', min_value=1, value=0, step=1)
+                font_size = st.number_input('フォントサイズを入力してください', min_value=5, value=5, step=1)
 
 
             def add_bracket(ax, x1, x2, y, text):
