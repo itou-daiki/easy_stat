@@ -211,7 +211,7 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
             
-            col1, col2, col3, col4 = st.beta_columns(4)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
                 show_title = st.checkbox('グラフタイトルを表示する', value=True)
             with col2:
