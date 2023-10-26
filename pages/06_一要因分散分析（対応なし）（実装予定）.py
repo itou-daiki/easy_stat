@@ -115,7 +115,7 @@ if df is not None:
                 df0.at[df00.columns[n], '最大値'] = y.max()
                 n += 1
 
-      
+
             # 要約統計量（サマリ）のデータフレームを表示
             st.write(df0.style.format("{:.2f}"))
 
