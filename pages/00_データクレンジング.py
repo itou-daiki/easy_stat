@@ -26,12 +26,11 @@ if uploaded_file is not None:
     st.write('元のデータ')
     st.write(data)
 
-    st.sidebar.header('前処理オプション')
-    remove_outliers_option = st.sidebar.checkbox('外れ値の削除')
-    data_cleansing_option = st.sidebar.checkbox('データクレンジング')
-    remove_empty_columns_option = st.sidebar.checkbox('値が入っていないカラムの削除')
+    remove_outliers_option = st.checkbox('外れ値の削除')
+    data_cleansing_option = st.checkbox('データクレンジング')
+    remove_empty_columns_option = st.checkbox('値が入っていないカラムの削除')
 
-    if st.sidebar.button('データ処理'):
+    if st.button('データ処理'):
         process_history = {}  # 処理の履歴を格納する辞書
 
         if remove_outliers_option:
