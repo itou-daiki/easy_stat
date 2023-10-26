@@ -14,7 +14,7 @@ st.markdown("""
 st.markdown("""
 - [**情報探究ステップアップガイド**](https://thorn-rumba-3a4.notion.site/612d9665350544aa97a2a8514a03c77c?v=0266abc5c1384b44a757b9044469d6bd&pvs=4)""")
 
-st.markdown("""具体的な機能は以下の通りです：""")
+st.markdown("""実装中の機能は以下の通りです：""")
 # List of implemented tests
 st.markdown("""- [**データクレンジング**](https://easystat-4-education.streamlit.app/データクレンジング)""")
 st.markdown("""- [**探索的データ分析（EDA）**](https://easystat-4-education.streamlit.app/探索的データ分析（EDA）)""")
