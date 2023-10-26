@@ -181,7 +181,7 @@ if df is not None:
             st.subheader('【解釈の補助】')
 
             for index, row in df_results.iterrows():
-                comparisons = "、".join([f'{xcat_var_d[i]} < {xcat_var_d[j]}' for i in range(len(xcat_var_d)) for j in range(i+1, len(xcat_var_d))])
+                comparisons = "、".join([f'「{xcat_var_d[i]}」 < 「{xcat_var_d[j]}」' for i in range(len(xcat_var_d)) for j in range(i+1, len(xcat_var_d))])
                 sign = row['sign']
                 if sign in ['**', '*']:
                     significance = "有意な差が生まれる"
@@ -191,7 +191,7 @@ if df is not None:
                     significance = "有意な差が生まれない"
                 p_value = row['p']
                 st.write(f'{cat_var_str}によって、【{index}】には{significance}')
-                st.write(f'　「{comparisons}」、（ p = {p_value:.2f} ）')
+                st.write(f'　{comparisons}、（ p = {p_value:.2f} ）')
 
 
             st.subheader('【可視化】')
