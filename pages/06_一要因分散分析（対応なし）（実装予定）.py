@@ -123,6 +123,7 @@ if df is not None:
             
             # ANOVAの実行
             groups = [df[df[cat_var[0]] == group][num_var] for group in df[cat_var[0]].unique()]
+            overall_mean = df[num_var].mean()
             fval, pval = stats.f_oneway(*groups)
             anova_results = stats.f_oneway(*groups)
             df_between = len(df[cat_var[0]].unique()) - 1
@@ -138,27 +139,17 @@ if df is not None:
             
             # 結果の表作成
             columns = ['全体M', '全体S.D'] + [f'{group}M' for group in df[cat_var[0]].unique()] + \
-                          [f'{group}S.D' for group in df[cat_var[0]].unique()] + ['df', 'F', 'p', 'sign', 'd']
+                          [f'{group}S.D' for group in df[cat_var[0]].unique()] + ['df', 'F', 'p', 'sign', 'η²', 'ω²']  # 修正: 'η²', 'ω²'を追加
             df_results = pd.DataFrame(columns=columns, index=[num_var])
 
-            overall_mean = df[num_var].mean()
             overall_std = df[num_var].std()
 
             means = [group.mean() for group in groups]
             stds = [group.std() for group in groups]
-            
-            df_results = pd.DataFrame(columns=columns, index=[num_var])
-            df_results['η²'] = eta_squared
-            df_results['ω²'] = omega_squared
-            
-
-            # 効果量（Cohen's d）の計算
-            pooled_std = np.sqrt(sum([(len(group) - 1) * (group.std() ** 2) for group in groups]) / (len(df) - len(df[cat_var[0]].unique())))
-            ds = [(mean - overall_mean) / pooled_std for mean in means]
 
             sign = '**' if pval < 0.01 else '*' if pval < 0.05 else 'n.s.'
 
-            df_results.loc[num_var] = [overall_mean, overall_std] + means + stds + [len(df) - len(df[cat_var[0]].unique()), fval, pval, sign, max(ds)]
+            df_results.loc[num_var] = [overall_mean, overall_std] + means + stds + [len(df) - len(df[cat_var[0]].unique()), fval, pval, sign, eta_squared, omega_squared]  # 修正: eta_squared, omega_squaredを追加
             st.write(df_results)
 
             # 結果の表示
