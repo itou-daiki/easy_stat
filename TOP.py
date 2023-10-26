@@ -55,6 +55,7 @@ st.markdown("""
 # Contact and repository info
 st.header("リンク")
 st.markdown("""
+- [**AutoML DataScience**](https://huggingface.co/spaces/itou-daiki/pycaret_datascience_streamlit)
 - [**音のデータサイエンス**](https://audiovisualizationanalysis-bpeekdjwymuf6nkqcb4cqy.streamlit.app/)
 - [**フィードバックはこちらまで**](https://forms.gle/G5sMYm7dNpz2FQtU9)
 - [**ソースコードはこちら（GitHub）**](https://github.com/itou-daiki/easy_stat)
