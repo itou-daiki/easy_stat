@@ -41,19 +41,19 @@ if uploaded_file is not None:
                 IQR = Q3 - Q1
                 outlier_condition = ((data[num_cols] < (Q1 - 1.5 * IQR)) | (data[num_cols] > (Q3 + 1.5 * IQR)))
                 data = data[~outlier_condition.any(axis=1)]
-                process_history['外れ値の削除'] = f'外れ値を削除したカラム: {", ".join(num_cols)}'
+                process_history['【外れ値の削除】'] = f'外れ値を削除したカラム: {", ".join(num_cols)}'
             else:
                 st.warning('外れ値を削除する数値列がありません')
 
         if data_cleansing_option:
             data = data.dropna()
             data = data.applymap(lambda x: x.strip() if isinstance(x, str) else x)
-            process_history['データクレンジング'] = '欠損値の削除と文字列の空白の削除を行いました'
+            process_history['【欠損値の削除】'] = '欠損値の削除と文字列の空白の削除を行いました'
 
         if remove_empty_columns_option:
             empty_columns = data.columns[data.isna().all()].tolist()
             data = data.dropna(axis=1, how='all')
-            process_history['値が入っていないカラムの削除'] = f'削除されたカラム: {", ".join(empty_columns)}'
+            process_history['【値が入っていないカラムの削除】'] = f'削除されたカラム: {", ".join(empty_columns)}'
 
         st.write('処理済みのデータ')
         st.write(data)
