@@ -60,9 +60,12 @@ if uploaded_file is not None:
         st.subheader('処理済みのデータ')
         st.write(processed_data)
 
-        st.subheader('処理の履歴')
-        for process, details in process_history.items():
-            st.text(f'{process}:\n{details}') 
+        with st.expander("処理の履歴"):  # アコーディオンウィジェットを使用
+                # テーブル形式での表示
+                process_history_df = pd.DataFrame(list(process_history.items()), columns=["Process", "Details"])
+                st.table(process_history_df)  # 処理の履歴をテーブル形式で表示
+                for process, details in process_history.items():
+                    st.markdown(f"**{process}**:\n{details}\n\n")
 
         file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
         if file_format == 'CSV':
