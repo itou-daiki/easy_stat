@@ -23,7 +23,7 @@ if uploaded_file is not None:
     else:
         data = pd.read_excel(uploaded_file)
     
-    st.write('元のデータ')
+    st.subheader('元のデータ')
     st.write(data)
 
     remove_outliers_option = st.checkbox('外れ値の削除')
@@ -55,12 +55,12 @@ if uploaded_file is not None:
             data = data.dropna(axis=1, how='all')
             process_history['【値が入っていないカラム（列）の削除】'] = '削除されたカラム:\n{}'.format(",\n".join(empty_columns))
 
-        st.write('処理済みのデータ')
+        st.subheader('処理済みのデータ')
         st.write(data)
 
-        st.write('処理の履歴')
+        st.subheader('処理の履歴')
         for process, details in process_history.items():
-            st.write(f'{process}:\n{details}')
+            st.text(f'{process}:\n{details}') 
     
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
