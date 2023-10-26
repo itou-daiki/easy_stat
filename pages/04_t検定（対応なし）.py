@@ -210,6 +210,16 @@ if df is not None:
             # グラフの描画
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
+            
+            col1, col2, col3, col4 = st.beta_columns(4)
+            with col1:
+                show_title = st.checkbox('グラフタイトルを表示する', value=True)
+            with col2:
+                italic_p = st.checkbox('ブラケット上のpをイタリックにする', value=True)
+            with col3:
+                show_label = st.checkbox('データラベルを表示する', value=False)
+            with col4:
+                font_size = st.number_input('フォントサイズを入力してください', min_value=1, value=0, step=1)
 
 
             def add_bracket(ax, x1, x2, y, text):
@@ -232,6 +242,8 @@ if df is not None:
                     '平均値': [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']],
                     '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
                 })
+                
+                
 
                 fig, ax = plt.subplots(figsize=(8, 6))
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
