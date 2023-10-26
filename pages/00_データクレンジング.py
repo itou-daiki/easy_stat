@@ -62,7 +62,7 @@ if uploaded_file is not None:
         for process, details in process_history.items():
             st.write(f'{process}: {details}')
 
-        file_format = st.selectbox('ダウンロードするファイル形式を選択', ['CSV', 'Excel'])
+        file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
         st.download_button(
             label="処理済みデータをダウンロード",
             data=data.to_csv(index=False) if file_format == 'CSV' else data.to_excel(index=False),
