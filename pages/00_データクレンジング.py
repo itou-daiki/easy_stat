@@ -27,7 +27,7 @@ if uploaded_file is not None:
     st.write(data)
 
     remove_outliers_option = st.checkbox('外れ値の削除')
-    data_cleansing_option = st.checkbox('データクレンジング')
+    data_cleansing_option = st.checkbox('欠損値の削除')
     remove_empty_columns_option = st.checkbox('値が入っていないカラムの削除')
 
     if st.button('データ処理'):
