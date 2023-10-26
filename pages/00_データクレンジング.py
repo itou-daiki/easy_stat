@@ -65,8 +65,8 @@ if uploaded_file is not None:
         file_format = st.selectbox('ダウンロードするファイル形式を選択', ['Excel', 'CSV'])
         st.download_button(
             label="処理済みデータをダウンロード",
-            data=data.to_csv(index=False) if file_format == 'CSV' else data.to_excel(index=False),
-            file_name=f'processed_data.{file_format.lower()}',
+            data=data.to_csv(index=False) if file_format == 'CSV' else data.to_excel(index=False),  # Convert data to CSV or Excel
+            file_name=f'processed_data.{file_format.lower()}',  # Name of the file to be downloaded
             mime='text/csv' if file_format == 'CSV' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
     
