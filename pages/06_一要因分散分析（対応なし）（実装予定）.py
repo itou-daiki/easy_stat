@@ -250,7 +250,7 @@ if df is not None:
                 
                 # ブラケットと判定を追加
                 for index, group in enumerate(means.index[:-1]):
-                    y_max = max(means.values + errors.values) + 5  # +5 を追加して、y軸の最大値を適切に設定
+                    y_max = max(means.values + np.array(errors.values)) + 5
                     ax.set_ylim(0, y_max + 5)  # y軸の最大値を設定
                     add_bracket(ax, index, index + 1, y_max, tukey_df.loc[index, 'reject'])  # y_maxを引数として渡す
 
