@@ -263,7 +263,7 @@ if df is not None:
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, (max(tukey_df[means]) + max(tukey_df[errors]))*1.4])  
+                ax.set_ylim([0, (max(means) + max(errors))*1.4])  
                 st.pyplot(fig)
 
 
