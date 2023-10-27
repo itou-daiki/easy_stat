@@ -167,18 +167,18 @@ if df is not None:
                 st.write(tukey_df)
             
 
-            # sign_captionを初期化
-            sign_caption = ''
+                # sign_captionを初期化
+                sign_caption = ''
 
-            # 各記号に対するチェックを実行
-            if df_results['sign'].str.contains('\*\*').any():
-                sign_caption += 'p<0.01** '
-            if df_results['sign'].str.contains('\*').any():
-                sign_caption += 'p<0.05* '
-            if df_results['sign'].str.contains('†').any():
-                sign_caption += 'p<0.1† '
-            
-            st.caption(sign_caption)
+                # 各記号に対するチェックを実行
+                if df_results['sign'].str.contains('\*\*').any():
+                    sign_caption += 'p<0.01** '
+                if df_results['sign'].str.contains('\*').any():
+                    sign_caption += 'p<0.05* '
+                if df_results['sign'].str.contains('†').any():
+                    sign_caption += 'p<0.1† '
+                
+                st.caption(sign_caption)
 
 
             # サンプルサイズの表示
