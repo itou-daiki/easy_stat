@@ -16,11 +16,8 @@ st.caption("Created by Daiki Ito")
 st.write("変数の選択　→　分散分析　→　表作成　→　解釈の補助を行います")
 st.write("")
 
-# フォント設定
-plt.rcParams['font.family'] = 'ipaexg.ttf'
-
 # 分析のイメージ
-image = Image.open('ttest.png')
+image = Image.open('anova.png')
 st.image(image)
 
 # ファイルアップローダー
@@ -32,7 +29,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('ttest_demo.xlsx', sheet_name=0)
+    df = pd.read_excel('anova_demo.xlsx', sheet_name=0)
     st.write(df.head())
 else:
     if uploaded_file is not None:
