@@ -232,8 +232,6 @@ if df is not None:
                     '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
                 })
                 
-                
-
                 fig, ax = plt.subplots(figsize=(8, 6))
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
                 ax.set_title(f'平均値の比較： {var}')
@@ -244,7 +242,7 @@ if df is not None:
                     significance_text = "p < 0.05 **"
                 else:
                     significance_text = "n.s."
-                ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
+                ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) * 1.2]) 
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 st.pyplot(fig)
             
@@ -269,7 +267,7 @@ if df is not None:
                 if i > 0:
                     prev_ax = axs[i - 1]
                     ylim = prev_ax.get_ylim()
-                    ax.set_ylim(ylim)
+                    ax.set_ylim(0, y_max)
 
                 ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
