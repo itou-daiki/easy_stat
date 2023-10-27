@@ -212,19 +212,25 @@ if df is not None:
             plt.rcParams['font.family'] = 'IPAexGothic'
 
             # ブラケットとp値の表示
-            def add_bracket(ax, x1, x2, y, text):
+            def add_bracket(ax, x1, x2, y, p_value, show_bracket=True):
                 bracket_length = 4  # bracket_lengthを小さくすることで、ブラケットの長さを調整することができます
-                ax.annotate("", xy=(x1, y), xycoords='data',
-                            xytext=(x1, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x2, y), xycoords='data',
-                            xytext=(x2, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x1 - 0.01, y + bracket_length - 0.5), xycoords='data',
-                            xytext=(x2 + 0.01, y + bracket_length - 0.5), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.text((x1 + x2) / 2, y + bracket_length, text,  # y + bracket_lengthに変更
-                        horizontalalignment='center', verticalalignment='bottom')
+                
+                # ブラケットを表示
+                if show_bracket:
+                    # 両端のブラケットの向きを下向きに修正
+                    ax.annotate("", xy=(x1, y), xycoords='data',
+                                xytext=(x1, y - bracket_length), textcoords='data',
+                                arrowprops=dict(arrowstyle="-", linewidth=1))
+                    ax.annotate("", xy=(x2, y), xycoords='data',
+                                xytext=(x2, y - bracket_length), textcoords='data',
+                                arrowprops=dict(arrowstyle="-", linewidth=1))
+                    # 中央部分のブラケットの向きを上向きに修正
+                    ax.annotate("", xy=(x1 + 0.01, y - bracket_length + 0.5), xycoords='data',
+                                xytext=(x2 - 0.01, y - bracket_length + 0.5), textcoords='data',
+                                arrowprops=dict(arrowstyle="-", linewidth=1))
+                # p値を表示
+                ax.text((x1 + x2) / 2, y - bracket_length - 2, f'p={p_value:.2f}',  # y - bracket_length - 2 でテキスト位置を調整
+                        horizontalalignment='center', verticalalignment='top')
 
             for num_var in num_vars:
                 # TukeyのHSDテストを実行
