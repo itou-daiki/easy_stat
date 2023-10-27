@@ -122,7 +122,9 @@ if df is not None:
             # ANOVAの実行
             # 結果の表作成
             columns = ['全体M', '全体S.D'] + [f'{group}M' for group in df[cat_var[0]].unique()] + \
-                          [f'{group}S.D' for group in df[cat_var[0]].unique()] + ['df', 'F', 'p', 'sign', 'η²', 'ω²']  # 修正: 'η²', 'ω²'を追加
+                    [f'{group}S.D' for group in df[cat_var[0]].unique()]
+            columns = ['全体M', '全体S.D'] + sum(zip([f'{group}M' for group in df[cat_var[0]].unique()], [f'{group}S.D' for group in df[cat_var[0]].unique()]), ()) + \
+                    ['df', 'F', 'p', 'sign', 'η²', 'ω²']
             df_results = pd.DataFrame(columns=columns, index=[num_var])
             
             for num_var in num_vars:
