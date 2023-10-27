@@ -213,7 +213,7 @@ if df is not None:
 
             # ブラケットとp値の表示
             def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 0.5  # bracket_lengthを小さくすることで、ブラケットの長さを調整することができます
+                bracket_length = 4  # bracket_lengthを小さくすることで、ブラケットの長さを調整することができます
                 ax.annotate("", xy=(x1, y), xycoords='data',
                             xytext=(x1, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
