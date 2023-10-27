@@ -231,8 +231,6 @@ if df is not None:
                 tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var[0]])
                 # 結果をデータフレームに変換
                 tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
-                st.write(f'{num_var}に対するTukeyのHSDテストの結果:')
-                st.write(tukey_df)
 
                 # 群ごとの平均値と標準偏差を計算
                 groups = df.groupby(cat_var[0])
