@@ -254,7 +254,7 @@ if df is not None:
                 y_max = max(means.values + np.array(errors.values))
                 
                 # ブラケットの位置を格納するリスト
-                bracket_positions = []
+                bracket_spacing = 10
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
@@ -275,14 +275,11 @@ if df is not None:
                     # group1 と group2 のインデックス位置を取得
                     x1 = means.index.get_loc(group1)
                     x2 = means.index.get_loc(group2)
-                    
-                    # 既存のブラケットとの重なりをチェック
-                    while any([x1 <= start <= x2 or x1 <= end <= x2 for start, end in bracket_positions]):
-                        y_max += 6
-                    # ブラケットの位置をリストに追加
-                    bracket_positions.append((x1, x2))
-                    
-                    add_bracket(ax, x1, x2, y_max + i*6, p_value, significance)
+
+                    # ブラケットの位置を計算
+                    y_position = y_max + i*bracket_spacing
+
+                    add_bracket(ax, x1, x2, y_position, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
