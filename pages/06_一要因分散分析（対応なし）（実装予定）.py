@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from vistats import pairwise_tukeyhsd
 import math
 from statistics import median, variance
 import matplotlib.pyplot as plt
@@ -211,84 +212,52 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            # ブラケットとp値の表示
-            def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 4
-                ax.annotate("", xy=(x1, y), xycoords='data',
-                            xytext=(x1, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x2, y), xycoords='data',
-                            xytext=(x2, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x1 - 0.01, y + bracket_length - 0.5), xycoords='data',
-                            xytext=(x2 + 0.01, y + bracket_length - 0.5), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
-                        horizontalalignment='center', verticalalignment='bottom')
+            def plot_tukey(data, num_var, cat_var):
+                tukey_result = pairwise_tukeyhsd(data[num_var], data[cat_var[0]])
+                tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
+                groups = data[cat_var[0]].unique()
 
-            for var in num_vars:
-                data = pd.DataFrame({
-                    '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
-                    '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
-                    '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
+                means = data.groupby(cat_var[0])[num_var].mean()
+                errors = data.groupby(cat_var[0])[num_var].sem()
+
+                fig, ax = plt.subplots()
+                        for var in num_vars:
+                            data = pd.DataFrame({
+                                '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
+                                '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
+                                '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
                 })
                 
-                
-                fig, ax = plt.subplots(figsize=(8, 6))
-                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
-                ax.set_title(f'平均値の比較： {var}')
-                p_value = df_results.at[var, 'p']
-                if p_value < 0.01:
-                    significance_text = "p < 0.01 **"
-                elif p_value < 0.05:
-                    significance_text = "p < 0.05 **"
-                else:
-                    significance_text = "n.s."
-                ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
+                # Draw bar graph
+                ax.bar(groups, means, yerr=errors, capsize=5)
+
+                # Draw brackets and p-values
+                for i, group1 in enumerate(groups):
+                    for j, group2 in enumerate(groups):
+                        if i < j:
+                            p_value = tukey_df[(tukey_df['group1'] == group1) & (tukey_df['group2'] == group2)]['p-adj'].values[0]
+                            y_max = max(means[i] + errors[i], means[j] + errors[j])
+                            bracket_height = y_max + 1  # Adjust this value to set the height of the bracket
+                            ax.annotate('', xy=(i, bracket_height), xytext=(j, bracket_height),
+                                        arrowprops=dict(arrowstyle='-',
+                                                        lw=1.5),
+                                        annotation_clip=False)
+                            significance = ''
+                            if p_value < 0.01:
+                                significance = '**'
+                            elif p_value < 0.05:
+                                significance = '*'
+                            elif p_value < 0.1:
+                                significance = '†'
+                            else:
+                                significance = 'n.s.'
+                            ax.text((i + j) / 2, bracket_height + 0.5, f'p={p_value:.2f} {significance}',
+                                    ha='center', va='bottom')
+
+                ax.set_ylabel(num_var)
+                plt.xticks(rotation=45)
                 st.pyplot(fig)
-            
-            # 全ての図を一つのフィギュアに結合して描画
 
-            # 結合された図の縦軸を揃える
-            
-            y_max = max([max(data['平均値']) + max(data['誤差']) * 1.5 for var in num_vars])
-            fig, axs = plt.subplots(1, len(num_vars), figsize=(8*len(num_vars), 6), sharey=True)  # sharey=Trueで縦軸を揃える
-            for i, var in enumerate(num_vars):
-                data = pd.DataFrame({
-                    '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
-                    '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
-                    '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
-                })
-
-                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5, zorder=3)  # zorder parameter added
-                ax.yaxis.grid(True, zorder=1)  # y軸のグリッド（横線）を表示, zorder parameter added
-
-                # 軸の横線を繋げる（隣接する軸の横線を繋げる）
-                if i > 0:
-                    prev_ax = axs[i - 1]
-                    ylim = prev_ax.get_ylim()
-                    ax.set_ylim(ylim)
-
-                ax.set_title(f'平均値の比較： {var}')
-                p_value = df_results.at[var, 'p']
-                if p_value < 0.01:
-                    significance_text = "p < 0.01 **"
-                elif p_value < 0.05:
-                    significance_text = "p < 0.05 **"
-                else:
-                    significance_text = "n.s."
-
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
-                ax.set_ylim([0, y_max*1.5])  # 各図の縦軸の最大値を揃える
-                ax.spines['top'].set_visible(False)  # 上の枠線を消す
-                ax.spines['right'].set_visible(False)  # 右の枠線を消す
-                ax.spines['left'].set_visible(False)  # 左の枠線を消す
-                ax.spines['bottom'].set_visible(False)  # 下の枠線を消す
-
-                ax.yaxis.grid(True)  # y軸のグリッド（横線）を表示
-
-            st.pyplot(fig)  # 結合されたフィギュアを表示
 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
