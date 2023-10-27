@@ -215,9 +215,9 @@ if df is not None:
 
             for var in num_vars:
                 data = pd.DataFrame({
-                    '群': groups,
-                    '平均値': [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']],
-                    '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
+                    '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
+                    '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
+                    '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
                 })
                 
                 
@@ -240,14 +240,13 @@ if df is not None:
 
             # 結合された図の縦軸を揃える
             
-            y_max = max([max(data['平均値']) + max(data['誤差']) *1.5 for var in num_vars])
+            y_max = max([max(data['平均値']) + max(data['誤差']) * 1.5 for var in num_vars])
             fig, axs = plt.subplots(1, len(num_vars), figsize=(8*len(num_vars), 6), sharey=True)  # sharey=Trueで縦軸を揃える
             for i, var in enumerate(num_vars):
-                ax = axs[i]  # 各図の座標軸を取得
                 data = pd.DataFrame({
-                    '群': groups,
-                    '平均値': [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']],
-                    '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
+                    '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
+                    '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
+                    '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
                 })
 
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5, zorder=3)  # zorder parameter added
