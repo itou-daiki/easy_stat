@@ -163,7 +163,7 @@ if df is not None:
                 tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var[0]])
                 # 結果をデータフレームに変換
                 tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
-                st.write(f'{num_var}に対するTukeyのHSDテストの結果:')
+                st.write(f'＜　　{num_var}　　に対する多重比較の結果＞')
                 st.write(tukey_df)
             
 
@@ -182,7 +182,7 @@ if df is not None:
 
 
             # サンプルサイズの表示
-            st.write('サンプルサイズ')
+            st.write('＜サンプルサイズ＞')
             st.write(f'全体N ＝ {len(df)}')
             for group_name in df[cat_var[0]].unique():
                 st.write(f'● {group_name}： {len(df[df[cat_var[0]] == group_name])}')
