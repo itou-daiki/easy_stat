@@ -70,7 +70,7 @@ if df is not None:
         cat_var_str = str(cat_var)
         
         # xcat_var_dの要素をst.writeで表示
-        st.write(f'{(cat_var_str)}（{xcat_var_d}）によって、')
+        st.write(f'{str(cat_var_str)}（{xcat_var_d}）によって、')
 
         for num_var in num_vars:
             st.write(f'● {num_var}')
