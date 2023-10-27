@@ -156,7 +156,7 @@ if df is not None:
             styled_df = df_results.style.format({col: "{:.2f}" for col in numeric_columns})
             st.write(styled_df)
             
-            st.write("多重比較の結果")
+            st.write("【多重比較の結果】")
 
             for num_var in num_vars:
                 # TukeyのHSDテストを実行
