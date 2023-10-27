@@ -249,7 +249,7 @@ if df is not None:
                 for index, group in enumerate(means.index[:-1]):
                     y_max = max(means.values + np.array(errors.values)) + 5
                     ax.set_ylim(0, y_max *1.4 )  # y軸の最大値を設定
-                    p_value = tukey_df.loc[index, 'p-adj']
+                    p_value = tukey_df.loc[index, 'reject']
                     if p_value < 0.01:
                         significance = '**'
                     elif p_value < 0.05:
