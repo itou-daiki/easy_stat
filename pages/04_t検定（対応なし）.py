@@ -242,7 +242,7 @@ if df is not None:
                     significance_text = "p < 0.05 **"
                 else:
                     significance_text = "n.s."
-                ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.5]) 
+                ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4]) 
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 st.pyplot(fig)
             
@@ -250,7 +250,7 @@ if df is not None:
 
             # 結合された図の縦軸を揃える
             
-            y_max = max([max(data['平均値']) + max(data['誤差']) *1.5 for var in num_vars])
+            y_max = max(([max(data['平均値']) + max(data['誤差'])) *1.4 for var in num_vars])
             fig, axs = plt.subplots(1, len(num_vars), figsize=(8*len(num_vars), 6), sharey=True)  # sharey=Trueで縦軸を揃える
             for i, var in enumerate(num_vars):
                 ax = axs[i]  # 各図の座標軸を取得
