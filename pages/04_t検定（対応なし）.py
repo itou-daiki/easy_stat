@@ -15,9 +15,6 @@ st.caption("Created by Daiki Ito")
 st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
 st.write("")
 
-# フォント設定
-plt.rcParams['font.family'] = 'ipaexg.ttf'
-
 # 分析のイメージ
 image = Image.open('ttest.png')
 st.image(image)
@@ -113,7 +110,6 @@ if df is not None:
                 df0.at[df00.columns[n], '最大値'] = y.max()
                 n += 1
 
-      
             # 要約統計量（サマリ）のデータフレームを表示
             st.write(df0.style.format("{:.2f}"))
 
@@ -211,6 +207,7 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
+            # ブラケット付きの棒グラフを出力する機能の追加
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4
                 ax.annotate("", xy=(x1, y), xycoords='data',

@@ -15,9 +15,6 @@ st.caption("Created by Daiki Ito")
 st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
 st.write("")
 
-# フォント設定
-plt.rcParams['font.family'] = 'ipaexg.ttf'
-
 # 分析のイメージ
 image = Image.open('ttest_rel.png')
 st.image(image)
@@ -233,55 +230,13 @@ if df is not None:
                     significance_text = "p < 0.01 **"
                 elif p_value < 0.05:
                     significance_text = "p < 0.05 *"
+                elif p_value < 0.1:
+                    significance_text = "p < 0.10 †"
                 else:
                     significance_text = "n.s."
-                ax.set_ylim([0, max(data['平均値']) + max(data['誤差']) + 20])
+                ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4])  
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 st.pyplot(fig)
 
-            # 全ての図を一つのフィギュアに結合して描画
-            # 結合された図の縦軸を揃える
-            y_max = max([max(data['平均値']) + max(data['誤差']) *1.5 for pre_var, post_var in zip(pre_vars, post_vars)])
-            fig, axs = plt.subplots(1, len(pre_vars), figsize=(8*len(pre_vars), 6), sharey=True)  # sharey=Trueで縦軸を揃える
-            for i, (pre_var, post_var) in enumerate(zip(pre_vars, post_vars)):
-                ax = axs[i]  # 各図の座標軸を取得
-                data = pd.DataFrame({
-                    '群': [pre_var, post_var],
-                    '平均値': [df[pre_var].mean(), df[post_var].mean()],
-                    '誤差': [df[pre_var].std(), df[post_var].std()]
-                })
-
-                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5, zorder=3)  # zorder parameter added
-                ax.yaxis.grid(True, zorder=1)  # y軸のグリッド（横線）を表示, zorder parameter added
-
-                # 軸の横線を繋げる（隣接する軸の横線を繋げる）
-                if i > 0:
-                    prev_ax = axs[i - 1]
-                    ylim = prev_ax.get_ylim()
-                    ax.set_ylim(ylim)
-
-                ax.set_title(f'平均値の比較： {pre_var} → {post_var}')
-                ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
-                p_value = ttest_result.pvalue
-                if p_value < 0.01:
-                    significance_text = "p < 0.01 **"
-                elif p_value < 0.05:
-                    significance_text = "p < 0.05 *"
-                else:
-                    significance_text = "n.s."
-
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
-                ax.set_ylim([0, y_max*1.5 ])  # 各図の縦軸の最大値を揃える
-                ax.spines['top'].set_visible(False)  # 上の枠線を消す
-                ax.spines['right'].set_visible(False)  # 右の枠線を消す
-                ax.spines['left'].set_visible(False)  # 左の枠線を消す
-                ax.spines['bottom'].set_visible(False)  # 下の枠線を消す
-
-                ax.yaxis.grid(True)  # y軸のグリッド（横線）を表示
-
-            st.pyplot(fig)  # 結合されたフィギュアを表示
-
-
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9',
-         'まで')
+st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9','まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
