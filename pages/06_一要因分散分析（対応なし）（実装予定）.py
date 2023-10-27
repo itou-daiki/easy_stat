@@ -257,7 +257,7 @@ if df is not None:
                     elif p_value < 0.1:
                         significance = '†'    
                     else:
-                        significance = 'ns'
+                        significance = 'n.s.'
                     add_bracket(ax, index, index + 1, y_max, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
