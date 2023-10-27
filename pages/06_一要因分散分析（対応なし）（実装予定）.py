@@ -273,7 +273,13 @@ if df is not None:
                     x1 = means.index.get_loc(group1)
                     x2 = means.index.get_loc(group2)
                     
-                    add_bracket(ax, x1, x2, y_max + i*7, p_value, significance)
+                    # 既存のブラケットとの重なりをチェック
+                    while any([x1 <= start <= x2 or x1 <= end <= x2 for start, end in bracket_positions]):
+                        y_max += 6
+                    # ブラケットの位置をリストに追加
+                    bracket_positions.append((x1, x2))
+                    
+                    add_bracket(ax, x1, x2, y_max + i*6, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
