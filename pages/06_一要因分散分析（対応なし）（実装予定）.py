@@ -215,20 +215,20 @@ if df is not None:
                 # ブラケットを表示
                 if show_bracket:
                     # ブラケットの両端を描画
-                    ax.annotate("", xy=(x1, y - bracket_length), xycoords='data',
+                    ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
                                 xytext=(x1, y), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
-                    ax.annotate("", xy=(x2, y - bracket_length), xycoords='data',
+                    ax.annotate("", xy=(x2, y + bracket_length), xycoords='data',
                                 xytext=(x2, y), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
                     
                     # ブラケットの中央部分を描画
-                    ax.annotate("", xy=(x1, y - bracket_length), xycoords='data',
-                                xytext=(x2, y - bracket_length), textcoords='data',
+                    ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
+                                xytext=(x2, y + bracket_length), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
                 
                 # p値と判定記号を表示
-                ax.text((x1 + x2) / 2, y + bracket_length * 0.3, f'p={p_value:.2f} {significance}',  # yの位置を調整
+                ax.text((x1 + x2) / 2, y + bracket_length * 2, f'p={p_value:.2f} {significance}',  # yの位置を調整
                         horizontalalignment='center', verticalalignment='bottom')
                 
             for num_var in num_vars:
@@ -247,10 +247,10 @@ if df is not None:
                 bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
                 
                 # ブラケットと判定を追加
-                for index, group in enumerate(means.index[:-1]):
-                    y_max = max(means.values + np.array(errors.values)) + 5
-                    ax.set_ylim(0, y_max *1.4 )  # y軸の最大値を設定
-                    p_value = tukey_df.loc[index, 'p-adj']
+                group_pairs = [(i, j) for i in range(len(means.index)) for j in range(i+1, len(means.index))]
+                y_max = max(means.values + np.array(errors.values))
+                for i, (group1, group2) in enumerate(group_pairs):
+                    p_value = pairwise_tukeyhsd(df[num_var], df[cat_var[0]]).pvalues[i]
                     if p_value < 0.01:
                         significance = '**'
                     elif p_value < 0.05:
@@ -259,12 +259,12 @@ if df is not None:
                         significance = '†'    
                     else:
                         significance = 'n.s.'
-                    add_bracket(ax, index, index + 1, y_max, p_value, significance)
+                    add_bracket(ax, group1, group2, y_max + i*3, p_value, significance)  # 位置の調整のためにiを利用
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, (max(means) + max(errors))*1.4])  
+                ax.set_ylim([0, y_max + len(group_pairs)*3])  # y軸の最大値を設定
                 st.pyplot(fig)
 
 
