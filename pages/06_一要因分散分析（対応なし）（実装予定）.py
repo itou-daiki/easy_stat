@@ -228,8 +228,8 @@ if df is not None:
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
                 
                 # p値と判定記号を表示
-                ax.text((x1 + x2) / 2, y - bracket_length * 1.5, f'p={p_value:.2f} {significance}',  # yの位置を調整
-                        horizontalalignment='center', verticalalignment='top')
+                ax.text((x1 + x2) / 2, y + bracket_length * 0.3, f'p={p_value:.2f} {significance}',  # yの位置を調整
+                        horizontalalignment='center', verticalalignment='bottom')
                 
             for num_var in num_vars:
                 # TukeyのHSDテストを実行
