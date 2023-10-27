@@ -250,7 +250,7 @@ if df is not None:
                 group_pairs = [(i, j) for i in range(len(means.index)) for j in range(i+1, len(means.index))]
                 y_max = max(means.values + np.array(errors.values))
                 for i, (group1, group2) in enumerate(group_pairs):
-                    p_value = pairwise_tukeyhsd(df[num_var], df[cat_var[0]]).pvalues[i]
+                    p_value = tukey_df['p-adj'][i]
                     if p_value < 0.01:
                         significance = '**'
                     elif p_value < 0.05:
