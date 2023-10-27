@@ -259,7 +259,7 @@ if df is not None:
                         significance = '†'    
                     else:
                         significance = 'n.s.'
-                    add_bracket(ax, group1, group2, y_max + i*3, p_value, significance)  # 位置の調整のためにiを利用
+                    add_bracket(ax, group1, group2, y_max + i*5, p_value, significance)  # 位置の調整のためにiを利用
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
