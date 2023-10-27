@@ -215,10 +215,10 @@ if df is not None:
                 # ブラケットを表示
                 if show_bracket:
                     # ブラケットの両端を描画
-                    ax.annotate("", xy=(x1-0.01, y + bracket_length), xycoords='data',
+                    ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
                                 xytext=(x1, y), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
-                    ax.annotate("", xy=(x2+0.01, y + bracket_length), xycoords='data',
+                    ax.annotate("", xy=(x2, y + bracket_length), xycoords='data',
                                 xytext=(x2, y), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
                     
