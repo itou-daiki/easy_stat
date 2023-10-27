@@ -211,26 +211,28 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            def add_bracket(ax, x1, x2, y, p_value, show_bracket=True):
-                bracket_length = 0.5  # bracket_lengthを小さくすることで、ブラケットの長さを調整することができます
+            def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
+                bracket_length = 0.5  # ブラケットの長さを調整
                 
                 # ブラケットを表示
                 if show_bracket:
-                    # 両端のブラケットの向きを下向きに修正
-                    ax.annotate("", xy=(x1, y), xycoords='data',
-                                xytext=(x1, y - bracket_length), textcoords='data',
+                    # ブラケットの両端を描画
+                    ax.annotate("", xy=(x1, y - bracket_length), xycoords='data',
+                                xytext=(x1, y), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
-                    ax.annotate("", xy=(x2, y), xycoords='data',
+                    ax.annotate("", xy=(x2, y - bracket_length), xycoords='data',
+                                xytext=(x2, y), textcoords='data',
+                                arrowprops=dict(arrowstyle="-", linewidth=1))
+                    
+                    # ブラケットの中央部分を描画
+                    ax.annotate("", xy=(x1, y - bracket_length), xycoords='data',
                                 xytext=(x2, y - bracket_length), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
-                    # 中央部分のブラケットの向きを上向きに修正
-                    ax.annotate("", xy=(x1 + 0.01, y - bracket_length + 0.2), xycoords='data',
-                                xytext=(x2 - 0.01, y - bracket_length + 0.2), textcoords='data',
-                                arrowprops=dict(arrowstyle="-", linewidth=1))
-                # p値を表示
-                ax.text((x1 + x2) / 2, y - bracket_length - 0.3, f'p={p_value:.2f}',  # y - bracket_length - 0.3 でテキスト位置を調整
+                
+                # p値と判定記号を表示
+                ax.text((x1 + x2) / 2, y - bracket_length * 1.5, f'p={p_value:.2f} {significance}',  # yの位置を調整
                         horizontalalignment='center', verticalalignment='top')
-
+                
             for num_var in num_vars:
                 # TukeyのHSDテストを実行
                 tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var[0]])
