@@ -240,11 +240,11 @@ if df is not None:
                 # 棒グラフと誤差範囲を描画
                 fig, ax = plt.subplots()
                 bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
-                y_max = max(means.values + errors.values) + 5  # +5 を追加して、y軸の最大値を適切に設定
-                ax.set_ylim(0, y_max + 5)  # y軸の最大値を設定
                 
                 # ブラケットと判定を追加
                 for index, group in enumerate(means.index[:-1]):
+                    y_max = max(means.values + errors.values) + 5  # +5 を追加して、y軸の最大値を適切に設定
+                    ax.set_ylim(0, y_max + 5)  # y軸の最大値を設定
                     add_bracket(ax, index, index + 1, y_max, tukey_df.loc[index, 'reject'])  # y_maxを引数として渡す
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
