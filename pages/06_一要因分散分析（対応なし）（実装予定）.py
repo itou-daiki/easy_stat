@@ -171,11 +171,11 @@ if df is not None:
                 sign_caption = ''
 
                 # 各記号に対するチェックを実行
-                if tukey_df['p-adj'].str.contains('\*\*').any():
+                if tukey_df['p-adj'] < 0.01:
                     sign_caption += 'p<0.01** '
-                if tukey_df['p-adj'].str.contains('\*').any():
+                if tukey_df['p-adj'] < 0.05:
                     sign_caption += 'p<0.05* '
-                if tukey_df['p-adj'].str.contains('†').any():
+                if tukey_df['p-adj'] < 0.1:
                     sign_caption += 'p<0.1† '
                 
                 st.caption(sign_caption)
