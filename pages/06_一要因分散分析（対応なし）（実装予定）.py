@@ -273,12 +273,12 @@ if df is not None:
                     x1 = means.index.get_loc(group1)
                     x2 = means.index.get_loc(group2)
                     
-                    add_bracket(ax, x1, x2, y_max + i*6, p_value, significance)
+                    add_bracket(ax, x1, x2, y_max + i*7, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*6])  # y軸の最大値を設定
+                ax.set_ylim([0, y_max + len(group_pairs)*7])  # y軸の最大値を設定
                 st.pyplot(fig)
 
 
