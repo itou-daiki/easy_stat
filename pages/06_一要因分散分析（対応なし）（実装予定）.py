@@ -145,7 +145,7 @@ if df is not None:
                 means = [group.mean() for group in groups]
                 stds = [group.std() for group in groups]
 
-                sign = '**' if pval < 0.01 else '*' if pval < 0.05 else 'n.s.'
+                sign = '**' if pval < 0.01 else '*' if pval < 0.05 else '†' if pval < 0.1 else 'n.s.'
 
                 df_results.loc[num_var] = [overall_mean, overall_std] + means + stds + [len(df) - len(df[cat_var[0]].unique()), fval, pval, sign, eta_squared, omega_squared]  # 修正: eta_squared, omega_squaredを追加
 
@@ -248,8 +248,17 @@ if df is not None:
                 # ブラケットと判定を追加
                 for index, group in enumerate(means.index[:-1]):
                     y_max = max(means.values + np.array(errors.values)) + 5
-                    ax.set_ylim(0, y_max + 5)  # y軸の最大値を設定
-                    add_bracket(ax, index, index + 1, y_max, tukey_df.loc[index, 'reject'])  # y_maxを引数として渡す
+                    ax.set_ylim(0, y_max *1.4 )  # y軸の最大値を設定
+                    p_value = tukey_df.loc[index, 'reject']
+                    if p_value < 0.01:
+                        significance = '**'
+                    elif p_value < 0.05:
+                        significance = '*'
+                    elif p_value < 0.1:
+                        significance = '†'    
+                    else:
+                        significance = 'ns'
+                    add_bracket(ax, index, index + 1, y_max, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
