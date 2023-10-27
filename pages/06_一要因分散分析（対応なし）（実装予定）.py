@@ -246,11 +246,12 @@ if df is not None:
                 fig, ax = plt.subplots()
                 bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
                 
+                # すべてのカテゴリ変数のペアを取得
+                group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
+                
                 # ブラケットと判定を追加
-                group_pairs = [(i, j) for i in range(len(means.index)) for j in range(i+1, len(means.index))]
-                y_max = max(means.values + np.array(errors.values))
                 for i, (group1, group2) in enumerate(group_pairs):
-                    p_value = tukey_df['p-adj'][i]
+                    p_value = tukey_df[(tukey_df['group1'] == group1) & (tukey_df['group2'] == group2)]['p-adj'].values[0]
                     if p_value < 0.01:
                         significance = '**'
                     elif p_value < 0.05:
