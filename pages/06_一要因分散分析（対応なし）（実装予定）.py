@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy import stats
-# from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from vistats import pairwise_tukeyhsd
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 import math
 from statistics import median, variance
 import matplotlib.pyplot as plt
@@ -212,51 +211,47 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            def plot_tukey(data, num_var, cat_var):
-                tukey_result = pairwise_tukeyhsd(data[num_var], data[cat_var[0]])
+            # ブラケットとp値の表示
+            def add_bracket(ax, x1, x2, y, text):
+                bracket_length = 4
+                ax.annotate("", xy=(x1, y), xycoords='data',
+                            xytext=(x1, y + bracket_length), textcoords='data',
+                            arrowprops=dict(arrowstyle="-", linewidth=1))
+                ax.annotate("", xy=(x2, y), xycoords='data',
+                            xytext=(x2, y + bracket_length), textcoords='data',
+                            arrowprops=dict(arrowstyle="-", linewidth=1))
+                ax.annotate("", xy=(x1 - 0.01, y + bracket_length - 0.5), xycoords='data',
+                            xytext=(x2 + 0.01, y + bracket_length - 0.5), textcoords='data',
+                            arrowprops=dict(arrowstyle="-", linewidth=1))
+                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
+                        horizontalalignment='center', verticalalignment='bottom')
+
+            for num_var in num_vars:
+                # TukeyのHSDテストを実行
+                tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var[0]])
+                # 結果をデータフレームに変換
                 tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
-                groups = data[cat_var[0]].unique()
+                st.write(f'{num_var}に対するTukeyのHSDテストの結果:')
+                st.write(tukey_df)
 
-                means = data.groupby(cat_var[0])[num_var].mean()
-                errors = data.groupby(cat_var[0])[num_var].sem()
+                # 群ごとの平均値と標準偏差を計算
+                groups = df.groupby(cat_var[0])
+                means = groups[num_var].mean()
+                errors = groups[num_var].std()
 
+                # 棒グラフと誤差範囲を描画
                 fig, ax = plt.subplots()
+                bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
                 
-                for var in num_vars:
-                    data = pd.DataFrame({
-                        '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
-                        '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
-                        '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
-                })
-                
-                # Draw bar graph
-                ax.bar(groups, means, yerr=errors, capsize=5)
+                # ブラケットと判定を追加
+                for index, group in enumerate(means.index[:-1]):
+                    y_max = max(means.values + errors.values) + index * 2  # Y位置を調整するためにindex * 2を追加
+                    add_bracket(ax, index, index + 1, y_max, tukey_df.loc[index, 'reject'])  # reject列に基づいてブラケットと判定を追加
 
-                # Draw brackets and p-values
-                for i, group1 in enumerate(groups):
-                    for j, group2 in enumerate(groups):
-                        if i < j:
-                            p_value = tukey_df[(tukey_df['group1'] == group1) & (tukey_df['group2'] == group2)]['p-adj'].values[0]
-                            y_max = max(means[i] + errors[i], means[j] + errors[j])
-                            bracket_height = y_max + 1  # Adjust this value to set the height of the bracket
-                            ax.annotate('', xy=(i, bracket_height), xytext=(j, bracket_height),
-                                        arrowprops=dict(arrowstyle='-',
-                                                        lw=1.5),
-                                        annotation_clip=False)
-                            significance = ''
-                            if p_value < 0.01:
-                                significance = '**'
-                            elif p_value < 0.05:
-                                significance = '*'
-                            elif p_value < 0.1:
-                                significance = '†'
-                            else:
-                                significance = 'n.s.'
-                            ax.text((i + j) / 2, bracket_height + 0.5, f'p={p_value:.2f} {significance}',
-                                    ha='center', va='bottom')
-
+                ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
-                plt.xticks(rotation=45)
+                ax.set_xlabel(cat_var[0])
+
                 st.pyplot(fig)
 
 
