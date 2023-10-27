@@ -213,7 +213,7 @@ if df is not None:
 
             # ブラケットとp値の表示
             def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 4
+                bracket_length = 0.5  # bracket_lengthを小さくすることで、ブラケットの長さを調整することができます
                 ax.annotate("", xy=(x1, y), xycoords='data',
                             xytext=(x1, y + bracket_length), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
@@ -223,7 +223,7 @@ if df is not None:
                 ax.annotate("", xy=(x1 - 0.01, y + bracket_length - 0.5), xycoords='data',
                             xytext=(x2 + 0.01, y + bracket_length - 0.5), textcoords='data',
                             arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
+                ax.text((x1 + x2) / 2, y + bracket_length, text,  # y + bracket_lengthに変更
                         horizontalalignment='center', verticalalignment='bottom')
 
             for num_var in num_vars:
@@ -240,11 +240,12 @@ if df is not None:
                 # 棒グラフと誤差範囲を描画
                 fig, ax = plt.subplots()
                 bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
+                y_max = max(means.values + errors.values) + 5  # +5 を追加して、y軸の最大値を適切に設定
+                ax.set_ylim(0, y_max + 5)  # y軸の最大値を設定
                 
                 # ブラケットと判定を追加
                 for index, group in enumerate(means.index[:-1]):
-                    y_max = max(means.values + errors.values) + index * 2  # Y位置を調整するためにindex * 2を追加
-                    add_bracket(ax, index, index + 1, y_max, tukey_df.loc[index, 'reject'])  # reject列に基づいてブラケットと判定を追加
+                    add_bracket(ax, index, index + 1, y_max, tukey_df.loc[index, 'reject'])  # y_maxを引数として渡す
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
