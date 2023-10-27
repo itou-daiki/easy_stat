@@ -254,7 +254,7 @@ if df is not None:
                 y_max = max(means.values + np.array(errors.values))
                 
                 # ブラケットの位置を格納するリスト
-                bracket_spacing = 10
+                bracket_spacing = 15
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
