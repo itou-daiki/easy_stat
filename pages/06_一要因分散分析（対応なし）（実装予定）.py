@@ -248,13 +248,15 @@ if df is not None:
                 
                 # すべてのカテゴリ変数のペアを取得
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
+
                 
                 #y軸の上限値を設定
                 y_max = max(means.values + np.array(errors.values))
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
-                    p_value = tukey_df[(tukey_df['group1'] == group1) & (tukey_df['group2'] == group2)]['p-adj'].values[0]
+                    group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
+
                     if p_value < 0.01:
                         significance = '**'
                     elif p_value < 0.05:
@@ -263,7 +265,12 @@ if df is not None:
                         significance = '†'    
                     else:
                         significance = 'n.s.'
-                    add_bracket(ax, group1, group2, y_max + i*5, p_value, significance)  # 位置の調整のためにiを利用
+                        
+                    # group1 と group2 のインデックス位置を取得
+                    x1 = means.index.get_loc(group1)
+                    x2 = means.index.get_loc(group2)
+                    
+                    add_bracket(ax, x1, x2, y_max + i*5, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
