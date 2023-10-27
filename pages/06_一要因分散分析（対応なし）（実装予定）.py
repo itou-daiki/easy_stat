@@ -158,6 +158,17 @@ if df is not None:
             # 選択した列にのみ、スタイルを適用
             styled_df = df_results.style.format({col: "{:.2f}" for col in numeric_columns})
             st.write(styled_df)
+            
+            st.write("多重比較の結果")
+
+            for num_var in num_vars:
+                # TukeyのHSDテストを実行
+                tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var[0]])
+                # 結果をデータフレームに変換
+                tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
+                st.write(f'{num_var}に対するTukeyのHSDテストの結果:')
+                st.write(tukey_df)
+            
 
             # sign_captionを初期化
             sign_caption = ''
@@ -200,6 +211,7 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
+            # ブラケットとp値の表示
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4
                 ax.annotate("", xy=(x1, y), xycoords='data',
@@ -222,7 +234,6 @@ if df is not None:
                 })
                 
                 
-
                 fig, ax = plt.subplots(figsize=(8, 6))
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
                 ax.set_title(f'平均値の比較： {var}')
