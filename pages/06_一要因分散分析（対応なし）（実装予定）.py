@@ -221,11 +221,12 @@ if df is not None:
                 errors = data.groupby(cat_var[0])[num_var].sem()
 
                 fig, ax = plt.subplots()
-                        for var in num_vars:
-                            data = pd.DataFrame({
-                                '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
-                                '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
-                                '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
+                
+                for var in num_vars:
+                    data = pd.DataFrame({
+                        '群': df[cat_var[0]].unique(),  # groupsをdf[cat_var[0]].unique()に変更
+                        '平均値': [df_results.at[var, f'{group}M'] for group in df[cat_var[0]].unique()],
+                        '誤差': [df_results.at[var, f'{group}S.D'] for group in df[cat_var[0]].unique()]
                 })
                 
                 # Draw bar graph
