@@ -253,6 +253,9 @@ if df is not None:
                 #y軸の上限値を設定
                 y_max = max(means.values + np.array(errors.values))
                 
+                # ブラケットの位置を格納するリスト
+                bracket_positions = []
+                
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
                     # tukey_df から特定のペアの p-adj 値を取得
