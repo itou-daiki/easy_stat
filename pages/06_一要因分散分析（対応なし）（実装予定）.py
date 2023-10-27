@@ -249,6 +249,9 @@ if df is not None:
                 # すべてのカテゴリ変数のペアを取得
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
                 
+                #y軸の上限値を設定
+                y_max = max(means.values + np.array(errors.values))
+                
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
                     p_value = tukey_df[(tukey_df['group1'] == group1) & (tukey_df['group2'] == group2)]['p-adj'].values[0]
