@@ -171,12 +171,13 @@ if df is not None:
                 sign_caption = ''
 
                 # 各記号に対するチェックを実行
-                if tukey_df['p-adj'] < 0.01:
-                    sign_caption += 'p<0.01** '
-                if tukey_df['p-adj'] < 0.05:
-                    sign_caption += 'p<0.05* '
-                if tukey_df['p-adj'] < 0.1:
-                    sign_caption += 'p<0.1† '
+                for p_adj in tukey_df['p-adj']:
+                    if p_adj < 0.01 and 'p<0.01**' not in sign_caption:
+                        sign_caption += 'p<0.01** '
+                    elif p_adj < 0.05 and 'p<0.05*' not in sign_caption:
+                        sign_caption += 'p<0.05* '
+                    elif p_adj < 0.1 and 'p<0.1†' not in sign_caption:
+                        sign_caption += 'p<0.1† '
                 
                 st.caption(sign_caption)
 
