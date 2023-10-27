@@ -245,50 +245,9 @@ if df is not None:
                 ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4]) 
                 add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 st.pyplot(fig)
-            
-            # 全ての図を一つのフィギュアに結合して描画
-
-            # 結合された図の縦軸を揃える
-            a
-            y_max = max([max(data['平均値']) + max(data['誤差']) *1.4 for var in num_vars]) #a
-            fig, axs = plt.subplots(1, len(num_vars), figsize=(8*len(num_vars), 6), sharey=True)  # sharey=Trueで縦軸を揃える
-            for i, var in enumerate(num_vars):
-                ax = axs[i]  # 各図の座標軸を取得
-                data = pd.DataFrame({
-                    '群': groups,
-                    '平均値': [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']],
-                    '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
-                })
-
-                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5, zorder=3)  # zorder parameter added
-                ax.yaxis.grid(True, zorder=1)  # y軸のグリッド（横線）を表示, zorder parameter added
-
-                # 軸の横線を繋げる（隣接する軸の横線を繋げる）
-                if i > 0:
-                    prev_ax = axs[i - 1]
-                    ylim = prev_ax.get_ylim()
-                    ax.set_ylim(0, y_max)
-
-                ax.set_title(f'平均値の比較： {var}')
-                p_value = df_results.at[var, 'p']
-                if p_value < 0.01:
-                    significance_text = "p < 0.01 **"
-                elif p_value < 0.05:
-                    significance_text = "p < 0.05 **"
-                else:
-                    significance_text = "n.s."
-
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
-                ax.set_ylim([0, y_max*1.5])  # 各図の縦軸の最大値を揃える
-                ax.spines['top'].set_visible(False)  # 上の枠線を消す
-                ax.spines['right'].set_visible(False)  # 右の枠線を消す
-                ax.spines['left'].set_visible(False)  # 左の枠線を消す
-                ax.spines['bottom'].set_visible(False)  # 下の枠線を消す
-
-                ax.yaxis.grid(True)  # y軸のグリッド（横線）を表示
-
-            st.pyplot(fig)  # 結合されたフィギュアを表示
-
+                st.write('')
+                
+                
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
