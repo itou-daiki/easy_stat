@@ -278,7 +278,7 @@ if df is not None:
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*7])  # y軸の最大値を設定
+                ax.set_ylim([0, y_max + len(group_pairs)*9])  # y軸の最大値を設定
                 st.pyplot(fig)
 
 
