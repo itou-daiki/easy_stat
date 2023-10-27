@@ -255,8 +255,11 @@ if df is not None:
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
-                    group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
-
+                    # tukey_df から特定のペアの p-adj 値を取得
+                    matching_row = tukey_df[((tukey_df['group1'] == group1) & (tukey_df['group2'] == group2)) | 
+                                            ((tukey_df['group1'] == group2) & (tukey_df['group2'] == group1))]
+                    p_value = matching_row['p-adj'].values[0]
+                    
                     if p_value < 0.01:
                         significance = '**'
                     elif p_value < 0.05:
@@ -270,12 +273,12 @@ if df is not None:
                     x1 = means.index.get_loc(group1)
                     x2 = means.index.get_loc(group2)
                     
-                    add_bracket(ax, x1, x2, y_max + i*5, p_value, significance)
+                    add_bracket(ax, x1, x2, y_max + i*6, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*5])  # y軸の最大値を設定
+                ax.set_ylim([0, y_max + len(group_pairs)*6])  # y軸の最大値を設定
                 st.pyplot(fig)
 
 
