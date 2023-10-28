@@ -220,7 +220,7 @@ if df is not None:
         
                     # ブラケットの中央部分を描画
                     ax.plot([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1)
-                    
+
                 # p値の表示内容を変更
                 if significance == '**':
                     p_display = 'p<0.01 **'
@@ -258,7 +258,7 @@ if df is not None:
                 y_max = max(means.values + np.array(errors.values))
                 
                 # ブラケットの位置を格納するリスト
-                bracket_spacing = 13
+                bracket_spacing = 15
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
