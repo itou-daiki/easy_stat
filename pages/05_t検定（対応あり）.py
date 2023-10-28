@@ -75,6 +75,9 @@ if df is not None:
         
         st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
+        # グラフタイトルを表示するチェックボックス
+        show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
+
         # t検定の実行
         if st.button('t検定の実行'):
             st.subheader('【分析結果】')
@@ -196,10 +199,6 @@ if df is not None:
 
             st.subheader('【可視化】')
 
-            # グラフタイトルを表示するチェックボックス
-            show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
-
-
             # グラフの描画
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
@@ -229,7 +228,7 @@ if df is not None:
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
                     ax.set_title(f'平均値の比較： {pre_var} → {post_var}')
-                    
+
                 ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
                 p_value = ttest_result.pvalue
                 if p_value < 0.01:
