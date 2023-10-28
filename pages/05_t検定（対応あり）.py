@@ -5,6 +5,7 @@ from scipy import stats
 import math
 from statistics import median, variance
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import japanize_matplotlib
 from PIL import Image
 
