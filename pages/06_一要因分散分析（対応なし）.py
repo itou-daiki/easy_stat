@@ -77,6 +77,9 @@ if df is not None:
 
         st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
+        # グラフタイトルを表示するチェックボックス
+        show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
+
         # t検定の実行
         if st.button('t検定の実行'):
             st.subheader('【分析結果】')
@@ -289,7 +292,8 @@ if df is not None:
 
                     add_bracket(ax, x1, x2, y_position, p_value, significance)
 
-                ax.set_title(f'{num_var} by {cat_var[0]}')
+                if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
+                    ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
                 ax.set_ylim([0, y_max + len(group_pairs)*15])  # y軸の最大値を設定
