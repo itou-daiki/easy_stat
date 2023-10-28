@@ -5,6 +5,7 @@ from scipy import stats
 import math
 from statistics import median, variance
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import japanize_matplotlib
 from PIL import Image
 
@@ -210,16 +211,16 @@ if df is not None:
             # ブラケット付きの棒グラフを出力する機能の追加
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4
-            # ブラケットの両端を描画
-            ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
-            ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
+                # ブラケットの両端を描画
+                ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
+                ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
 
-            # ブラケットの中央部分を描画
-            ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
+                # ブラケットの中央部分を描画
+                ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
 
-            # p値と判定記号を表示
-            ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
-                    horizontalalignment='center', verticalalignment='bottom')
+                # p値と判定記号を表示
+                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
+                        horizontalalignment='center', verticalalignment='bottom')
 
             for var in num_vars:
                 data = pd.DataFrame({
@@ -235,7 +236,9 @@ if df is not None:
                 if p_value < 0.01:
                     significance_text = "p < 0.01 **"
                 elif p_value < 0.05:
-                    significance_text = "p < 0.05 **"
+                    significance_text = "p < 0.05 *"
+                elif p_value < 0.1:
+                    significance_text = "p < 0.1 †"
                 else:
                     significance_text = "n.s."
                 ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4]) 
