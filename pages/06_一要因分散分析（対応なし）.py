@@ -215,17 +215,12 @@ if df is not None:
                 # ブラケットを表示
                 if show_bracket:
                     # ブラケットの両端を描画
-                    ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
-                                xytext=(x1, y), textcoords='data',
-                                arrowprops=dict(arrowstyle="-", linewidth=1))
-                    ax.annotate("", xy=(x2, y + bracket_length), xycoords='data',
-                                xytext=(x2, y), textcoords='data',
-                                arrowprops=dict(arrowstyle="-", linewidth=1))
-                    
+                    ax.plot([x1, x1], [y, y + bracket_length], color='black', lw=1)
+                    ax.plot([x2, x2], [y, y + bracket_length], color='black', lw=1)
+        
                     # ブラケットの中央部分を描画
-                    ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
-                                xytext=(x2, y + bracket_length), textcoords='data',
-                                arrowprops=dict(arrowstyle="-", linewidth=1))
+                    ax.plot([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1)
+                    
                 # p値の表示内容を変更
                 if significance == '**':
                     p_display = 'p<0.01 **'
