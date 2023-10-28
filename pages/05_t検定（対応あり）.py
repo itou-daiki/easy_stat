@@ -196,6 +196,10 @@ if df is not None:
 
             st.subheader('【可視化】')
 
+            # グラフタイトルを表示するチェックボックス
+            show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
+
+
             # グラフの描画
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
@@ -223,7 +227,9 @@ if df is not None:
 
                 fig, ax = plt.subplots(figsize=(8, 6))
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
-                ax.set_title(f'平均値の比較： {pre_var} → {post_var}')
+                if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
+                    ax.set_title(f'平均値の比較： {pre_var} → {post_var}')
+                    
                 ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
                 p_value = ttest_result.pvalue
                 if p_value < 0.01:
