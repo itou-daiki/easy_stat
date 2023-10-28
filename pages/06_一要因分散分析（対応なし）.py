@@ -213,7 +213,7 @@ if df is not None:
                 bracket_length = 4  # ブラケットの長さを調整
                 
                 # ブラケットを表示
-                if show_bracket and significance != 'n.s.':  # n.s.のときはブラケットを描画しない
+                if show_bracket
                     # ブラケットの両端を描画
                     ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
                                 xytext=(x1, y), textcoords='data',
