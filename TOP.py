@@ -22,12 +22,16 @@ st.markdown("""- [**相関分析**](https://easystat-4-education.streamlit.app/�
 st.markdown("""- [**カイ２乗分析**](https://easystat-4-education.streamlit.app/カイ２乗検定)""")
 st.markdown("""- [**ｔ検定（対応なし）**](https://easystat-4-education.streamlit.app/t検定（対応なし）)""")
 st.markdown("""- [**ｔ検定（対応あり）**](https://easystat-4-education.streamlit.app/t検定（対応あり）)""")
+st.markdown("""- [**一要因分散分析（対応なし）**](https://easystat-4-education.streamlit.app/一要因分散分析（対応なし）)""")
 st.markdown("""- [**テキストマイニング**](https://easystat-4-education.streamlit.app/テキストマイニング)""")
 
 # Updates and history
 st.header("更新履歴")
 
 st.markdown("""
+#### **2023/10/2８**
+- 一要因分散分析（対応なし）を実装しました
+
 #### **2023/10/26**
 - データクレンジングページを実装しました
 - t検定で出力される図に、ブラケットと判定を表示できるようにしました。
