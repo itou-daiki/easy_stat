@@ -75,6 +75,9 @@ if df is not None:
 
         st.write("これらの数値変数に有意な差が生まれるか検定します。")
 
+        # グラフタイトルを表示するチェックボックス
+        show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
+
         # t検定の実行
         if st.button('t検定の実行'):
             st.subheader('【分析結果】')
@@ -231,7 +234,8 @@ if df is not None:
                 
                 fig, ax = plt.subplots(figsize=(8, 6))
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
-                ax.set_title(f'平均値の比較： {var}')
+                if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
+                    ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
                 if p_value < 0.01:
                     significance_text = "p < 0.01 **"
