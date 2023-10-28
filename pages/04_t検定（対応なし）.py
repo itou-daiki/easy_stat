@@ -210,17 +210,16 @@ if df is not None:
             # ブラケット付きの棒グラフを出力する機能の追加
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4
-                ax.annotate("", xy=(x1, y), xycoords='data',
-                            xytext=(x1, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x2, y), xycoords='data',
-                            xytext=(x2, y + bracket_length), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.annotate("", xy=(x1 - 0.01, y + bracket_length - 0.5), xycoords='data',
-                            xytext=(x2 + 0.01, y + bracket_length - 0.5), textcoords='data',
-                            arrowprops=dict(arrowstyle="-", linewidth=1))
-                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
-                        horizontalalignment='center', verticalalignment='bottom')
+            # ブラケットの両端を描画
+            ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
+            ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
+
+            # ブラケットの中央部分を描画
+            ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
+
+            # p値と判定記号を表示
+            ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
+                    horizontalalignment='center', verticalalignment='bottom')
 
             for var in num_vars:
                 data = pd.DataFrame({
