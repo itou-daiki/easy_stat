@@ -213,7 +213,7 @@ if df is not None:
                 bracket_length = 4  # ブラケットの長さを調整
                 
                 # ブラケットを表示
-                if show_bracket:
+                if show_bracket and significance != 'n.s.':  # n.s.のときはブラケットを描画しない
                     # ブラケットの両端を描画
                     ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
                                 xytext=(x1, y), textcoords='data',
@@ -226,9 +226,18 @@ if df is not None:
                     ax.annotate("", xy=(x1, y + bracket_length), xycoords='data',
                                 xytext=(x2, y + bracket_length), textcoords='data',
                                 arrowprops=dict(arrowstyle="-", linewidth=1))
+                # p値の表示内容を変更
+                if significance == '**':
+                    p_display = 'p<0.01 **'
+                elif significance == '*':
+                    p_display = 'p<0.05 *'
+                elif significance == '†':
+                    p_display = 'p<0.1 †'
+                else:
+                    p_display = 'n.s.'
                 
                 # p値と判定記号を表示
-                ax.text((x1 + x2) / 2, y + bracket_length + 1.5, f'p={p_value:.2f} {significance}',  # yの位置を調整
+                ax.text((x1 + x2) / 2, y + bracket_length + 1.5, p_display,  # yの位置を調整
                         horizontalalignment='center', verticalalignment='bottom')
                 
             for num_var in num_vars:
