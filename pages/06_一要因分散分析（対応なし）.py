@@ -278,8 +278,6 @@ if df is not None:
                         significance = '*'
                     elif p_value < 0.1:
                         significance = '†'    
-                    else:
-                        significance = 'n.s.'
                         
                     # group1 と group2 のインデックス位置を取得
                     x1 = means.index.get_loc(group1)
@@ -288,7 +286,11 @@ if df is not None:
                     # ブラケットの位置を計算
                     y_position = y_max + i*bracket_spacing
 
-                    add_bracket(ax, x1, x2, y_position, p_value, significance)
+                    # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加
+                    if significance != 'n.s.':
+                        add_bracket(ax, x1, x2, y_position, p_value, significance)
+
+                    # add_bracket(ax, x1, x2, y_position, p_value, significance)
 
                 ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
