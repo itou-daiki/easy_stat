@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="ブラウザ統計", layout="wide")
+st.set_page_config(page_title="easyStat", layout="wide")
 
 # App title and creator
 st.title("easyStat（ブラウザ統計）")
