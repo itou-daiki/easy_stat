@@ -81,7 +81,7 @@ if df is not None:
         show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
 
         # t検定の実行
-        if st.button('t検定の実行'):
+        if st.button('分散分析の実行'):
             st.subheader('【分析結果】')
             st.write('【要約統計量】')
 
