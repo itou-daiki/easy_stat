@@ -4,7 +4,7 @@ st.set_page_config(page_title="easyStat", layout="wide")
 
 # App title and creator
 st.title("easyStat（ブラウザ統計）")
-st.caption("Created by Daiki Ito")
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 
 # Introduction
 st.markdown("""
@@ -70,4 +70,5 @@ st.markdown("""
 """)
 
 # Copyright
-st.markdown('© 2022-2023 Daiki Ito. All Rights Reserved.')
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+

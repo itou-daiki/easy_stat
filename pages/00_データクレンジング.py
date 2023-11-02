@@ -11,7 +11,7 @@ import io
 st.set_page_config(page_title="データクレンジング", layout="wide")
 
 st.title("データクレンジング")
-st.caption("Created by Daiki Ito")
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 st.write("データセットに対して、欠損値処理や外れ値の処理などができます")
 st.write("")
 
@@ -81,4 +81,5 @@ if uploaded_file is not None:
             )
     
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+

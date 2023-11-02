@@ -11,7 +11,7 @@ from PIL import Image
 st.set_page_config(page_title="相関分析", layout="wide")
 
 st.title("相関分析")
-st.caption("Created by Daiki Ito")
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 st.write("２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。")
 st.write("")
 
@@ -101,4 +101,4 @@ if df is not None:
 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')

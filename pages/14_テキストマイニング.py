@@ -20,7 +20,7 @@ plt.rcParams['font.family'] = 'IPAexGothic'
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
 st.title("テキストマイニング")
-st.caption("Created by Daiki Ito")
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 st.write("カテゴリ変数と記述変数からワードクラウドや共起ネットワークを抽出できます")
 st.write("")
 
@@ -214,6 +214,8 @@ if df is not None:
             
 else:
     st.error('データフレームがありません。ファイルをアップロードするか、デモデータを使用してください。')
+
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
 
 
 

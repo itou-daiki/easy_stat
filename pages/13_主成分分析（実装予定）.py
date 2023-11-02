@@ -17,7 +17,7 @@ mpl.rcParams['font.family'] = font_prop.get_name()
 st.set_page_config(page_title="主成分分析", layout="wide")
 
 st.title("主成分分析")
-st.caption("Created by Daiki Ito")
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 st.write("")
 st.subheader("ブラウザで検定　→　表　→　解釈まで出力できるウェブアプリです。")
 st.write("iPad等でも分析を行うことができます")
@@ -76,3 +76,5 @@ if uploaded_file is not None:
 
     st.write("Principal components:")
     st.write(components)
+
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')

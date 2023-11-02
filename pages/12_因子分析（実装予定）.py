@@ -7,6 +7,7 @@ import plotly.offline as py
 
 # タイトルを設定
 st.title('因子分析アプリ')
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 
 # CSVまたはExcelファイルのアップロード
 uploaded_file = st.file_uploader("CSVまたはExcelファイルをアップロードしてください", type=["csv", "xlsx"])
@@ -42,3 +43,6 @@ if uploaded_file is not None:
         # トレンドや週次、年次の影響を表示
         fig2 = model.plot_components(forecast)
         st.write(fig2)
+
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+

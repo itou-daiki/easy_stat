@@ -12,7 +12,7 @@ from PIL import Image
 st.set_page_config(page_title="t検定(対応あり)", layout="wide")
 
 st.title("t検定(対応あり)")
-st.caption("Created by Daiki Ito")
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
 st.write("")
 
@@ -244,4 +244,4 @@ if df is not None:
                 st.pyplot(fig)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9','まで')
-st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')

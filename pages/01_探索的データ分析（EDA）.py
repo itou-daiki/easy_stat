@@ -11,7 +11,7 @@ import japanize_matplotlib
 st.set_page_config(page_title="探索的データ解析（EDA）", layout="wide")
 
 st.title("探索的データ解析（EDA）")
-st.caption("Created by Daiki Ito")
+st.caption("Created by Dit-Lab.(Daiki Ito)")
 st.write("簡易的な探索的データ解析（EDA）が実行できます")
 st.write("")
 
@@ -157,4 +157,4 @@ if df is not None:
         st.warning('２つのカテゴリ変数と１つの数値変数を選択してください。')
     
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-st.write('© 2022-2023 Daiki Ito. All Rights Reserved.')
+st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
