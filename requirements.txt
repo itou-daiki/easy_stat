@@ -17,7 +17,7 @@ wordcloud
 networkx
 mecab-python3
 unidic-lite
-nlplot
+nlplot[all]
 Counter
 cufflinks
 statsmodels
