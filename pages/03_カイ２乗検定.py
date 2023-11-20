@@ -46,7 +46,7 @@ if df is not None:
     # カテゴリ変数の選択
     st.subheader("カテゴリ変数の選択")
     selected_col1 = st.selectbox('変数1を選択してください', categorical_cols, key='select1')
-    categorical_cols.remove(selected_col1)  # 選択済みの変数をリストから削除
+    # categorical_cols.remove(selected_col1)  # 選択済みの変数をリストから削除
     selected_col2 = st.selectbox('変数2を選択してください', categorical_cols, key='select2')
 
     # 選択した変数の度数分布のバープロット
