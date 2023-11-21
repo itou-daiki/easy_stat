@@ -211,25 +211,19 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            def add_bracket(ax, x1, x2, yerr1, yerr2, text):
-                # バーの高さとエラーバーの最大値を取得
-                y1, y2 = ax.patches[x1].get_height(), ax.patches[x2].get_height()
-                y1 += yerr1
-                y2 += yerr2
-                
-                # y軸の全範囲に対するオフセットを計算
-                ylim = ax.get_ylim()
-                yrange = ylim[1] - ylim[0]
-                offset = yrange * 0.05  # オフセットをy軸の範囲の5%に設定
-                
-                # ブラケットの上端位置をエラーバーの上端からさらに上に設定
-                bracket_top = max(y1, y2) + offset
-                
-                # ブラケット線を描く
-                ax.plot([x1, x1, x2, x2], [y1, bracket_top, bracket_top, y2], color='black', lw=1)
-                
-                # ブラケットの中央にテキストを描く
-                ax.text((x1 + x2) * 0.5, bracket_top + offset, text, ha='center', va='bottom')
+            # ブラケット付きの棒グラフを出力する機能の追加
+            def add_bracket(ax, x1, x2, y, text):
+                bracket_length = 4
+                # ブラケットの両端を描画
+                ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
+                ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
+
+                # ブラケットの中央部分を描画
+                ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
+
+                # p値と判定記号を表示
+                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
+                        horizontalalignment='center', verticalalignment='bottom')
 
             for var in num_vars:
                 data = pd.DataFrame({
@@ -252,14 +246,7 @@ if df is not None:
                 else:
                     significance_text = "n.s."
                 ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4]) 
-
-                # エラーバーの値を取得
-                yerr1 = data['誤差'][0]
-                yerr2 = data['誤差'][1]
-
-                # ブラケットを追加する関数の呼び出し
-                add_bracket(ax, 0, 1, yerr1, yerr2, significance_text)
-
+                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
                 st.pyplot(fig)
                 st.write('')
                 
