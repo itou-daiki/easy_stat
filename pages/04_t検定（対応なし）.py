@@ -247,7 +247,14 @@ if df is not None:
                 else:
                     significance_text = "n.s."
                 ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4]) 
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
+
+                # エラーバーの値を取得
+                yerr1 = data['誤差'][0]
+                yerr2 = data['誤差'][1]
+
+                # ブラケットを追加する関数の呼び出し
+                add_bracket(ax, 0, 1, yerr1, yerr2, significance_text)
+                
                 st.pyplot(fig)
                 st.write('')
                 
