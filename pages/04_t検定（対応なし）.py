@@ -211,21 +211,27 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            # ブラケット付きの棒グラフを出力する機能の追加
             def add_bracket(ax, x1, x2, yerr1, yerr2, text):
                 # バーの高さとエラーバーの最大値を取得
-                y1, y2 = ax.patches[x1].get_height() + yerr1, ax.patches[x2].get_height() + yerr2
-                bracket_height = (ax.get_ylim()[1] - ax.get_ylim()[0]) * 0.02  # y軸の範囲に基づいて高さを設定
+                y1, y2 = ax.patches[x1].get_height(), ax.patches[x2].get_height()
+                y1 += yerr1
+                y2 += yerr2
                 
-                # ブラケットの上部位置を決定する
+                # ブラケットの基本的な高さをエラーバーの上端から決定
+                bracket_height = (ax.get_ylim()[1] - ax.get_ylim()[0]) * 0.02
+                
+                # ブラケットの上端位置をエラーバーの上端からさらに上に設定
                 bracket_top = max(y1, y2) + bracket_height
+                
+                # ブラケットとエラーバーの間にオフセットを追加
+                offset = bracket_height * 0.1  # オフセットはブラケットの高さの10%に設定
 
                 # ブラケット線を描く
-                ax.plot([x1, x1, x2, x2], [y1, bracket_top, bracket_top, y2], color='black', lw=1)
-
+                ax.plot([x1, x1, x2, x2], [y1 + offset, bracket_top, bracket_top, y2 + offset], color='black', lw=1)
+                
                 # ブラケットの中央にテキストを描く
-                ax.text((x1 + x2) * 0.5, bracket_top + bracket_height, text, ha='center', va='bottom')
-
+                ax.text((x1 + x2) * 0.5, bracket_top + offset, text, ha='center', va='bottom')
+                
             for var in num_vars:
                 data = pd.DataFrame({
                     '群': groups,
@@ -254,7 +260,7 @@ if df is not None:
 
                 # ブラケットを追加する関数の呼び出し
                 add_bracket(ax, 0, 1, yerr1, yerr2, significance_text)
-                
+
                 st.pyplot(fig)
                 st.write('')
                 
