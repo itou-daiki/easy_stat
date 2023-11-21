@@ -217,21 +217,20 @@ if df is not None:
                 y1 += yerr1
                 y2 += yerr2
                 
-                # ブラケットの基本的な高さをエラーバーの上端から決定
-                bracket_height = (ax.get_ylim()[1] - ax.get_ylim()[0]) * 0.02
+                # y軸の全範囲に対するオフセットを計算
+                ylim = ax.get_ylim()
+                yrange = ylim[1] - ylim[0]
+                offset = yrange * 0.05  # オフセットをy軸の範囲の5%に設定
                 
                 # ブラケットの上端位置をエラーバーの上端からさらに上に設定
-                bracket_top = max(y1, y2) + bracket_height
+                bracket_top = max(y1, y2) + offset
                 
-                # ブラケットとエラーバーの間にオフセットを追加
-                offset = bracket_height * 0.1  # オフセットはブラケットの高さの10%に設定
-
                 # ブラケット線を描く
-                ax.plot([x1, x1, x2, x2], [y1 + offset, bracket_top, bracket_top, y2 + offset], color='black', lw=1)
+                ax.plot([x1, x1, x2, x2], [y1, bracket_top, bracket_top, y2], color='black', lw=1)
                 
                 # ブラケットの中央にテキストを描く
                 ax.text((x1 + x2) * 0.5, bracket_top + offset, text, ha='center', va='bottom')
-                
+
             for var in num_vars:
                 data = pd.DataFrame({
                     '群': groups,
