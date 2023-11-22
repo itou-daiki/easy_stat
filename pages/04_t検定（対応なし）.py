@@ -249,6 +249,9 @@ if df is not None:
                 
                 # y軸の限界を調整して全てがフィットするようにする
                 ax.set_ylim(0, max(bars_height) + fixed_bracket_height_above_bars + annotation_height_above_bracket + 5)
+
+                # プロットを表示
+                st.pyplot(fig)
                 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
