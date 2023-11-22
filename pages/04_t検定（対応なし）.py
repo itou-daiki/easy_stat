@@ -233,6 +233,7 @@ if df is not None:
                     ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
                 significance_text = "p < 0.01 **" if p_value < 0.01 else "p < 0.05 *" if p_value < 0.05 else "p < 0.1 †" if p_value < 0.1 else "n.s."
+                bracket_length = 4
                 bracket_height = max(data['平均値']) + max(data['誤差']) * 1.1 + bracket_length
                 ax.set_ylim([0, bracket_height * 1.4])
                 add_bracket(ax, 0, 1, bracket_height, significance_text)
