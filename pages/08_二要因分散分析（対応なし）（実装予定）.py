@@ -86,8 +86,10 @@ if df is not None:
             for cat in cat_vars:
                 tukey = pairwise_tukeyhsd(endog=df[num_var], groups=df[cat], alpha=0.05)
                 tukey_results[cat] = tukey
+                # Tukey結果をDataFrameに変換して表示
+                tukey_df = pd.DataFrame(data=tukey._results_table.data[1:], columns=tukey._results_table.data[0])
                 st.write(f'＜ {cat} に対する多重比較の結果 ＞')
-                st.table(tukey.summary())
+                st.table(tukey_df)
 
             # 可視化
             st.subheader('【可視化】')
@@ -110,10 +112,12 @@ if df is not None:
             # すべての組み合わせについてブラケットを追加
             height = means.values.max() + errors.values.max() + 0.05
             for cat in cat_vars:
-                for i, group1 in enumerate(df[cat].unique()):
-                    for j, group2 in enumerate(df[cat].unique()):
+                unique_groups = df[cat].unique()
+                for i, group1 in enumerate(unique_groups):
+                    for j, group2 in enumerate(unique_groups):
                         if i < j:
-                            p_value = tukey_results[cat].pvalues[i * len(df[cat].unique()) + j]
+                            # 正しいインデックスでp値を取得
+                            p_value = tukey_results[cat].pvalues[unique_groups.tolist().index(group1) * len(unique_groups) + unique_groups.tolist().index(group2)]
                             if p_value < 0.05:
                                 display_text = f'p = {p_value:.3f}'
                                 add_significance_brackets(cat, group1, group2, height, display_text)
