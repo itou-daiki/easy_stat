@@ -213,13 +213,12 @@ if df is not None:
 
             # ブラケット付きの棒グラフを出力する機能の更新
             def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 4  # ブラケットの縦棒の固定長さ
-
-                # ブラケットの両端（縦棒）を描画
+                bracket_length = 4
+                # ブラケットの両端を描画
                 ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
                 ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
 
-                # ブラケットの中央部分（横棒）を描画
+                # ブラケットの中央部分を描画
                 ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
 
                 # p値と判定記号を表示
@@ -240,10 +239,11 @@ if df is not None:
                     ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
                 significance_text = "p < 0.01 **" if p_value < 0.01 else "p < 0.05 *" if p_value < 0.05 else "p < 0.1 †" if p_value < 0.1 else "n.s."
-                bracket_position = max(data['平均値']) + max(data['誤差']) + 5  # ブラケットの位置を決定
-                ax.set_ylim([0, bracket_position + 10])  # Y軸の範囲を設定
-                add_bracket(ax, 0, 1, bracket_position, significance_text)
+                bracket_height = max(data['平均値']) + max(data['誤差']) * 1.1
+                ax.set_ylim([0, bracket_height * 1.4])
+                add_bracket(ax, 0, 1, bracket_height, significance_text)
                 st.pyplot(fig)
+                
                 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
