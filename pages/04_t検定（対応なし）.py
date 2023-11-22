@@ -211,12 +211,6 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            # 棒グラフの上の固定ブラケットの高さを設定
-            fixed_bracket_height_above_bars = 10
-
-            # ブラケットの上のアノテーションのための固定高さを設定
-            annotation_height_above_bracket = 2
-
             # ブラケット付きの棒グラフを出力する機能の更新
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4  # ブラケットの両端の縦棒の長さを固定
