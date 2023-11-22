@@ -211,7 +211,7 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            # ブラケット付きの棒グラフを出力する機能の追加
+            # ブラケット付きの棒グラフを出力する機能の更新
             def add_bracket(ax, x1, x2, y, text):
                 bracket_length = 4
                 # ブラケットの両端を描画
@@ -225,30 +225,24 @@ if df is not None:
                 ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
                         horizontalalignment='center', verticalalignment='bottom')
 
+            # グラフ描画部分の更新
             for var in num_vars:
                 data = pd.DataFrame({
                     '群': groups,
                     '平均値': [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']],
                     '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
                 })
-                
+
                 fig, ax = plt.subplots(figsize=(8, 6))
                 bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
-                if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
+                if show_graph_title:
                     ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
-                if p_value < 0.01:
-                    significance_text = "p < 0.01 **"
-                elif p_value < 0.05:
-                    significance_text = "p < 0.05 *"
-                elif p_value < 0.1:
-                    significance_text = "p < 0.1 †"
-                else:
-                    significance_text = "n.s."
-                ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4]) 
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
+                significance_text = "p < 0.01 **" if p_value < 0.01 else "p < 0.05 *" if p_value < 0.05 else "p < 0.1 †" if p_value < 0.1 else "n.s."
+                bracket_height = max(data['平均値']) + max(data['誤差']) * 1.1
+                ax.set_ylim([0, bracket_height * 1.4])
+                add_bracket(ax, 0, 1, bracket_height, significance_text)
                 st.pyplot(fig)
-                st.write('')
                 
                 
 
