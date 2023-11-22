@@ -86,8 +86,12 @@ if df is not None:
             for cat in cat_vars:
                 tukey = pairwise_tukeyhsd(endog=df[num_var], groups=df[cat], alpha=0.05)
                 tukey_results[cat] = tukey
-                # Tukey結果をDataFrameに変換して表示
+
+                # Tukey結果をDataFrameに変換して列名を適切なものに変更
                 tukey_df = pd.DataFrame(data=tukey._results_table.data[1:], columns=tukey._results_table.data[0])
+                tukey_df.columns = ['Group1', 'Group2', 'Meandiff', 'P-adj', 'Lower', 'Upper', 'Reject']
+                tukey_df = tukey_df.rename(columns={'Group1': f'{cat}1', 'Group2': f'{cat}2'})
+
                 st.write(f'＜ {cat} に対する多重比較の結果 ＞')
                 st.table(tukey_df)
 
