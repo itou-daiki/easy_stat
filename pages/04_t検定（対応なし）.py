@@ -211,13 +211,21 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
+            # 棒グラフの上の固定ブラケットの高さを設定
+            fixed_bracket_height_above_bars = 10
+
+            # ブラケットの上のアノテーションのための固定高さを設定
+            annotation_height_above_bracket = 2
+
             # ブラケット付きの棒グラフを出力する機能の更新
-            def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 4  # ブラケットの両端の縦棒の長さを固定
-                ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
-                ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
-                ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
-                ax.text((x1 + x2) / 2, y + bracket_length + 2, text, ha='center', va='bottom')
+            def add_bracket(ax, x1, x2, bars_height, text):
+                # 棒グラフの高さに基づいてブラケットのy位置を計算
+                y = max(bars_height) + fixed_bracket_height_above_bars
+                
+                # ブラケットの線を描画
+                ax.plot([x1, x1, x2, x2], [y, y + 1, y + 1, y], lw=1, c='black')
+                # ブラケットにp値をアノテートする
+                ax.text((x1 + x2) * .5, y + 1 + annotation_height_above_bracket, text, ha='center', va='bottom')
 
             # グラフ描画部分の更新
             for var in num_vars:
@@ -233,12 +241,14 @@ if df is not None:
                     ax.set_title(f'平均値の比較： {var}')
                 p_value = df_results.at[var, 'p']
                 significance_text = "p < 0.01 **" if p_value < 0.01 else "p < 0.05 *" if p_value < 0.05 else "p < 0.1 †" if p_value < 0.1 else "n.s."
-                bracket_length = 4
-                bracket_height = max(data['平均値']) + max(data['誤差']) * 1.1 + bracket_length
-                ax.set_ylim([0, bracket_height * 1.4])
-                add_bracket(ax, 0, 1, bracket_height, significance_text)
-                st.pyplot(fig)
+                # ブラケット関数に渡すためにバーの高さを計算
+                bars_height = [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']]
                 
+                # ブラケットを追加
+                add_bracket(ax, 0, 1, bars_height, significance_text)
+                
+                # y軸の限界を調整して全てがフィットするようにする
+                ax.set_ylim(0, max(bars_height) + fixed_bracket_height_above_bars + annotation_height_above_bracket + 5)
                 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
