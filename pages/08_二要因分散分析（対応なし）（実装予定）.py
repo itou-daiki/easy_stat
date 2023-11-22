@@ -53,7 +53,7 @@ if df is not None:
 
     # カテゴリ変数の選択
     st.subheader("カテゴリ変数の選択")
-    cat_vars = st.multiselect('2つのカテゴリ変数を選択してください', categorical_cols, format_func=lambda x: x, default=categorical_cols[:2])
+    cat_vars = st.multiselect('2つのカテゴリ変数を選択してください', categorical_cols, format_func=lambda x: x)
 
     # 数値変数の選択
     st.subheader("数値変数の選択")
