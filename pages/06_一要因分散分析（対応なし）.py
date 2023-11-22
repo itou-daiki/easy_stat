@@ -257,17 +257,11 @@ if df is not None:
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
 
                 
-                # 群ごとの平均値と標準偏差を計算
-                groups = df.groupby(cat_var[0])
-                means = groups[num_var].mean()
-                errors = groups[num_var].std()
-
-                # 棒グラフと誤差範囲を描画
-                fig, ax = plt.subplots()
-                bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
-
-                # y軸の上限の動的調整
-                y_max = max(means.values + errors.values) + 10  # 追加する余裕を持たせる
+                #y軸の上限値を設定
+                y_max = max(means.values + np.array(errors.values))
+                
+                # ブラケットの位置を格納するリスト
+                bracket_spacing = 15
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
@@ -290,12 +284,13 @@ if df is not None:
                     x2 = means.index.get_loc(group2)
 
                     # ブラケットの位置を計算
-                    y_position = means[group1] + errors[group1] + (2 * i)  # 誤差範囲を考慮
-                    add_bracket(ax, x1, x2, y_position, p_value, significance)
-
-                # y軸の上限を設定
-                ax.set_ylim([0, y_max])
+                    y_position = y_max + i*bracket_spacing
+                    # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加
                     
+                    # if significance != 'n.s.':
+                    #     add_bracket(ax, x1, x2, y_position, p_value, significance)
+
+                    add_bracket(ax, x1, x2, y_position, p_value, significance)
 
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
                     ax.set_title(f'{num_var} by {cat_var[0]}')
