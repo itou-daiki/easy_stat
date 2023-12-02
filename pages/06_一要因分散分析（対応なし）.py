@@ -321,6 +321,5 @@ if df is not None:
                 st.pyplot(fig)
 
 
-
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
