@@ -262,6 +262,12 @@ if df is not None:
                 
                 # ブラケットの位置を格納するリスト
                 bracket_spacing = 15
+
+                # y軸の最大値に基づくブラケットの開始位置を設定
+                y_bracket_start = y_max + bracket_spacing
+
+                # ブラケットの位置を格納するリストを初期化
+                bracket_positions = []
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
@@ -285,11 +291,11 @@ if df is not None:
 
                     # ブラケットの位置を計算
                     y_position = y_max + i*bracket_spacing
-                    # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加
                     
+                    # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加                    
                     if significance != 'n.s.':
                         add_bracket(ax, x1, x2, y_position, p_value, significance)
-
+                        bracket_positions.append(y_position)  # 追加したブラケットの位置を記録
                     # add_bracket(ax, x1, x2, y_position, p_value, significance)
 
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
