@@ -256,15 +256,8 @@ if df is not None:
                 # すべてのカテゴリ変数のペアを取得
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
 
-                
                 #y軸の上限値を設定
                 y_max = max(means.values + errors.values) * 1.1  # エラーバーを考慮して上限を設定
-                
-                # ブラケットの位置を格納するリスト
-                bracket_spacing = 15
-
-                # y軸の最大値に基づくブラケットの開始位置を設定
-                y_bracket_start = y_max + bracket_spacing
 
                 # ブラケットの位置を格納するリストを初期化
                 bracket_positions = []
@@ -296,13 +289,22 @@ if df is not None:
                     if significance != 'n.s.':
                         add_bracket(ax, x1, x2, y_position, p_value, significance)
                         bracket_positions.append(y_position)  # 追加したブラケットの位置を記録
-                    # add_bracket(ax, x1, x2, y_position, p_value, significance)
+                
+                # 全てのブラケットの位置を考慮したy軸の上限値を設定
+                if bracket_positions:
+                    y_lim_upper = max(bracket_positions) + bracket_spacing  # 追加のスペースを確保
+                else:
+                    y_lim_upper = y_max
+
 
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim(0, y_max)  # y軸の最大値を設定
+                ax.set_ylim(0, y_lim_upper)  # y軸の最大値を設定
+                # グラフの余白を調整
+                plt.tight_layout()
+                # グラフを表示
                 st.pyplot(fig)
 
 
