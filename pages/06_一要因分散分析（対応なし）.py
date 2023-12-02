@@ -254,13 +254,18 @@ if df is not None:
 
                 # y軸の上限値を計算
                 y_max = max(means.values + np.array(errors.values))
+
+                # ブラケットとアノテーションに必要な追加スペースを計算
+                additional_space_for_annotation = 5
                 
                 # すべてのカテゴリ変数のペアを取得
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
 
-                # ブラケットの数に基づいたy軸の最大値を計算
-                num_brackets = sum([p_value < 0.1 for _, _, p_value in tukey_df[['group1', 'group2', 'p-adj']].values])
-                y_axis_max = y_max + num_brackets * bracket_spacing + bracket_length
+                # 有意な差があるペアの数を計算
+                num_significant_pairs = sum([p_value < 0.1 for _, _, p_value in tukey_df[['group1', 'group2', 'p-adj']].values])
+
+                # y軸の最大値を計算
+                y_axis_max = y_max + (num_significant_pairs * (bracket_spacing + bracket_length)) + additional_space_for_annotation
 
                 # 棒グラフと誤差範囲を描画
                 fig, ax = plt.subplots()
