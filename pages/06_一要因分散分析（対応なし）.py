@@ -308,7 +308,7 @@ if df is not None:
                 ax.set_xlabel(cat_var[0])
 
                 # y軸の最大値を設定するための最大ブラケット位置を計算
-                max_bracket_position = y_max + len(bracket_positions) * bracket_spacing
+                max_bracket_position = y_max + len(bracket_count) * bracket_spacing
                 ax.set_ylim([0, max_bracket_position])  # y軸の最大値を設定
                 st.pyplot(fig)
 
