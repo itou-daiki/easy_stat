@@ -252,17 +252,20 @@ if df is not None:
                 means = groups[num_var].mean()
                 errors = groups[num_var].std()
 
-                # 棒グラフと誤差範囲を描画
-                fig, ax = plt.subplots()
-                bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
+                # y軸の上限値を計算
+                y_max = max(means.values + np.array(errors.values))
                 
                 # すべてのカテゴリ変数のペアを取得
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
 
-                
-                #y軸の上限値を設定
-                y_max = max(means.values + np.array(errors.values))
-                
+                # ブラケットの数に基づいたy軸の最大値を計算
+                num_brackets = sum([p_value < 0.1 for _, _, p_value in tukey_df[['group1', 'group2', 'p-adj']].values])
+                y_axis_max = y_max + num_brackets * bracket_spacing + bracket_length
+
+                # 棒グラフと誤差範囲を描画
+                fig, ax = plt.subplots()
+                bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
+
                 # y軸の最大値に基づくブラケットの開始位置を設定
                 y_bracket_start = y_max + bracket_spacing
 
@@ -301,7 +304,9 @@ if df is not None:
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*15])  # y軸の最大値を設定
+                # y軸の最大値を設定
+                ax.set_ylim([0, y_axis_max])
+                # グラフを描画
                 st.pyplot(fig)
 
 
