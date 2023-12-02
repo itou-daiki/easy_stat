@@ -258,7 +258,7 @@ if df is not None:
 
                 
                 #y軸の上限値を設定
-                y_max = max(means.values + np.array(errors.values))
+                y_max = max(means.values + errors.values) * 1.1  # エラーバーを考慮して上限を設定
                 
                 # ブラケットの位置を格納するリスト
                 bracket_spacing = 15
