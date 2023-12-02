@@ -287,10 +287,10 @@ if df is not None:
                     y_position = y_max + i*bracket_spacing
                     # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加
                     
-                    # if significance != 'n.s.':
-                    #     add_bracket(ax, x1, x2, y_position, p_value, significance)
+                    if significance != 'n.s.':
+                        add_bracket(ax, x1, x2, y_position, p_value, significance)
 
-                    add_bracket(ax, x1, x2, y_position, p_value, significance)
+                    # add_bracket(ax, x1, x2, y_position, p_value, significance)
 
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
                     ax.set_title(f'{num_var} by {cat_var[0]}')
