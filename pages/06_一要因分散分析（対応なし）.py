@@ -268,6 +268,9 @@ if df is not None:
 
                 # ブラケットの位置を格納するリストを初期化
                 bracket_positions = []
+
+                # ブラケットの描画回数をカウントする変数
+                bracket_count = 0
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
@@ -296,13 +299,13 @@ if df is not None:
                     if significance != 'n.s.':
                         add_bracket(ax, x1, x2, y_position, p_value, significance)
                         bracket_positions.append(y_position)  # 追加したブラケットの位置を記録
-                    # add_bracket(ax, x1, x2, y_position, p_value, significance)
+                        bracket_count += 1  # ブラケットの描画回数をインクリメント
 
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*5])  # y軸の最大値を設定
+                ax.set_ylim([0, y_max + bracket_count * bracket_spacing])  # y軸の最大値を設定
                 st.pyplot(fig)
 
 
