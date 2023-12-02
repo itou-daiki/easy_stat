@@ -304,7 +304,7 @@ if df is not None:
                 ax.set_xlabel(cat_var[0])
                 ax.set_ylim([0, y_max + len(group_pairs)*15])  # y軸の最大値を設定
                 # グラフの余白を調整
-                plt.subplots_adjust(left=0.1, right=0.95, top=0.9, bottom=0.1)
+                fig.tight_layout(pad=1.0)
                 st.pyplot(fig)
 
 
