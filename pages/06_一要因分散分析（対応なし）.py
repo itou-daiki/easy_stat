@@ -302,7 +302,12 @@ if df is not None:
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*15])  # y軸の最大値を設定
+
+                # アノテーションの最大y値を計算
+                max_y_annotation = max(bracket_positions)
+
+                # 新しいy軸の限界をアノテーションの最大y値プラス10に設定
+                plt.ylim(0, max_y_annotation + 10)
                 st.pyplot(fig)
 
 
