@@ -290,7 +290,7 @@ if df is not None:
                     x2 = means.index.get_loc(group2)
 
                     # ブラケットの位置を計算
-                    y_position = y_max + i*bracket_spacing
+                    y_position = max(bracket_positions[-1] + bracket_spacing if bracket_positions else y_bracket_start, y_bracket_start)
                     
                     # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加                    
                     if significance != 'n.s.':
