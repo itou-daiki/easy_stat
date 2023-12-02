@@ -303,11 +303,14 @@ if df is not None:
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
 
-                # アノテーションの最大y値を計算
-                max_y_annotation = max(bracket_positions)
+                # ブラケットの最上部のy値を取得します
+                y_bracket_top = max(bracket_positions)
+
+                # 新しいy軸の上限値を設定します（ここでは余白として10を加算）
+                y_max_new = y_bracket_top + 10
 
                 # 新しいy軸の限界をアノテーションの最大y値プラス10に設定
-                plt.ylim(max_y_annotation + 10)
+                ax.set_ylim(top=y_max_new)
                 st.pyplot(fig)
 
 
