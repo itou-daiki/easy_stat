@@ -214,7 +214,7 @@ if df is not None:
 
             # ブラケットの位置を格納するリスト
             bracket_spacing = 3
-            bracket_length = 0.5
+            bracket_length = 1
 
             def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
                 
@@ -238,7 +238,7 @@ if df is not None:
                     p_display = 'n.s.'
                 
                 # p値と判定記号を表示
-                ax.text((x1 + x2) / 2, y + bracket_length + 1, p_display,  # yの位置を調整
+                ax.text((x1 + x2) / 2, y + bracket_length, p_display,  # yの位置を調整
                         horizontalalignment='center', verticalalignment='bottom')
                 
             for num_var in num_vars:
