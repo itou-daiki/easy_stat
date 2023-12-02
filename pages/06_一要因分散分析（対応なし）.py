@@ -238,7 +238,7 @@ if df is not None:
                     p_display = 'n.s.'
                 
                 # p値と判定記号を表示
-                ax.text((x1 + x2) / 2, y + bracket_length, p_display,  # yの位置を調整
+                ax.text((x1 + x2) / 2, y + bracket_length + 0.5, p_display,  # yの位置を調整
                         horizontalalignment='center', verticalalignment='bottom')
                 
             for num_var in num_vars:
