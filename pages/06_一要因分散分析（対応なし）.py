@@ -292,25 +292,18 @@ if df is not None:
                     # ブラケットの位置を計算
                     y_position = max(bracket_positions[-1] + bracket_spacing if bracket_positions else y_bracket_start, y_bracket_start)
                     
-                    bracket_positions.append(y_position)  # 追加したブラケットの位置を記録
-
                     # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加                    
                     if significance != 'n.s.':
                         add_bracket(ax, x1, x2, y_position, p_value, significance)
                         bracket_positions.append(y_position)  # 追加したブラケットの位置を記録
+                    # add_bracket(ax, x1, x2, y_position, p_value, significance)
 
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
+                ax.set_ylim([0, y_max + len(group_pairs)*3])  # y軸の最大値を設定
 
-                if bracket_positions:
-                    ax.set_ylim([0, max(bracket_positions) + 10])  # ここで10は余白の大きさを調整する値です。
-                else:
-                    ax.set_ylim([0, y_max + 10])
-
-                # グラフの余白を調整
-                fig.tight_layout(pad=1.0)
                 st.pyplot(fig)
 
 
