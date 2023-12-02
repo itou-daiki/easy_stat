@@ -261,6 +261,9 @@ if df is not None:
 
                 # ブラケットの位置を格納するリストを初期化
                 bracket_positions = []
+
+                # ブラケット間のスペースを定義
+                bracket_spacing = 15  # ブラケット間の垂直間隔
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
