@@ -213,7 +213,7 @@ if df is not None:
             plt.rcParams['font.family'] = 'IPAexGothic'
 
             bracket_length = 4  # ブラケットの長さを調整
-            bracket_spacing = 15
+            bracket_spacing = 15　# ブラケットの間隔を調整
 
             def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
                 
@@ -257,13 +257,10 @@ if df is not None:
                 
                 # すべてのカテゴリ変数のペアを取得
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
-
                 
                 #y軸の上限値を設定
                 y_max = max(means.values + np.array(errors.values))
                 
-
-
                 # y軸の最大値に基づくブラケットの開始位置を設定
                 y_bracket_start = y_max + bracket_spacing
 
