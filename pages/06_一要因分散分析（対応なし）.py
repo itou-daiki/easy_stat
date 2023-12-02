@@ -257,7 +257,7 @@ if df is not None:
                 y_max = max(means + errors * 3)*1.1
 
                 # ブラケットとアノテーションに必要な追加スペースを計算
-                additional_space_for_annotation = 1
+                additional_space_for_annotation = 5
                 
                 # すべてのカテゴリ変数のペアを取得
                 group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
