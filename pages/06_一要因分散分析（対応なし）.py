@@ -212,8 +212,11 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
+            bracket_length = 4  # ブラケットの長さを調整
+            # ブラケットの位置を格納するリスト
+            bracket_spacing = 15
+
             def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
-                bracket_length = 4  # ブラケットの長さを調整
                 
                 # ブラケットを表示
                 if show_bracket:
@@ -260,8 +263,7 @@ if df is not None:
                 #y軸の上限値を設定
                 y_max = max(means.values + np.array(errors.values))
                 
-                # ブラケットの位置を格納するリスト
-                bracket_spacing = 15
+
 
                 # y軸の最大値に基づくブラケットの開始位置を設定
                 y_bracket_start = y_max + bracket_spacing
@@ -305,7 +307,10 @@ if df is not None:
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + bracket_count * bracket_spacing])  # y軸の最大値を設定
+
+                # y軸の最大値を設定するための最大ブラケット位置を計算
+                max_bracket_position = y_max + len(bracket_positions) * bracket_spacing
+                ax.set_ylim([0, max_bracket_position])  # y軸の最大値を設定
                 st.pyplot(fig)
 
 
