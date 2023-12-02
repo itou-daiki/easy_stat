@@ -254,7 +254,7 @@ if df is not None:
 
                 # y軸の上限値を計算
                 # y_max = max(means.values + np.array(errors.values))
-                y_max = max(means + stds * 3)
+                y_max = max(means + errors * 3)
 
                 # ブラケットとアノテーションに必要な追加スペースを計算
                 additional_space_for_annotation = 0.5
