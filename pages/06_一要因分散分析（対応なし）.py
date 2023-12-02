@@ -214,7 +214,7 @@ if df is not None:
 
             # ブラケットの位置を格納するリスト
             bracket_spacing = 3
-            bracket_length = 1
+            bracket_length = 0.5
 
             def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
                 
