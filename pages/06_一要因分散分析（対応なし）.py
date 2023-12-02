@@ -212,9 +212,10 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
+            bracket_length = 4  # ブラケットの長さを調整
+            bracket_spacing = 5
+
             def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
-                bracket_length = 4  # ブラケットの長さを調整
-                bracket_spacing = 5
                 
                 # ブラケットを表示
                 if show_bracket:
