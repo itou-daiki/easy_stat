@@ -317,8 +317,6 @@ if df is not None:
                 # ラベルを45度回転して設定
                 ax.set_xticklabels(labels, rotation=-45)
 
-                # y軸の最大値を設定
-                ax.set_ylim([0, y_axis_max])
                 # グラフを描画
                 st.pyplot(fig)
 
