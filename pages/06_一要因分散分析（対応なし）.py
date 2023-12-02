@@ -310,6 +310,13 @@ if df is not None:
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
+                
+                # x軸のラベルを取得
+                labels = ax.get_xticklabels()
+
+                # ラベルを45度回転して設定
+                ax.set_xticklabels(labels, rotation=45)
+
                 # y軸の最大値を設定
                 ax.set_ylim([0, y_axis_max])
                 # グラフを描画
