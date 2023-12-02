@@ -300,7 +300,13 @@ if df is not None:
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*15])  # y軸の最大値を設定
+                # Y軸の最大値を設定
+                if bracket_positions:  # ブラケットがある場合
+                    y_axis_max = max(bracket_positions) + bracket_spacing  # 最後のブラケットの位置にスペースを追加
+                else:  # ブラケットがない場合
+                    y_axis_max = y_max + bracket_spacing  # デフォルトの最大値を使用
+
+                ax.set_ylim([0, y_axis_max])  # Y軸の最大値を設定
                 st.pyplot(fig)
 
 
