@@ -212,10 +212,9 @@ if df is not None:
             font_path = 'ipaexg.ttf'
             plt.rcParams['font.family'] = 'IPAexGothic'
 
-            bracket_length = 2
-            bracket_spacing = 5
-
             def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
+                bracket_length = 4  # ブラケットの長さを調整
+                bracket_spacing = 5
                 
                 # ブラケットを表示
                 if show_bracket:
@@ -269,9 +268,6 @@ if df is not None:
 
                 # ブラケットの位置を格納するリストを初期化
                 bracket_positions = []
-
-                # ブラケットの描画回数をカウントする変数
-                bracket_count = 0
                 
                 # ブラケットと判定を追加
                 for i, (group1, group2) in enumerate(group_pairs):
@@ -300,16 +296,13 @@ if df is not None:
                     if significance != 'n.s.':
                         add_bracket(ax, x1, x2, y_position, p_value, significance)
                         bracket_positions.append(y_position)  # 追加したブラケットの位置を記録
-                        bracket_count += 1  # ブラケットの描画回数をインクリメント
+                    # add_bracket(ax, x1, x2, y_position, p_value, significance)
 
                 if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-
-                # y軸の最大値を設定するための最大ブラケット位置を計算
-                max_bracket_position = y_max + len(bracket_count) * bracket_spacing
-                ax.set_ylim([0, max_bracket_position])  # y軸の最大値を設定
+                ax.set_ylim([0, y_max + len(group_pairs)*15])  # y軸の最大値を設定
                 st.pyplot(fig)
 
 
