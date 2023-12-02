@@ -302,7 +302,11 @@ if df is not None:
                     ax.set_title(f'{num_var} by {cat_var[0]}')
                 ax.set_ylabel(num_var)
                 ax.set_xlabel(cat_var[0])
-                ax.set_ylim([0, y_max + len(group_pairs)*15])  # y軸の最大値を設定
+
+                y_bracket_start = y_max + bracket_spacing
+                # 全てのブラケットと注釈が追加された後
+                highest_bracket_position = max(bracket_positions) if bracket_positions else y_bracket_start
+                plt.ylim(0, highest_bracket_position + 10)  # 最も高いブラケットの上に10のマージンを加える
                 st.pyplot(fig)
 
 
