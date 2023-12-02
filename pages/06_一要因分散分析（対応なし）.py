@@ -273,7 +273,7 @@ if df is not None:
                 bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
 
                 # y軸の最大値に基づくブラケットの開始位置を設定
-                y_bracket_start = ybar_max + 0.5
+                y_bracket_start = ybar_max + 10
 
                 # ブラケットの位置を格納するリストを初期化
                 bracket_positions = []
