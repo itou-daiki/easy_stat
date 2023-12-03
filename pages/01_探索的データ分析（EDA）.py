@@ -8,11 +8,11 @@ import japanize_matplotlib
 
 
 
-st.set_page_config(page_title="探索的データ解析（EDA）", layout="wide")
+st.set_page_config(page_title="探索的データ分析（EDA）", layout="wide")
 
-st.title("探索的データ解析（EDA）")
+st.title("探索的データ分析（EDA）")
 st.caption("Created by Dit-Lab.(Daiki Ito)")
-st.write("簡易的な探索的データ解析（EDA）が実行できます")
+st.write("簡易的な探索的データ分析（EDA）が実行できます")
 st.write("")
 
 # ファイルアップローダー
