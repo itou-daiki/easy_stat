@@ -48,7 +48,7 @@ if df is not None:
 
     # カテゴリ変数の選択
     st.subheader("カテゴリ変数の選択")
-    cat_var = st.multiselect('カテゴリ変数（独立変数）を選択してください', categorical_cols)
+    cat_var = st.selectbox('カテゴリ変数（独立変数）を選択してください', categorical_cols)
 
     # 数値変数の選択
     st.subheader("数値変数の選択")

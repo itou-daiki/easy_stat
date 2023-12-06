@@ -94,7 +94,7 @@ if df is not None:
     st.subheader('選択した２変数の可視化')
     
     # 変数選択
-    selected_vars = st.multiselect('変数を２つ選択してください:', df.columns.tolist())
+    selected_vars = st.multiselect('変数を２つ選択してください:', df.columns.tolist(),max_selections=2)
 
     if len(selected_vars) > 2:
         st.error('2項目以上を選択することはできません。選択をクリアし、2項目のみを選択してください。')
@@ -126,7 +126,7 @@ if df is not None:
     st.subheader('２つのカテゴリ変数と１つの数値変数による棒グラフ')
 
     # カテゴリ変数と数値変数の選択
-    cat_vars = st.multiselect('２つのカテゴリ変数を選択してください:', categorical_cols, key='cat_vars')
+    cat_vars = st.multiselect('２つのカテゴリ変数を選択してください:', categorical_cols, key='cat_vars',max_selections=2)
     num_var = st.selectbox('１つの数値変数を選択してください:', numerical_cols, key='num_var')
 
     if len(cat_vars) == 2 and num_var:
