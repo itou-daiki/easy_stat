@@ -31,8 +31,8 @@ st.header("更新履歴")
 st.markdown("""
 #### **2023/12/7**
 - リポジトリを追加しました
--- GitHub（https://easystat-4-education.streamlit.app/）
--- Huggingface（https://huggingface.co/spaces/itou-daiki/easy_stat）      
+- GitHub（https://easystat-4-education.streamlit.app/）
+- Huggingface（https://huggingface.co/spaces/itou-daiki/easy_stat）      
 - 分析に変数選択に制限を設けました            
             
 #### **2023/10/28**
