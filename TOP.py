@@ -23,12 +23,17 @@ st.markdown("""- [**カイ２乗分析**]""")
 st.markdown("""- [**ｔ検定（対応なし）**]""")
 st.markdown("""- [**ｔ検定（対応あり）**]""")
 st.markdown("""- [**一要因分散分析（対応なし）**]""")
+st.markdown("""- [**単回帰分析**]""")
 st.markdown("""- [**テキストマイニング**]""")
 
 # Updates and history
 st.header("更新履歴")
 
 st.markdown("""
+
+#### **2024/3/29**
+- 単回帰分析を実装しました（Provided by Toshiyuki）
+
 #### **2023/12/7**
 - リポジトリを追加しました
 - GitHub（https://easystat-4-education.streamlit.app/）
@@ -76,5 +81,13 @@ st.markdown("""
 """)
 
 # Copyright
-st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+st.markdown('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+st.markdown("""
+In collaboration with our esteemed contributors:
+- Toshiyuki
+With heartfelt appreciation for their dedication and support.
+""")
+st.subheader("easyStat: Open Source for Ubiquitous Statistics")
+st.write("Democratizing data, everywhere.")
+
 
