@@ -87,6 +87,6 @@ st.write("Democratizing data, everywhere.")
 st.markdown("""
 In collaboration with our esteemed contributors:
 - Toshiyuki
-With heartfelt appreciation for their dedication and support.
+- With heartfelt appreciation for their dedication and support.
 """)
 
