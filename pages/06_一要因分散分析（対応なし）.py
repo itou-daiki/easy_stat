@@ -322,4 +322,11 @@ if df is not None:
 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-st.markdown('© 2022-2023 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+# Copyright
+st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+st.write("easyStat: Open Source for Ubiquitous Statistics")
+st.write("Democratizing data, everywhere.")
+st.write("")
+st.subheader("In collaboration with our esteemed contributors:")
+st.write("・Toshiyuki")
+st.write("With heartfelt appreciation for their dedication and support.")
