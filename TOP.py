@@ -31,6 +31,9 @@ st.header("更新履歴")
 
 st.markdown("""
 
+#### **2024/4/14**
+- 重回帰分析を実装しました（Provided by Toshiyuki）
+
 #### **2024/3/29**
 - 単回帰分析を実装しました（Provided by Toshiyuki）
 
