@@ -24,6 +24,7 @@ st.markdown("""- [**ｔ検定（対応なし）**]""")
 st.markdown("""- [**ｔ検定（対応あり）**]""")
 st.markdown("""- [**一要因分散分析（対応なし）**]""")
 st.markdown("""- [**単回帰分析**]""")
+st.markdown("""- [**重回帰分析**]""")
 st.markdown("""- [**テキストマイニング**]""")
 
 # Updates and history
