@@ -50,8 +50,8 @@ def main():
         if st.button('重回帰分析の実行'):
         
             if len(X_columns) > 0 and y_column:
-                X = data[X_columns]
-                y = data[y_column]
+                X = input_df[X_columns]
+                y = input_df[y_column]
                 
                 # 交互作用項の生成（総当たり）
                 interaction_terms = []
