@@ -148,7 +148,10 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+
+
+st.write('')
+st.write('')
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 # Copyright
 st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
