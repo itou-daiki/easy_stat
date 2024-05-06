@@ -1,14 +1,15 @@
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
 import streamlit as st
 import pandas as pd
-
-from sklearn import preprocessing
+import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+import plotly.graph_objects as go
+from scipy import stats
+import itertools
+import matplotlib.pyplot as plt
 
 plt.rcParams['font.family'] = 'IPAexGothic'
-
 
 def plot_graph(
     model: LinearRegression,
@@ -26,7 +27,7 @@ def plot_graph(
         ax.set_xlabel(feature_cols[0])
         ax.set_ylabel(target_col)
         ax.scatter(features, target, color="blue")
-        ax.plot(features, target_pred, color="red")
+        ax.plot(features, model.predict(features.reshape(-1, 1)), color="red")
         st.pyplot(fig)
     elif len(feature_cols) == 2:
         x1 = features[:, 0]
@@ -36,7 +37,7 @@ def plot_graph(
 
         ax.scatter3D(x1, x2, target)
         ax.set_xlabel(feature_cols[0])
-        ax.set_ylabel(feature_cols[1])
+        ax.set_ylabel(feature_cols[1]) 
         ax.set_zlabel(target_col)
 
         mesh_x1 = np.arange(x1.min(), x1.max(), (x1.max()-x1.min())/20)
@@ -46,95 +47,154 @@ def plot_graph(
         ax.plot_wireframe(mesh_x1, mesh_x2, mesh_y)
     
     st.pyplot(fig)
-                
 
-st.set_page_config(page_title="重回帰分析", layout="wide")
+def main():
+    st.set_page_config(page_title="重回帰分析アプリケーション", layout="wide")
+    st.title("重回帰分析アプリケーション")
+    st.caption("Created by Dit-Lab.(Daiki Ito)") 
 
-st.title("重回帰分析")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
-st.write("")
-st.write("説明変数と目的変数の関係を重回帰分析を使用して分析する補助を行います。")
+    # ファイルのアップロード
+    uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
+    use_demo_data = st.checkbox('デモデータを使用')
 
-st.write("")
-
-uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
-use_demo_data = st.checkbox('デモデータを使用')
-
-input_df = None
-if use_demo_data:
-     # TODO デモファイルを用意する
-     input_df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
-#else:
-elif uploaded_file is not None:
-    print(uploaded_file.type)
-    if uploaded_file.type == 'text/csv':
-        input_df = pd.read_csv(uploaded_file)
-    else:
-        input_df = pd.read_excel(uploaded_file)
-
-feature_col = None
-target_col = None
-if input_df is not None:
-    st.subheader('元のデータ')
-    st.write(input_df)
-
-    numerical_cols = input_df.select_dtypes(exclude=['object', 'category']).columns.tolist()
-
-    # 説明変数の選択
-    st.subheader("説明変数の選択")
-    feature_cols = st.multiselect('説明変数を選択してください', numerical_cols)
-
-    # 目的変数の選択
-    st.subheader("目的変数の選択")
-    target_col = st.selectbox('目的変数を選択してください', numerical_cols)
-
-    st.subheader("【分析前の確認】")
-    st.write(f"{feature_cols}から{target_col}の値を予測します。")
-
-    is_normalizataion = st.checkbox('説明変数の標準化を行う', value=False)
-
-    if 1 <= len(feature_cols) <= 2:
-        show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
-
-    # 単回帰分析の実施
-    if st.button('重回帰分析の実行'):
-        if len(feature_cols) == 0:
-             st.error("説明変数を少なくとも１つは選択してください。")
-        elif target_col in feature_cols:
-             st.error("目的変数は説明変数に含まれていないものを選択してください。")
+    if use_demo_data or uploaded_file is not None:
+        if use_demo_data:
+            # TODO: デモファイルを用意する 
+            data = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
         else:
-            st.subheader('【分析結果】')
-            st.write('【要約統計量】')
+            if uploaded_file.type == 'text/csv':
+                data = pd.read_csv(uploaded_file) 
+            else:
+                data = pd.read_excel(uploaded_file)
+        
+        st.subheader('元のデータ')
+        st.write(data)
 
-            features = input_df[feature_cols].to_numpy()
-            target = input_df[target_col]
+        numerical_cols = data.select_dtypes(exclude=['object', 'category']).columns.tolist()
+        
+        # 説明変数の選択
+        X_columns = st.multiselect("説明変数を選択してください", numerical_cols)
+        
+        # 目的変数の選択 
+        y_column = st.selectbox("目的変数を選択してください", numerical_cols)
+        
+        is_normalization = st.checkbox('説明変数の標準化を行う', value=False)
 
-            if is_normalizataion:
-                # 標準化
-                sscaler = preprocessing.StandardScaler()
-                sscaler.fit(features)
-                features = sscaler.transform(features)
-
+        if 1 <= len(X_columns) <= 2:
+            show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
+        
+        if len(X_columns) > 0 and y_column:
+            X = data[X_columns]
+            y = data[y_column]
+            
+            # 交互作用項の生成（総当たり）
+            interaction_terms = []
+            for i in range(2, len(X_columns) + 1):
+                for combination in itertools.combinations(X_columns, i):
+                    term = " × ".join(combination)
+                    X[term] = X[list(combination)].prod(axis=1)
+                    interaction_terms.append(term)
+            
+            X_poly_columns = X.columns
+            
+            if is_normalization:
+                scaler = StandardScaler()
+                X = scaler.fit_transform(X)
+            
+            # 重回帰分析の実行
             model = LinearRegression()
-            model.fit(features, target)
-            target_pred = model.predict(features)
+            model.fit(X, y)
+            
+            # 結果の表示
+            st.subheader("重回帰分析の結果")
+            r2 = r2_score(y, model.predict(X))
+            
+            # F値、自由度、p値の計算
+            n = len(y)
+            k = len(X_poly_columns)
+            f_value = (r2 / k) / ((1 - r2) / (n - k - 1))
+            df_model = k
+            df_resid = n - k - 1
+            p_value = stats.f.sf(f_value, df_model, df_resid)
+            
+            # 決定係数、F値、自由度、p値をデータフレームで表示
+            summary_df = pd.DataFrame({
+                '指標': ['決定係数', 'F値', '自由度', 'p値'],
+                '値': [round(r2, 2), round(f_value, 2), f"{df_model}, {df_resid}", round(p_value, 2)]
+            })
+            st.write(summary_df)
+            
+            st.subheader("偏回帰係数と標準化係数")
+            coefficients = pd.DataFrame({"変数": X_poly_columns, "偏回帰係数": model.coef_, "標準化係数": model.coef_ * (X.std(axis=0) / y.std())})
+            coefficients = coefficients.applymap(lambda x: round(x, 2) if isinstance(x, (int, float)) else x)
+            st.write(coefficients)
+            
+            if 1 <= len(X_columns) <= 2:
+                plot_graph(model, X, y, X_columns, y_column, show_graph_title)
+            
+            # パス図の作成
+            edge_traces = []
+            for coef in model.coef_ * (X.std(axis=0) / y.std()):
+                edge_traces.append(go.Scatter(
+                    x=[0.25, 0.25, 0.4, -0.1, -0.1, -0.35],
+                    y=[0.6, 0.4, 0, 0.6, 0.4, 0],
+                    mode='lines',
+                    line=dict(color='rgba(0,0,255,0.5)', width=abs(coef) * 5),
+                    hoverinfo='none',
+                    showlegend=False
+                ))
+            
+            anno_trace = go.Scatter(
+                x=[0.30, 0.30, 0.4, -0.15, -0.15, -0.35],
+                y=[0.65, 0.35, 0, 0.65, 0.35, 0],
+                mode='text',
+                text=[f"{coef:.2f}<br>{'**' if abs(coef) >= 0.2 else '*' if abs(coef) >= 0.1 else ''}" for coef in model.coef_ * (X.std(axis=0) / y.std())],
+                textposition='top center',
+                hoverinfo='none',
+                showlegend=False
+            )
+            
+            rect_trace = go.Scatter(
+                x=[-0.5, 0.5, 0.5, -0.5, -0.5],
+                y=[0.8, 0.8, -0.2, -0.2, 0.8],
+                mode='lines',
+                fill='toself',
+                fillcolor='rgba(255, 255, 255, 1.0)',
+                line=dict(color='black', width=1),
+                hoverinfo='none',
+                showlegend=False
+            )
+            
+            text_trace = go.Scatter(
+                x=[-0.45, -0.45, 0.35, 0.35, -0.45],
+                y=[0.7, 0.5, 0.7, 0.5, -0.1],
+                mode='text',
+                text=X_poly_columns.tolist() + [y_column],
+                hoverinfo='none',
+                showlegend=False
+            )
+            
+            fig = go.Figure(data=[rect_trace] + edge_traces + [anno_trace, text_trace])
+            
+            fig.update_layout(
+                title_text=f"パス図 (R={np.sqrt(r2):.2f}, F<sub>{df_model, df_resid}</sub>={f_value:.3f}**)",
+                font_size=10,
+                showlegend=False,
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                plot_bgcolor='white'
+            )
+            
+            st.plotly_chart(fig)
 
-            if len(feature_cols) <= 2:
-                plot_graph(model, features, target, feature_cols, target_col, show_graph_title)
+    # Copyright
+    st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
+    st.write("easyStat: Open Source for Ubiquitous Statistics")
+    st.write("Democratizing data, everywhere.")
+    st.write("")
+    st.subheader("In collaboration with our esteemed contributors:")
+    st.write("・Toshiyuki")
+    st.write("With heartfelt appreciation for their dedication and support.")
 
-            coefs_str = "編回帰係数:\n"
-            for i, coef in enumerate(model.coef_):
-                coefs_str += f"- x{i} = {feature_cols[i]},  a{i} = {coef}\n"
-
-            st.write(coefs_str)
-            st.write(f"切片: {model.intercept_}")
-            st.write("")
-
-# Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+if __name__ == "__main__":
+    main()
