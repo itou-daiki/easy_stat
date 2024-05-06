@@ -30,7 +30,8 @@ def main():
             input_df = pd.read_csv(uploaded_file)
         else:
             input_df = pd.read_excel(uploaded_file)
-        
+            
+    if input_df is not None:
         st.subheader('元のデータ')
         st.write(input_df)
 
