@@ -9,7 +9,7 @@ from scipy import stats
 import itertools
 
 def main():
-    st.title("重回帰分析アプリケーション")
+    st.title("重回帰分析")
     
     # ファイルのアップロード
     uploaded_file = st.file_uploader("CSVファイルをアップロードしてください", type="csv")
