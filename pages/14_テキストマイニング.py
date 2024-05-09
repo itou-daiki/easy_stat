@@ -112,8 +112,9 @@ if df is not None:
     # 共起ネットワークの作成と表示
     st.subheader('【共起ネットワーク】')
     min_edge_frequency_all = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
-    fig_co_network_all = npt.build_graph(min_edge_frequency=min_edge_frequency_all)
+    G = npt.build_graph(min_edge_frequency=min_edge_frequency_all)
     fig_co_network_all = npt.co_network(
+        G,
         sizing=100,
         node_size='adjacency_frequency',
         color_palette='hls',
@@ -162,8 +163,9 @@ if df is not None:
         st.subheader('【共起ネットワーク】')
         min_edge_frequency_group = st.slider('最小エッジ頻度',1, 100, 100, key=f'co_network_group_{name}')
         npt_group = nlplot.NLPlot(group[selected_text], target_col=selected_text)
-        fig_co_network_group = npt_group.build_graph(min_edge_frequency=min_edge_frequency_group)
+        G_group = npt_group.build_graph(min_edge_frequency=min_edge_frequency_group)
         fig_co_network_group = npt_group.co_network(
+            G_group,
             sizing=100,
             node_size='adjacency_frequency',
             color_palette='hls',
