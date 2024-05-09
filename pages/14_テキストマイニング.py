@@ -74,7 +74,20 @@ if df is not None:
 
     # テキストデータの抽出と前処理
     text_data = df[selected_text].dropna().str.cat(sep=' ')
-    words = npt.preprocess(text_data, stopwords=stopwords_list, lexicon_path=None)
+
+    # 前処理用の関数
+    def preprocess(text):
+        nodes = mecab.parseToNode(text)
+        words = []
+        while nodes:
+            features = nodes.feature.split(",")
+            if features[0] not in ["助詞"] and nodes.surface not in stopwords_list:
+                if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
+                    words.append(nodes.surface)
+            nodes = nodes.next
+        return " ".join(words)
+
+    words = preprocess(text_data)
 
     st.subheader('全体の分析')
 
@@ -104,7 +117,7 @@ if df is not None:
 
         # テキストデータの抽出と前処理 (カテゴリ別)
         text_data_group = group[selected_text].dropna().str.cat(sep=' ')
-        words_group = npt.preprocess(text_data_group, stopwords=stopwords_list, lexicon_path=None)
+        words_group = preprocess(text_data_group)
 
         # ワードクラウドの作成と表示 (カテゴリ別)
         st.subheader('【ワードクラウド】')
