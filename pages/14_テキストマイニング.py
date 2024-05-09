@@ -94,7 +94,20 @@ if df is not None:
     # ワードクラウドの作成と表示
     st.subheader('【ワードクラウド】')
     max_words_all = st.slider('ワードクラウドの最大単語数', 50, 200, 125, key='max_words_all')
-    wordcloud = npt.wordcloud(words, font_path=font_path, max_words=max_words_all, width=800, height=400)
+    wordcloud = WordCloud(
+        font_path=font_path,
+        max_words=max_words_all,
+        width=800,
+        height=400,
+        background_color='white',
+        collocations=False,
+        stopwords=stopwords_list
+    ).generate(words)
+
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud, interpolation='bilinear')
+    ax.axis('off')
+    st.pyplot(fig)
 
     # 共起ネットワークの作成と表示
     st.subheader('【共起ネットワーク】')
@@ -122,7 +135,20 @@ if df is not None:
         # ワードクラウドの作成と表示 (カテゴリ別)
         st.subheader('【ワードクラウド】')
         max_words_group = st.slider('ワードクラウドの最大単語数', 50, 200, 125,key=f'max_words_group_{name}')
-        wordcloud_group = npt.wordcloud(words_group, font_path=font_path, max_words=max_words_group, width=800, height=400)
+        wordcloud_group = WordCloud(
+            font_path=font_path,
+            max_words=max_words_group,
+            width=800,
+            height=400,
+            background_color='white',
+            collocations=False,
+            stopwords=stopwords_list
+        ).generate(words_group)
+
+        fig, ax = plt.subplots()
+        ax.imshow(wordcloud_group, interpolation='bilinear')
+        ax.axis('off')
+        st.pyplot(fig)
 
         # 共起ネットワークの作成と表示 (カテゴリ別)
         st.subheader('【共起ネットワーク】')
