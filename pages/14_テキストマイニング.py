@@ -110,19 +110,22 @@ if df is not None:
     st.pyplot(fig)
 
     # 共起ネットワークの作成と表示
-    st.subheader('【共起ネットワーク】')
-    min_edge_frequency_all = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
-    G = npt.build_graph(df, stopwords=stopwords_list, min_edge_frequency=min_edge_frequency_all)
-    fig_co_network_all = npt.co_network(
-        G,
-        sizing=100,
-        node_size='adjacency_frequency',
-        color_palette='hls',
-        width=1100,
-        height=700,
-        save=False
-    )
-    st.write(fig_co_network_all)
+    try:
+        st.subheader('【共起ネットワーク】')
+        min_edge_frequency_all = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
+        G = npt.build_graph(df, stopwords=stopwords_list, min_edge_frequency=min_edge_frequency_all)
+        fig_co_network_all = npt.co_network(
+            G,
+            sizing=100,
+            node_size='adjacency_frequency',
+            color_palette='hls',
+            width=1100,
+            height=700,
+            save=False
+        )
+        st.write(fig_co_network_all)
+    except ValueError as e:
+        st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
 
     # 名詞の度数を棒グラフで表示
     st.subheader('【名詞の出現度数】')
@@ -160,20 +163,23 @@ if df is not None:
         st.pyplot(fig)
 
         # 共起ネットワークの作成と表示 (カテゴリ別)
-        st.subheader('【共起ネットワーク】')
-        min_edge_frequency_group = st.slider('最小エッジ頻度',1, 100, 100, key=f'co_network_group_{name}')
-        npt_group = nlplot.NLPlot(group, target_col=selected_text)
-        G_group = npt_group.build_graph(group, stopwords=stopwords_list, min_edge_frequency=min_edge_frequency_group)
-        fig_co_network_group = npt_group.co_network(
-            G_group,
-            sizing=100,
-            node_size='adjacency_frequency',
-            color_palette='hls',
-            width=1100,
-            height=700,
-            save=False
-        )
-        st.write(fig_co_network_group)
+        try:
+            st.subheader('【共起ネットワーク】')
+            min_edge_frequency_group = st.slider('最小エッジ頻度',1, 100, 100, key=f'co_network_group_{name}')
+            npt_group = nlplot.NLPlot(group, target_col=selected_text)
+            G_group = npt_group.build_graph(group, stopwords=stopwords_list, min_edge_frequency=min_edge_frequency_group)
+            fig_co_network_group = npt_group.co_network(
+                G_group,
+                sizing=100,
+                node_size='adjacency_frequency',
+                color_palette='hls',
+                width=1100,
+                height=700,
+                save=False
+            )
+            st.write(fig_co_network_group)
+        except ValueError as e:
+            st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
 
         # 名詞の度数を棒グラフで表示 (カテゴリ別)
         st.subheader('【名詞の出現度数】')
