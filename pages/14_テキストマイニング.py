@@ -112,7 +112,7 @@ if df is not None:
     # 共起ネットワークの作成と表示
     st.subheader('【共起ネットワーク】')
     min_edge_frequency_all = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
-    fig_co_network_all = npt.build_graph(words, min_edge_frequency=min_edge_frequency_all)
+    fig_co_network_all = npt.build_graph(df, min_edge_frequency=min_edge_frequency_all)
     st.write(fig_co_network_all)
 
     # 名詞の度数を棒グラフで表示
@@ -153,7 +153,7 @@ if df is not None:
         # 共起ネットワークの作成と表示 (カテゴリ別)
         st.subheader('【共起ネットワーク】')
         min_edge_frequency_group = st.slider('最小エッジ頻度',1, 100, 100, key=f'co_network_group_{name}')
-        fig_co_network_group = npt.build_graph(words_group, min_edge_frequency=min_edge_frequency_group)
+        fig_co_network_group = npt.build_graph(group, min_edge_frequency=min_edge_frequency_group)
         st.write(fig_co_network_group)
 
         # 名詞の度数を棒グラフで表示 (カテゴリ別)
