@@ -110,6 +110,7 @@ if df is not None:
     st.pyplot(fig)
 
     # 共起ネットワークの作成と表示
+    fig_co_network_all = None
     try:
         st.subheader('【共起ネットワーク】')
         min_edge_frequency_all = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
@@ -123,9 +124,11 @@ if df is not None:
             height=700,
             save=False
         )
-        st.write(fig_co_network_all)
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
+
+if fig_co_network_all:
+    st.write(fig_co_network_all)
 
     # 名詞の度数を棒グラフで表示
     st.subheader('【名詞の出現度数】')
@@ -163,6 +166,7 @@ if df is not None:
         st.pyplot(fig)
 
         # 共起ネットワークの作成と表示 (カテゴリ別)
+        fig_co_network_group = None
         try:
             st.subheader('【共起ネットワーク】')
             min_edge_frequency_group = st.slider('最小エッジ頻度',1, 100, 100, key=f'co_network_group_{name}')
@@ -177,9 +181,11 @@ if df is not None:
                 height=700,
                 save=False
             )
-            st.write(fig_co_network_group)
         except ValueError as e:
             st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
+
+        if fig_co_network_group:
+            st.write(fig_co_network_group)
 
         # 名詞の度数を棒グラフで表示 (カテゴリ別)
         st.subheader('【名詞の出現度数】')
