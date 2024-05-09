@@ -127,8 +127,8 @@ if df is not None:
     except ValueError as e:
         st.error(f'共起ネットワークの作成に失敗しました: {str(e)}')
 
-if fig_co_network_all:
-    st.write(fig_co_network_all)
+    if fig_co_network_all:
+        st.write(fig_co_network_all)
 
     # 名詞の度数を棒グラフで表示
     st.subheader('【名詞の出現度数】')
