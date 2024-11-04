@@ -2,14 +2,15 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 from PIL import Image
-
-
+import seaborn as sns
+import numpy as np
 
 st.set_page_config(page_title="相関分析", layout="wide")
-
 st.title("相関分析")
 st.caption("Created by Dit-Lab.(Daiki Ito)")
 st.write("２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。")
@@ -42,7 +43,7 @@ else:
 if df is not None:
     # 数値変数の抽出
     numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
-
+    
     # 数値変数の選択
     st.subheader("数値変数の選択")
     selected_cols = st.multiselect('数値変数を選択してください', numerical_cols)
@@ -57,10 +58,12 @@ if df is not None:
         st.subheader('相関マトリックス')
         st.dataframe(corr_matrix)
         
-        # ヒートマップの表示 (plotly.expressを使用)
-        fig = px.imshow(corr_matrix, color_continuous_scale='rdbu', labels=dict(color="相関係数"))
-
-        # アノテーションの追加 (相関係数の数値をセルに表示)
+        # ヒートマップの表示
+        fig_heatmap = px.imshow(corr_matrix, 
+                               color_continuous_scale='rdbu', 
+                               labels=dict(color="相関係数"))
+        
+        # アノテーションの追加
         annotations = []
         for i, row in enumerate(corr_matrix.values):
             for j, value in enumerate(row):
@@ -75,8 +78,54 @@ if df is not None:
                         'color': 'black' if -0.5 < value < 0.5 else 'white'
                     }
                 })
+        fig_heatmap.update_layout(title="相関係数のヒートマップ", annotations=annotations)
+        st.plotly_chart(fig_heatmap)
 
-        fig.update_layout(title="相関係数のヒートマップ", annotations=annotations)
+        # 散布図行列の作成
+        st.subheader('散布図行列')
+        
+        # Plotlyで散布図行列を作成
+        fig = make_subplots(rows=len(selected_cols), 
+                           cols=len(selected_cols),
+                           subplot_titles=['' for _ in range(len(selected_cols) * len(selected_cols))])
+
+        # ヒストグラムと散布図の作成
+        for i, var1 in enumerate(selected_cols):
+            for j, var2 in enumerate(selected_cols):
+                row = i + 1
+                col = j + 1
+                
+                if i == j:  # 対角線上にヒストグラムを配置
+                    fig.add_trace(
+                        go.Histogram(x=df[var1], name=var1),
+                        row=row, col=col
+                    )
+                else:  # 散布図を配置
+                    fig.add_trace(
+                        go.Scatter(
+                            x=df[var2],
+                            y=df[var1],
+                            mode='markers',
+                            marker=dict(size=6),
+                            showlegend=False
+                        ),
+                        row=row, col=col
+                    )
+
+        # レイアウトの調整
+        fig.update_layout(
+            height=200 * len(selected_cols),
+            width=200 * len(selected_cols),
+            showlegend=False,
+            title="散布図行列とヒストグラム"
+        )
+        
+        # 軸ラベルの追加
+        for i, var1 in enumerate(selected_cols):
+            for j, var2 in enumerate(selected_cols):
+                fig.update_xaxes(title_text=var2, row=i+1, col=j+1)
+                fig.update_yaxes(title_text=var1, row=i+1, col=j+1)
+
         st.plotly_chart(fig)
         
         # 相関の解釈
@@ -98,9 +147,8 @@ if df is not None:
                         description += f'強い負の相関がある (r={correlation:.2f})'
                     st.write(description)
 
-
-
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
+
 # Copyright
 st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
 st.write("easyStat: Open Source for Ubiquitous Statistics")
