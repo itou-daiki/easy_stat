@@ -120,11 +120,20 @@ if df is not None:
             title="散布図行列とヒストグラム"
         )
         
-        # 軸ラベルの追加
+        # 軸ラベルの追加 (修正部分)
         for i, var1 in enumerate(selected_cols):
             for j, var2 in enumerate(selected_cols):
-                fig.update_xaxes(title_text=var2, row=i+1, col=j+1)
-                fig.update_yaxes(title_text=var1, row=i+1, col=j+1)
+                # 横軸のラベルを最下の行のみに設定
+                if i == len(selected_cols) - 1:  
+                    fig.update_xaxes(title_text=var2, row=i+1, col=j+1)
+                else:
+                    fig.update_xaxes(title_text='', row=i+1, col=j+1)
+        
+                # 縦軸のラベルを最左の列のみに設定
+                if j == 0:  
+                    fig.update_yaxes(title_text=var1, row=i+1, col=j+1)
+                else:
+                    fig.update_yaxes(title_text='', row=i+1, col=j+1)
 
         st.plotly_chart(fig)
         
