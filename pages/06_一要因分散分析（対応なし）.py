@@ -3,11 +3,9 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-import math
 from statistics import median, variance
-import matplotlib.pyplot as plt
-import japanize_matplotlib
 from PIL import Image
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="一要因分散分析(対応なし)", layout="wide")
 
@@ -29,16 +27,21 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('anova_demo.xlsx', sheet_name=0)
-    st.write(df.head())
+    try:
+        df = pd.read_excel('anova_demo.xlsx', sheet_name=0)
+        st.write(df.head())
+    except FileNotFoundError:
+        st.error("デモデータファイルが見つかりません。ファイルパスを確認してください。")
 else:
     if uploaded_file is not None:
-        if uploaded_file.type == 'text/csv':
-            df = pd.read_csv(uploaded_file)
+        try:
+            if uploaded_file.type == 'text/csv':
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
             st.write(df.head())
-        else:
-            df = pd.read_excel(uploaded_file)
-            st.write(df.head())
+        except Exception as e:
+            st.error(f"ファイルの読み込み中にエラーが発生しました: {e}")
 
 if df is not None:
     # カテゴリ変数の抽出
@@ -48,7 +51,7 @@ if df is not None:
 
     # カテゴリ変数の選択
     st.subheader("カテゴリ変数の選択")
-    cat_var = st.multiselect('カテゴリ変数を選択してください', categorical_cols,max_selections=1)
+    cat_var = st.multiselect('カテゴリ変数を選択してください', categorical_cols, max_selections=1)
 
     # 数値変数の選択
     st.subheader("数値変数の選択")
@@ -60,17 +63,17 @@ if df is not None:
     elif not num_vars:
         st.error("数値変数を選択してください。")
     elif len(df[cat_var].iloc[:, 0].unique()) < 3:
-        st.error("独立変数が2群になっていないます、分析を実行できません")
+        st.error("独立変数が3群以上になっていないため、分析を実行できません")
     else:
         st.success("分析可能な変数を選択しました。分析を実行します。")
 
         # 独立変数から重複のないデータを抽出し、リストに変換
         xcat_var_d = df[cat_var].iloc[:, 0].unique().tolist()
         st.subheader('【分析前の確認】')
-        cat_var_str = str(cat_var)
-        
+        cat_var_str = cat_var[0]
+
         # xcat_var_dの要素をst.writeで表示
-        st.write(f'{(cat_var_str)}（{xcat_var_d}）によって、')
+        st.write(f'{cat_var_str}（{xcat_var_d}）によって、')
 
         for num_var in num_vars:
             st.write(f'● {num_var}')
@@ -80,121 +83,114 @@ if df is not None:
         # グラフタイトルを表示するチェックボックス
         show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
 
-        # t検定の実行
+        # 分散分析の実行
         if st.button('分散分析の実行'):
             st.subheader('【分析結果】')
             st.write('【要約統計量】')
 
-            # 数値変数の要素の数を取得
-            num_range = len(num_vars)
+            # 要約統計量の計算
+            summaryColumns = ["有効N", "平均値", "中央値", "標準偏差", "分散", "最小値", "最大値"]
+            df_summary = pd.DataFrame(index=num_vars, columns=summaryColumns)
 
-            # 各値の初期化
-            n = 1
-            summaryList = [num_vars]
-            summaryColumns = ["有効N", "平均値", "中央値", "標準偏差", "分散",
-                            "最小値", "最大値"]
+            for num_var in num_vars:
+                y = df[num_var]
+                df_summary.at[num_var, '有効N'] = len(y)
+                df_summary.at[num_var, '平均値'] = y.mean()
+                df_summary.at[num_var, '中央値'] = median(y)
+                df_summary.at[num_var, '標準偏差'] = y.std(ddof=1)
+                df_summary.at[num_var, '分散'] = variance(y)
+                df_summary.at[num_var, '最小値'] = y.min()
+                df_summary.at[num_var, '最大値'] = y.max()
 
-            # 目的変数、従属変数から作業用データフレームのセット
-            df00_list = cat_var + num_vars
-            df00 = df[df00_list]
-
-            # サマリ(df0)用のデータフレームのセット
-            df0 = pd.DataFrame(index=summaryList, columns=summaryColumns)
-
-            # サマリ(df0)用のデータフレームに平均値と標準偏差を追加
-            for summary in range(num_range):
-                # 列データの取得（nは従属変数の配列番号）
-                y = df00.iloc[:, n]
-
-                # 従属変数の列データの計算処理
-                df0.at[df00.columns[n], '有効N'] = len(y)
-                df0.at[df00.columns[n], '平均値'] = y.mean()
-                df0.at[df00.columns[n], '中央値'] = median(y)
-                df0.at[df00.columns[n], '標準偏差'] = y.std()
-                df0.at[df00.columns[n], '分散'] = variance(y)
-                df0.at[df00.columns[n], '最小値'] = y.min()
-                df0.at[df00.columns[n], '最大値'] = y.max()
-                n += 1
-
-
-            # 要約統計量（サマリ）のデータフレームを表示
-            st.write(df0.style.format("{:.2f}"))
+            # 要約統計量の表示
+            st.write(df_summary.style.format("{:.2f}"))
 
             st.write('【分散分析（対応なし）】')
-            
-            # ANOVAの実行
-            # 結果の表作成
-            columns = ['全体M', '全体S.D'] + [item for sublist in zip([f'{group}M' for group in df[cat_var[0]].unique()], [f'{group}S.D' for group in df[cat_var[0]].unique()]) for item in sublist] + \
-                    ['df', 'F', 'p', 'sign', 'η²', 'ω²']
-            df_results = pd.DataFrame(columns=columns, index=[num_var])
-            
-            for num_var in num_vars:
-                groups = [df[df[cat_var[0]] == group][num_var] for group in df[cat_var[0]].unique()]
-                overall_mean = df[num_var].mean()
-                fval, pval = stats.f_oneway(*groups)
-                anova_results = stats.f_oneway(*groups)
-                df_between = len(df[cat_var[0]].unique()) - 1
-                df_within = len(df) - len(df[cat_var[0]].unique())
-                ss_between = df_between * sum([(group.mean() - overall_mean)**2 for group in groups])
-                ss_total = sum([(value - overall_mean)**2 for group in groups for value in group])
-                ms_within = (ss_total - ss_between) / df_within
 
-                # 効果量の計算
+            # 結果を保存するデータフレームの初期化
+            groups = df[cat_var_str].unique()
+            k = len(groups)
+            N = len(df)
+            columns = ['全体M', '全体S.D'] + \
+                [f'{group}M' for group in groups] + \
+                [f'{group}S.D' for group in groups] + \
+                ['群間自由度', '群内自由度', 'F', 'p', 'sign', 'η²', 'ω²']
+            df_results = pd.DataFrame(columns=columns, index=num_vars)
+
+            for num_var in num_vars:
+                group_data = [df[df[cat_var_str] == group][num_var] for group in groups]
+                overall_mean = df[num_var].mean()
+                overall_std = df[num_var].std(ddof=1)
+                fval, pval = stats.f_oneway(*group_data)
+
+                # 自由度の計算
+                df_between = k - 1  # 群間自由度
+                df_within = N - k     # 群内自由度
+
+                # 分散と効果量の計算
+                ss_between = sum([len(group)*(group.mean() - overall_mean)**2 for group in group_data])
+                ss_total = sum((df[num_var] - overall_mean)**2)
+                ms_within = ss_total / df_within
+
                 eta_squared = ss_between / ss_total
                 omega_squared = (ss_between - (df_between * ms_within)) / (ss_total + ms_within)
-                
-                overall_std = df[num_var].std()
 
-                means = [group.mean() for group in groups]
-                stds = [group.std() for group in groups]
+                means = [group.mean() for group in group_data]
+                stds = [group.std(ddof=1) for group in group_data]
 
-                sign = '**' if pval < 0.01 else '*' if pval < 0.05 else '†' if pval < 0.1 else 'n.s.'
+                if pval < 0.01:
+                    sign = '**'
+                elif pval < 0.05:
+                    sign = '*'
+                elif pval < 0.1:
+                    sign = '†'
+                else:
+                    sign = 'n.s.'
 
-                df_results.loc[num_var] = [overall_mean, overall_std] + means + stds + [len(df) - len(df[cat_var[0]].unique()), fval, pval, sign, eta_squared, omega_squared]  # 修正: eta_squared, omega_squaredを追加
+                df_results.loc[num_var] = [overall_mean, overall_std] + means + stds + \
+                    [df_between, df_within, fval, pval, sign, eta_squared, omega_squared]
 
             # 結果の表示
-            # 数値型の列だけを選択
             numeric_columns = df_results.select_dtypes(include=['float64', 'int64']).columns
-            # 選択した列にのみ、スタイルを適用
             styled_df = df_results.style.format({col: "{:.2f}" for col in numeric_columns})
             st.write(styled_df)
-            
+
             st.write("【多重比較の結果】")
 
             for num_var in num_vars:
                 # TukeyのHSDテストを実行
-                tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var[0]])
-                # 結果をデータフレームに変換
-                tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
-                st.write(f'＜　　{num_var}　　に対する多重比較の結果＞')
-                st.write(tukey_df)
-            
+                try:
+                    tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var_str])
+                    # 結果をデータフレームに変換
+                    tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
+                    st.write(f'＜　　{num_var}　　に対する多重比較の結果＞')
+                    st.write(tukey_df)
 
-                # sign_captionを初期化
-                sign_caption = ''
+                    # sign_captionを初期化
+                    sign_caption = ''
 
-                # 各記号に対するチェックを実行
-                for p_adj in tukey_df['p-adj']:
-                    if p_adj < 0.01 and 'p<0.01**' not in sign_caption:
-                        sign_caption += 'p<0.01** '
-                    elif p_adj < 0.05 and 'p<0.05*' not in sign_caption:
-                        sign_caption += 'p<0.05* '
-                    elif p_adj < 0.1 and 'p<0.1†' not in sign_caption:
-                        sign_caption += 'p<0.1† '
-                
-                st.caption(sign_caption)
+                    # 各記号に対するチェックを実行
+                    for p_adj in tukey_df['p-adj']:
+                        if p_adj < 0.01 and 'p<0.01**' not in sign_caption:
+                            sign_caption += 'p<0.01** '
+                        elif p_adj < 0.05 and 'p<0.05*' not in sign_caption:
+                            sign_caption += 'p<0.05* '
+                        elif p_adj < 0.1 and 'p<0.1†' not in sign_caption:
+                            sign_caption += 'p<0.1† '
 
+                    st.caption(sign_caption)
+                except Exception as e:
+                    st.error(f"TukeyのHSDテスト実行中にエラーが発生しました: {e}")
 
             # サンプルサイズの表示
             st.write('＜サンプルサイズ＞')
             st.write(f'全体N ＝ {len(df)}')
-            for group_name in df[cat_var[0]].unique():
-                st.write(f'● {group_name}： {len(df[df[cat_var[0]] == group_name])}')
+            for group_name in groups:
+                st.write(f'● {group_name}： {len(df[df[cat_var_str] == group_name])}')
 
             st.subheader('【解釈の補助】')
 
             for index, row in df_results.iterrows():
-                comparisons = "、".join([f'「{xcat_var_d[i]}」 < 「{xcat_var_d[j]}」' for i in range(len(xcat_var_d)) for j in range(i+1, len(xcat_var_d))])
                 sign = row['sign']
                 if sign in ['**', '*']:
                     significance = "有意な差が生まれる"
@@ -204,122 +200,151 @@ if df is not None:
                     significance = "有意な差が生まれない"
                 p_value = row['p']
                 st.write(f'{cat_var_str}によって、【{index}】には{significance}')
-                st.write(f'　{comparisons}、（ p = {p_value:.2f} ）')
-
+                st.write(f'（ p = {p_value:.2f} ）')
 
             st.subheader('【可視化】')
-            # グラフの描画
-            font_path = 'ipaexg.ttf'
-            plt.rcParams['font.family'] = 'IPAexGothic'
 
-            # ブラケットの位置を格納するリスト
-            bracket_spacing = 3
-            bracket_length = 1
+            # ブラケット付きの棒グラフを描画する関数
+            def create_bracket_annotation(x0, x1, y, text):
+                return dict(
+                    xref='x',
+                    yref='y',
+                    x=(x0 + x1) / 2,
+                    y=y,
+                    text=text,
+                    showarrow=False,
+                    font=dict(color='black'),
+                    xanchor='center',
+                    yanchor='bottom'
+                )
 
-            def add_bracket(ax, x1, x2, y, p_value, significance, show_bracket=True):
-                
-                # ブラケットを表示
-                if show_bracket:
-                    # ブラケットの両端を描画
-                    ax.plot([x1, x1], [y, y + bracket_length], color='black', lw=1)
-                    ax.plot([x2, x2], [y, y + bracket_length], color='black', lw=1)
-        
-                    # ブラケットの中央部分を描画
-                    ax.plot([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1)
+            def create_bracket_shape(x0, x1, y_vline_bottom, bracket_y):
+                return dict(
+                    type='path',
+                    path=f'M {x0},{y_vline_bottom} L{x0},{bracket_y} L{x1},{bracket_y} L{x1},{y_vline_bottom}',
+                    line=dict(color='black'),
+                    xref='x',
+                    yref='y'
+                )
 
-                # p値の表示内容を変更
-                if significance == '**':
-                    p_display = 'p<0.01 **'
-                elif significance == '*':
-                    p_display = 'p<0.05 *'
-                elif significance == '†':
-                    p_display = 'p<0.1 †'
-                else:
-                    p_display = 'n.s.'
-                
-                # p値と判定記号を表示
-                ax.text((x1 + x2) / 2, y + bracket_length + 0.5, p_display,  # yの位置を調整
-                        horizontalalignment='center', verticalalignment='bottom')
-                
+            # レベル割り当て関数
+            def assign_levels(comparisons):
+                levels = []
+                comparison_levels = []
+                for comp in comparisons:
+                    group1, group2 = comp
+                    placed = False
+                    for level_num, level in enumerate(levels):
+                        # 比較レベルが共有するグループがないかチェック
+                        if group1 not in level and group2 not in level:
+                            level.add(group1)
+                            level.add(group2)
+                            comparison_levels.append(level_num)
+                            placed = True
+                            break
+                    if not placed:
+                        levels.append(set([group1, group2]))
+                        comparison_levels.append(len(levels) - 1)
+                return comparison_levels, len(levels)
+
             for num_var in num_vars:
                 # TukeyのHSDテストを実行
-                tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var[0]])
-                # 結果をデータフレームに変換
-                tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
+                try:
+                    tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var_str])
+                    # 結果をデータフレームに変換
+                    tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
+                except Exception as e:
+                    st.error(f"TukeyのHSDテスト実行中にエラーが発生しました: {e}")
+                    continue
+
+                # 有意な比較を抽出
+                significant_comparisons = []
+                for _, row in tukey_df.iterrows():
+                    group1 = row['group1']
+                    group2 = row['group2']
+                    p_value = row['p-adj']
+                    if p_value < 0.1:
+                        if p_value < 0.01:
+                            significance = '**'
+                        elif p_value < 0.05:
+                            significance = '*'
+                        else:
+                            significance = '†'
+                        significant_comparisons.append((group1, group2, p_value, significance))
+
+                # レベルを割り当て
+                comparisons = [(comp[0], comp[1]) for comp in significant_comparisons]
+                comparison_levels, num_levels = assign_levels(comparisons) if comparisons else ([], 0)
 
                 # 群ごとの平均値と標準偏差を計算
-                groups = df.groupby(cat_var[0])
-                means = groups[num_var].mean()
-                errors = groups[num_var].std()
+                group_means = df.groupby(cat_var_str)[num_var].mean()
+                group_errors = df.groupby(cat_var_str)[num_var].std(ddof=1)
 
-                # y軸の上限値を計算
-                ybar_max = max(means.values + np.array(errors.values))
-                y_max = max(means + errors * 3)*1.1
+                # カテゴリを数値にマッピング
+                category_positions = {group: i for i, group in enumerate(group_means.index)}
+                x_values = [category_positions[group] for group in group_means.index]
 
-                # ブラケットとアノテーションに必要な追加スペースを計算
-                additional_space_for_annotation = 1
-                
-                # すべてのカテゴリ変数のペアを取得
-                group_pairs = [(group1, group2) for i, group1 in enumerate(means.index) for j, group2 in enumerate(means.index) if i < j]
+                fig = go.Figure()
 
-                # 有意な差があるペアの数を計算
-                num_significant_pairs = sum([p_value < 0.1 for _, _, p_value in tukey_df[['group1', 'group2', 'p-adj']].values])
+                fig.add_trace(go.Bar(
+                    x=x_values,
+                    y=group_means.values,
+                    error_y=dict(type='data', array=group_errors.values, visible=True),
+                    marker_color='skyblue'
+                ))
+
+                # x軸をカテゴリ名で表示
+                fig.update_xaxes(
+                    tickvals=list(category_positions.values()),
+                    ticktext=list(category_positions.keys())
+                )
+
+                if show_graph_title:
+                    fig.update_layout(title_text=f'{num_var} by {cat_var_str}')
 
                 # y軸の最大値を計算
-                y_axis_max = y_max + (num_significant_pairs * (bracket_spacing + bracket_length)) + additional_space_for_annotation
+                base_y_max = max(group_means + group_errors) * 1.1 if not group_means.empty else 1
+                y_offset = base_y_max * 0.05
+                step_size = base_y_max * 0.05  # 各レベルごとの高さ
 
-                # 棒グラフと誤差範囲を描画
-                fig, ax = plt.subplots()
-                bars = ax.bar(x=means.index, height=means.values, yerr=errors.values, capsize=5)
+                # レベルごとに必要な余白を計算
+                additional_height = num_levels * (step_size + y_offset)  # 各レベルごとにスペースを増やす
+                y_max = base_y_max + additional_height
 
-                # y軸の最大値に基づくブラケットの開始位置を設定
-                y_bracket_start = ybar_max + 0.5
+                # ブラケットとアノテーションを追加
+                for idx, (comp, level) in enumerate(zip(significant_comparisons, comparison_levels)):
+                    group1, group2, p_value, significance = comp
+                    x0 = category_positions[group1]
+                    x1 = category_positions[group2]
 
-                # ブラケットの位置を格納するリストを初期化
-                bracket_positions = []
-                
-                # ブラケットと判定を追加
-                for i, (group1, group2) in enumerate(group_pairs):
-                    # tukey_df から特定のペアの p-adj 値を取得
-                    matching_row = tukey_df[((tukey_df['group1'] == group1) & (tukey_df['group2'] == group2)) | 
-                                            ((tukey_df['group1'] == group2) & (tukey_df['group2'] == group1))]
-                    p_value = matching_row['p-adj'].values[0]
-                    
-                    if p_value < 0.01:
-                        significance = '**'
-                    elif p_value < 0.05:
-                        significance = '*'
-                    elif p_value < 0.1:
-                        significance = '†'    
-                    else:
-                        significance = 'n.s.'
-                        
-                    # group1 と group2 のインデックス位置を取得
-                    x1 = means.index.get_loc(group1)
-                    x2 = means.index.get_loc(group2)
+                    # ブラケットの下端はエラーバーの上端 + 小さな余白
+                    y_vline_bottom = max(group_means[group1] + group_errors[group1],
+                                         group_means[group2] + group_errors[group2]) + y_offset * 0.2
 
-                    # ブラケットの位置を計算
-                    y_position = max(bracket_positions[-1] + bracket_spacing if bracket_positions else y_bracket_start, y_bracket_start)
-                    
-                    # significance が 'n.s.' でない場合のみ、ブラケットと判定を追加                    
-                    if significance != 'n.s.':
-                        add_bracket(ax, x1, x2, y_position, p_value, significance)
-                        bracket_positions.append(y_position)  # 追加したブラケットの位置を記録
+                    # ブラケットの上端はレベルに応じて設定
+                    # 各レベルごとに十分なスペースを確保するために step_size と y_offset を組み合わせる
+                    bracket_y = y_vline_bottom + (level * (step_size + y_offset)) + y_offset * 0.2
 
-                if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
-                    ax.set_title(f'{num_var} by {cat_var[0]}')
-                ax.set_ylabel(num_var)
-                ax.set_xlabel(cat_var[0])
+                    # ブラケットを追加
+                    fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
 
-                # x軸のラベルを取得
-                labels = ax.get_xticklabels()
+                    # アノテーションを追加
+                    annotation_y = bracket_y + y_offset * 0.2  # ブラケットの上にさらにスペースを追加
+                    fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, f'p < {p_value:.2f} {significance}'))
 
-                # ラベルを45度回転して設定
-                ax.set_xticklabels(labels, rotation=-45)
+                # y軸の範囲を設定
+                fig.update_yaxes(range=[0, y_max])
 
-                # グラフを描画
-                st.pyplot(fig)
+                # 日本語フォントの設定
+                fig.update_layout(font=dict(family="IPAexGothic"))
 
+                st.plotly_chart(fig, use_container_width=True)
+
+                # グラフキャプションの追加
+                caption_text = f"グループごとの平均値 (SD): "
+                caption_text += ", ".join([f"{group}: {mean:.2f} ({error:.2f})" for group, mean, error in zip(group_means.index, group_means.values, group_errors.values)])
+                caption_text += f", F = {df_results.loc[num_var, 'F']:.2f}, p = {df_results.loc[num_var, 'p']:.3f}, η² = {df_results.loc[num_var, 'η²']:.2f}, ω² = {df_results.loc[num_var, 'ω²']:.2f}"
+                st.caption(caption_text)
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 # Copyright

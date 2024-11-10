@@ -2,12 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy import stats
-import math
 from statistics import median, variance
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-import japanize_matplotlib
 from PIL import Image
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
@@ -48,7 +45,7 @@ if df is not None:
 
     # カテゴリ変数の選択
     st.subheader("カテゴリ変数の選択")
-    cat_var = st.multiselect('カテゴリ変数（独立変数）を選択してください', categorical_cols,max_selections=1)
+    cat_var = st.multiselect('カテゴリ変数（独立変数）を選択してください', categorical_cols, max_selections=1)
 
     # 数値変数の選択
     st.subheader("数値変数の選択")
@@ -67,8 +64,8 @@ if df is not None:
         # 独立変数から重複のないデータを抽出し、リストに変換
         xcat_var_d = df[cat_var].iloc[:, 0].unique().tolist()
         st.subheader('【分析前の確認】')
-        cat_var_str = str(cat_var)
-        st.write(f'{(cat_var_str)}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
+        cat_var_str = str(cat_var[0])
+        st.write(f'{cat_var_str}（{xcat_var_d[0]}・{xcat_var_d[1]}）によって、')
 
         for num_var in num_vars:
             st.write(f'● {num_var}')
@@ -88,9 +85,9 @@ if df is not None:
 
             # 各値の初期化
             n = 1
-            summaryList = [num_vars]
+            summaryList = num_vars
             summaryColumns = ["有効N", "平均値", "中央値", "標準偏差", "分散",
-                            "最小値", "最大値"]
+                              "最小値", "最大値"]
 
             # 目的変数、従属変数から作業用データフレームのセット
             df00_list = cat_var + num_vars
@@ -122,7 +119,7 @@ if df is not None:
 
             # 結果を保存するデータフレームの初期化
             columns = ['全体M', '全体S.D', f'{groups[0]}M', f'{groups[0]}S.D',
-                    f'{groups[1]}M', f'{groups[1]}S.D', 'df', 't', 'p', 'sign', 'd']
+                       f'{groups[1]}M', f'{groups[1]}S.D', 'df', 't', 'p', 'sign', 'd']
             df_results = pd.DataFrame(columns=columns)
 
             for var in num_vars:
@@ -130,14 +127,26 @@ if df is not None:
                 group0_data = df[df[cat_var[0]] == groups[0]][var]
                 group1_data = df[df[cat_var[0]] == groups[1]][var]
 
+                n1 = len(group0_data)
+                n2 = len(group1_data)
+                s1_sq = np.var(group0_data, ddof=1)
+                s2_sq = np.var(group1_data, ddof=1)
+
+                # Welch–Satterthwaiteの式で自由度を計算
+                df_numerator = (s1_sq / n1 + s2_sq / n2) ** 2
+                df_denominator = ((s1_sq / n1) ** 2) / (n1 - 1) + ((s2_sq / n2) ** 2) / (n2 - 1)
+                df_welch = df_numerator / df_denominator
+
                 ttest_result = stats.ttest_ind(group0_data, group1_data, equal_var=False)
                 overall_mean = series.mean()
-                overall_std = series.std()
+                overall_std = series.std(ddof=1)
                 g0_mean = group0_data.mean()
-                g0_std = group0_data.std()
+                g0_std = group0_data.std(ddof=1)
                 g1_mean = group1_data.mean()
-                g1_std = group1_data.std()
-                effect_size = abs(g0_mean - g1_mean) / overall_std
+                g1_std = group1_data.std(ddof=1)
+
+                # 効果量dの計算（不偏分散を使用）
+                effect_size = (g0_mean - g1_mean) / np.sqrt((s1_sq + s2_sq) / 2)
 
                 if ttest_result.pvalue < 0.01:
                     significance = '**'
@@ -155,7 +164,7 @@ if df is not None:
                     f'{groups[0]}S.D': g0_std,
                     f'{groups[1]}M': g1_mean,
                     f'{groups[1]}S.D': g1_std,
-                    'df': len(series) - 1,
+                    'df': df_welch,
                     't': abs(ttest_result.statistic),
                     'p': ttest_result.pvalue,
                     'sign': significance,
@@ -181,9 +190,8 @@ if df is not None:
                 sign_caption += 'p<0.05* '
             if df_results['sign'].str.contains('†').any():
                 sign_caption += 'p<0.1† '
-            
-            st.caption(sign_caption)
 
+            st.caption(sign_caption)
 
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
@@ -205,19 +213,29 @@ if df is not None:
                 p_value = row['p']
                 st.write(f'{cat_var_str}によって、{index}には{significance}（{xcat_var_d[0]}{comparison}{xcat_var_d[1]}）（p= {p_value:.2f}）')
 
-
             st.subheader('【可視化】')
             # グラフの描画
-            font_path = 'ipaexg.ttf'
-            plt.rcParams['font.family'] = 'IPAexGothic'
 
-            # ブラケット付きの棒グラフを出力する機能の更新
-            def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 4  # ブラケットの両端の縦棒の長さを固定
-                ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
-                ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
-                ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
-                ax.text((x1 + x2) / 2, y + bracket_length + 2, text, ha='center', va='bottom')
+            # ブラケット付きの棒グラフを描画する関数
+            def create_bracket_annotation(x0, x1, y, text):
+                return dict(
+                    xref='x',
+                    yref='y',
+                    x=(x0 + x1) / 2,
+                    y=y,
+                    text=text,
+                    showarrow=False,
+                    font=dict(color='black'),
+                )
+
+            def create_bracket_shape(x0, x1, y_vline_bottom, bracket_y):
+                return dict(
+                    type='path',
+                    path=f'M {x0},{y_vline_bottom} L{x0},{bracket_y} L{x1},{bracket_y} L{x1},{y_vline_bottom}',
+                    line=dict(color='black'),
+                    xref='x',
+                    yref='y'
+                )
 
             # グラフ描画部分の更新
             for var in num_vars:
@@ -227,18 +245,79 @@ if df is not None:
                     '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
                 })
 
-                fig, ax = plt.subplots(figsize=(8, 6))
-                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
+                # カテゴリを数値にマッピング
+                category_positions = {group: i for i, group in enumerate(data['群'])}
+                x_values = [category_positions[group] for group in data['群']]
+
+                fig = go.Figure()
+
+                fig.add_trace(go.Bar(
+                    x=x_values,
+                    y=data['平均値'],
+                    error_y=dict(type='data', array=data['誤差'], visible=True),
+                    marker_color='skyblue'
+                ))
+
+                # x軸をカテゴリ名で表示
+                fig.update_xaxes(
+                    tickvals=list(category_positions.values()),
+                    ticktext=list(category_positions.keys())
+                )
+
                 if show_graph_title:
-                    ax.set_title(f'平均値の比較： {var}')
+                    fig.update_layout(title_text=f'平均値の比較： {var} by {cat_var_str}')
+
+                # 各統計量を取得
                 p_value = df_results.at[var, 'p']
-                significance_text = "p < 0.01 **" if p_value < 0.01 else "p < 0.05 *" if p_value < 0.05 else "p < 0.1 †" if p_value < 0.1 else "n.s."
-                bracket_length = 4
-                bracket_height = max(data['平均値']) + max(data['誤差']) * 1.1 + bracket_length
-                ax.set_ylim([0, bracket_height * 1.4])
-                add_bracket(ax, 0, 1, bracket_height, significance_text)
-                st.pyplot(fig)
-                
+                effect_size = df_results.at[var, 'd']
+                g0_mean = df_results.at[var, f'{groups[0]}M']
+                g0_std = df_results.at[var, f'{groups[0]}S.D']
+                g1_mean = df_results.at[var, f'{groups[1]}M']
+                g1_std = df_results.at[var, f'{groups[1]}S.D']
+
+                if p_value < 0.01:
+                    significance_text = "p < 0.01 **"
+                elif p_value < 0.05:
+                    significance_text = "p < 0.05 *"
+                elif p_value < 0.1:
+                    significance_text = "p < 0.1 †"
+                else:
+                    significance_text = "n.s."
+
+                # 位置を計算
+                y0_bar = data['平均値'][0]
+                y1_bar = data['平均値'][1]
+                e0 = data['誤差'][0]
+                e1 = data['誤差'][1]
+                y0_top = y0_bar + e0
+                y1_top = y1_bar + e1
+                y_max_error = max(y0_top, y1_top)
+                y_range = y_max_error * 1.1
+                y_offset = y_range * 0.05
+                bracket_y = y_max_error + y_offset
+                vertical_line_offset = y_offset * 0.5
+                y_vline_bottom = y_max_error + vertical_line_offset
+                annotation_offset = y_offset * 0.5
+                annotation_y = bracket_y + annotation_offset
+
+                x0 = x_values[0]
+                x1 = x_values[1]
+
+                # ブラケットを追加
+                fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
+                fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, significance_text))
+
+                fig.update_yaxes(range=[0, annotation_y + y_offset])
+
+                # 日本語フォントの設定
+                fig.update_layout(font=dict(family="IPAexGothic"))
+
+                st.plotly_chart(fig)
+
+                # キャプションの追加
+                st.caption(f"【{groups[0]}】 平均値 (SD): {g0_mean:.2f} ( {g0_std:.2f} ), "
+                           f"【{groups[1]}】 平均値 (SD): {g1_mean:.2f} ( {g1_std:.2f} ), "
+                           f"【危険率】p値: {p_value:.3f},【効果量】d値: {effect_size:.2f}")
                 
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')

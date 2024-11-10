@@ -2,12 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy import stats
-import math
 from statistics import median, variance
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-import japanize_matplotlib
 from PIL import Image
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="t検定(対応あり)", layout="wide")
 
@@ -84,7 +81,7 @@ if df is not None:
             st.write("【要約統計量】")
             
             # 数値変数のリスト
-            num_vars = numerical_cols
+            num_vars = pre_vars + post_vars
 
             # サマリ用のデータフレームのセット
             summaryColumns = ["有効N", "平均値", "中央値", "標準偏差", "分散",
@@ -97,7 +94,7 @@ if df is not None:
                 df_summary.at[var, '有効N'] = len(y)
                 df_summary.at[var, '平均値'] = y.mean()
                 df_summary.at[var, '中央値'] = median(y)
-                df_summary.at[var, '標準偏差'] = y.std()
+                df_summary.at[var, '標準偏差'] = y.std(ddof=1)
                 df_summary.at[var, '分散'] = variance(y)
                 df_summary.at[var, '最小値'] = y.min()
                 df_summary.at[var, '最大値'] = y.max()
@@ -108,31 +105,35 @@ if df is not None:
             st.write("【平均値の差の検定（対応あり）】")
             
             # 検定結果のデータフレームを作成
-            resultColumns = ["観測値" + "M", "観測値" + "S.D",
-                            "測定値" + "M", "測定値" + "S.D",
+            resultColumns = ["観測値M", "観測値S.D",
+                            "測定値M", "測定値S.D",
                             'df', 't', 'p', 'sign', 'd']
-
-            # indexにpre → post となるようにデータフレームを記載
             index = [f'{pre_var} → {post_var}' for pre_var, post_var in zip(pre_vars, post_vars)]
             result_df = pd.DataFrame(index=index, columns=resultColumns)
             paired_variable_list = [f'{pre_var} → {post_var}' for pre_var, post_var in zip(pre_vars, post_vars)]
 
             for pre_var, post_var, idx in zip(pre_vars, post_vars, index):
-                # t値、p値、s（全体標準偏差）、d値（効果量）の取得
-                x, y = df[pre_var], df[post_var]
+                x = df[pre_var]
+                y = df[post_var]
+                n = len(x)
+
+                # 対応のあるt検定
                 ttest = stats.ttest_rel(x, y)
-                t = abs(ttest.statistic)
+                t = ttest.statistic
                 p = ttest.pvalue
-                xs, ys = x.std(), y.std()
-                xm, ym = x.mean(), y.mean()
-                d_beta = xm - ym
-                xdf, ydf = len(x), len(y)
-                px, py = pow(xs, 2), pow(ys, 2)
-                ds = math.sqrt(((xdf * px) + (ydf * py)) / (xdf + ydf))
-                d = abs(d_beta / ds)
+                df_t = n - 1  # 自由度
+
+                # 平均値と標準偏差
+                x_mean = x.mean()
+                y_mean = y.mean()
+                x_std = x.std(ddof=1)
+                y_std = y.std(ddof=1)
+
+                # 効果量dの計算（対応のあるデータの標準偏差を使用）
+                diff = x - y
+                d = (x_mean - y_mean) / diff.std(ddof=1)
 
                 # p値の判定をsignに格納
-                sign = ""
                 if p < 0.01:
                     sign = "**"
                 elif p < 0.05:
@@ -142,22 +143,21 @@ if df is not None:
                 else:
                     sign = "n.s."
 
-                # 従属変数の列データの計算処理
-                result_df.at[idx, '観測値M'] = xm
-                result_df.at[idx, '観測値S.D'] = xs
-                result_df.at[idx, '測定値M'] = ym
-                result_df.at[idx, '測定値S.D'] = ys
-                result_df.at[idx, 'df'] = len(x) - 1
+                # 結果をデータフレームに格納
+                result_df.at[idx, '観測値M'] = x_mean
+                result_df.at[idx, '観測値S.D'] = x_std
+                result_df.at[idx, '測定値M'] = y_mean
+                result_df.at[idx, '測定値S.D'] = y_std
+                result_df.at[idx, 'df'] = df_t
                 result_df.at[idx, 't'] = t
                 result_df.at[idx, 'p'] = p
                 result_df.at[idx, 'sign'] = sign
                 result_df.at[idx, 'd'] = d
 
             # 結果のデータフレームを表示
-            # r_numerical_cols = result_df.select_dtypes(exclude=['object', 'category']).columns.tolist()
-            # result_df[r_numerical_cols] = result_df[r_numerical_cols].apply(pd.to_numeric, errors='coerce')
-            # styled_df = result_df.style.format({col: "{:.2f}" for col in r_numerical_cols})
-            st.write(result_df) 
+            numeric_columns = result_df.select_dtypes(include=['float64', 'int64']).columns
+            styled_df = result_df.style.format({col: "{:.2f}" for col in numeric_columns})
+            st.write(styled_df)
 
             # sign_captionを初期化
             sign_caption = ''
@@ -177,71 +177,134 @@ if df is not None:
             st.write(f'全体N ＝ {len(df)}')
 
             st.subheader('【解釈の補助】')
-            # 'sign'列、'観測値M'列、および'測定値M'列の列番号を取得
-            sign_col = result_df.columns.get_loc('sign')
-            x_mean_col = result_df.columns.get_loc("観測値M")
-            y_mean_col = result_df.columns.get_loc("測定値M")
-
             # paired_variable_listを直接イテレートして、各変数に対して解釈を提供
             for idx, vn in enumerate(paired_variable_list):
                 # p値の解釈を取得
-                interpretation = ""
-                comparison = "＞" if result_df.iat[idx, x_mean_col] > result_df.iat[idx, y_mean_col] else "＜"
+                sign = result_df.iloc[idx]['sign']
+                x_mean = result_df.iloc[idx]['観測値M']
+                y_mean = result_df.iloc[idx]['測定値M']
+                p_value = result_df.iloc[idx]['p']
 
-                if result_df.iat[idx, sign_col] == "**" or result_df.iat[idx, sign_col] == "*":
-                    interpretation = f'{vn}には有位な差が生まれる（ 観測値　{comparison}　測定値 ）'
-                elif result_df.iat[idx, sign_col] == "†":
-                    interpretation = f'{vn}には有意な差が生まれる傾向にある（ 観測値　{comparison}　測定値 ）'
-                elif result_df.iat[idx, sign_col] == "n.s.":
+                comparison = "＞" if x_mean > y_mean else "＜"
+
+                if sign in ["**", "*"]:
+                    interpretation = f'{vn}には有意な差が生まれる（観測値 {comparison} 測定値）'
+                elif sign == "†":
+                    interpretation = f'{vn}には有意な差が生まれる傾向にある（観測値 {comparison} 測定値）'
+                else:
                     interpretation = f'{vn}には有意な差が生まれない'
+
                 # 解釈を表示
-                st.write(f'●{interpretation}（p={result_df.iat[idx, result_df.columns.get_loc("p")]:.2f}）')
+                st.write(f'● {interpretation}（p= {p_value:.2f}）')
 
             st.subheader('【可視化】')
 
-            # グラフの描画
-            font_path = 'ipaexg.ttf'
-            plt.rcParams['font.family'] = 'IPAexGothic'
+            # ブラケット付きの棒グラフを描画する関数
+            def create_bracket_annotation(x0, x1, y, text):
+                return dict(
+                    xref='x',
+                    yref='y',
+                    x=(x0 + x1) / 2,
+                    y=y,
+                    text=text,
+                    showarrow=False,
+                    font=dict(color='black'),
+                )
 
-            # ブラケット付きの棒グラフを出力する機能の追加
-            def add_bracket(ax, x1, x2, y, text):
-                bracket_length = 4
-                # ブラケットの両端を描画
-                ax.add_line(Line2D([x1, x1], [y, y + bracket_length], color='black', lw=1))
-                ax.add_line(Line2D([x2, x2], [y, y + bracket_length], color='black', lw=1))
+            def create_bracket_shape(x0, x1, y_vline_bottom, bracket_y):
+                return dict(
+                    type='path',
+                    path=f'M {x0},{y_vline_bottom} L{x0},{bracket_y} L{x1},{bracket_y} L{x1},{y_vline_bottom}',
+                    line=dict(color='black'),
+                    xref='x',
+                    yref='y'
+                )
 
-                # ブラケットの中央部分を描画
-                ax.add_line(Line2D([x1, x2], [y + bracket_length, y + bracket_length], color='black', lw=1))
-
-                # p値と判定記号を表示
-                ax.text((x1 + x2) / 2, y + bracket_length + 2, text,
-                        horizontalalignment='center', verticalalignment='bottom')
-
+            # グラフ描画部分
             for pre_var, post_var in zip(pre_vars, post_vars):
+                x = df[pre_var]
+                y = df[post_var]
                 data = pd.DataFrame({
                     '群': [pre_var, post_var],
-                    '平均値': [df[pre_var].mean(), df[post_var].mean()],
-                    '誤差': [df[pre_var].std(), df[post_var].std()]
+                    '平均値': [x.mean(), y.mean()],
+                    '誤差': [x.std(ddof=1), y.std(ddof=1)]
                 })
 
-                fig, ax = plt.subplots(figsize=(8, 6))
-                bars = ax.bar(x=data['群'], height=data['平均値'], yerr=data['誤差'], capsize=5)
-                if show_graph_title:  # チェックボックスの状態に基づいてタイトルを表示または非表示にする
-                    ax.set_title(f'平均値の比較： {pre_var} → {post_var}')
+                # カテゴリを数値にマッピング
+                category_positions = {group: i for i, group in enumerate(data['群'])}
+                x_values = [category_positions[group] for group in data['群']]
 
-                ttest_result = stats.ttest_rel(df[pre_var], df[post_var])
+                fig = go.Figure()
+
+                fig.add_trace(go.Bar(
+                    x=x_values,
+                    y=data['平均値'],
+                    error_y=dict(type='data', array=data['誤差'], visible=True),
+                    marker_color='skyblue'
+                ))
+
+                # x軸をカテゴリ名で表示
+                fig.update_xaxes(
+                    tickvals=list(category_positions.values()),
+                    ticktext=list(category_positions.keys())
+                )
+
+                if show_graph_title:
+                    fig.update_layout(title_text=f'平均値の比較： {pre_var} → {post_var}')
+
+                # 各統計量を取得
+                ttest_result = stats.ttest_rel(x, y)
+                t = ttest_result.statistic
                 p_value = ttest_result.pvalue
+                n = len(x)
+                df_t = n - 1  # 自由度
+
+                diff = x - y
+                d = (x.mean() - y.mean()) / diff.std(ddof=1)
+
                 if p_value < 0.01:
                     significance_text = "p < 0.01 **"
                 elif p_value < 0.05:
                     significance_text = "p < 0.05 *"
                 elif p_value < 0.1:
-                    significance_text = "p < 0.10 †"
+                    significance_text = "p < 0.1 †"
                 else:
                     significance_text = "n.s."
-                ax.set_ylim([0, (max(data['平均値']) + max(data['誤差']))*1.4])  
-                add_bracket(ax, 0, 1, max(data['平均値']) + max(data['誤差']) + 5, significance_text)
-                st.pyplot(fig)
+
+                # 位置を計算
+                y0_bar = data['平均値'][0]
+                y1_bar = data['平均値'][1]
+                e0 = data['誤差'][0]
+                e1 = data['誤差'][1]
+                y0_top = y0_bar + e0
+                y1_top = y1_bar + e1
+                y_max_error = max(y0_top, y1_top)
+                y_range = y_max_error * 1.1
+                y_offset = y_range * 0.05
+                bracket_y = y_max_error + y_offset
+                vertical_line_offset = y_offset * 0.5
+                y_vline_bottom = y_max_error + vertical_line_offset
+                annotation_offset = y_offset * 0.5
+                annotation_y = bracket_y + annotation_offset
+
+                x0 = x_values[0]
+                x1 = x_values[1]
+
+                # ブラケットを追加
+                fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
+                fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, significance_text))
+
+                fig.update_yaxes(range=[0, annotation_y + y_offset])
+
+                # 日本語フォントの設定
+                fig.update_layout(font=dict(family="IPAexGothic"))
+
+                st.plotly_chart(fig)
+
+                # キャプションの追加
+                st.caption(f"【観測値】 平均値 (SD): {x.mean():.2f} ({x.std(ddof=1):.2f}), "
+                           f"【測定値】 平均値 (SD): {y.mean():.2f} ({y.std(ddof=1):.2f}), "
+                           f"【危険率】　p値: {p_value:.3f},【効果量】 d値: {d:.2f}")
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9','まで')
 # Copyright
