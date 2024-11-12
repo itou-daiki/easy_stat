@@ -25,7 +25,7 @@ st.markdown("""- [**ｔ検定（対応あり）**]""")
 st.markdown("""- [**一要因分散分析（対応なし）**]""")
 st.markdown("""- [**単回帰分析**]""")
 st.markdown("""- [**重回帰分析**]""")
-st.markdown("""- [**因子分析*]""")
+st.markdown("""- [**因子分析**]""")
 st.markdown("""- [**テキストマイニング**]""")
 
 # Updates and history
@@ -33,8 +33,8 @@ st.header("更新履歴")
 
 st.markdown("""
 
-#### **2024/11/10**
-- グラフの描画方法を変更し、インタラクティブな図を描画できるようにしました。
+#### **2024/11/13**
+- 重回帰分析のパス図が正しく描画されるように修正しました。
 
 #### **2024/11/04**
 - 相関分析に散布図行列を表示する機能を追加しました。
@@ -85,8 +85,15 @@ st.markdown("""
 # Contact and repository info
 st.header("リンク")
 st.markdown("""
-- [**AutoML DataScience**](https://huggingface.co/spaces/itou-daiki/pycaret_datascience_streamlit)
-- [**音のデータサイエンス**](https://audiovisualizationanalysis-bpeekdjwymuf6nkqcb4cqy.streamlit.app/)
+- [**進数変換学習アプリ**](https://easy-base-converter.streamlit.app)
+- [**easyRSA**](https://easy-rsa.streamlit.app/)
+- [**easyAutoML（回帰）**](https://huggingface.co/spaces/itou-daiki/pycaret_datascience_streamlit)
+- [**pkl_predict_reg**](https://huggingface.co/spaces/itou-daiki/pkl_predict_reg)
+- [**音のデータサイエンス**](https://audiovisualizationanalysis-bpeekdjwymuf6nkqcb4cqy.streamlit.app)
+- [**3D RGB Cube Visualizer**](https://boxplot-4-mysteams.streamlit.app)
+- [**上マーク角度計算補助ツール**](https://sailing-mark-angle.streamlit.app)
+- [**Factor Score Calculator**](https://factor-score-calculator.streamlit.app/)
+- [**easy Excel Merge**](https://easy-xl-merge.streamlit.app)
 - [**フィードバックはこちらまで**](https://forms.gle/G5sMYm7dNpz2FQtU9)
 - [**ソースコードはこちら（GitHub）**](https://github.com/itou-daiki/easy_stat)
 """)
