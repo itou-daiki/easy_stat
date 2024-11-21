@@ -3,15 +3,12 @@ import pandas as pd
 import numpy as np
 from wordcloud import WordCloud
 import networkx as nx
-import cufflinks as cf
 import plotly.express as px
-import plotly
-from plotly.subplots import make_subplots
 from collections import Counter
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 from PIL import Image
-import MeCab
+from janome.tokenizer import Tokenizer
 import nlplot
 
 font_path = "ipaexg.ttf"
@@ -72,33 +69,28 @@ if df is not None:
         # カテゴリ変数の選択
         st.subheader("カテゴリ変数の選択")
         selected_category = st.selectbox('カテゴリ変数を選択してください', categorical_cols)
-        categorical_cols.remove(selected_category)  # 選択済みの変数をリストから削除
+        # 選択済みの変数をリストから削除
+        text_cols.remove(selected_category)
         # デフォルトで最後のカラムを選択する
         default_index = len(text_cols) - 1 if len(text_cols) > 0 else 0
         selected_text = st.selectbox('記述変数を選択してください', text_cols, index=default_index)
 
         st.subheader('全体の分析')
 
-        # MeCabの初期化
-        mecab = MeCab.Tagger("-Owakati")
-
-        # ストップワードの定義
-        STOPWORDS = set([
-            "する", "なる", "ある", "こと", "これ", "それ", "もの", "ため", "ところ", 
-            "やる", "れる", "られる", "の", "を", "し", "に", "です", "は", 
-            "その", "ます", "が", "て", "で", "と", "も"
-        ])
+        # Janomeの初期化
+        tokenizer = Tokenizer()
 
         def extract_words(text):
-            nodes = mecab.parseToNode(text)
+            if pd.isnull(text):
+                return ""
+            tokens = tokenizer.tokenize(text)
             words = []
-            while nodes:
-                features = nodes.feature.split(",")
-                if features[0] not in ["助詞"] and nodes.surface not in STOPWORDS:
-                    if features[0] in ["名詞", "動詞", "形容詞", "固有名詞", "感動詞"]:
-                        words.append(nodes.surface)
-                nodes = nodes.next
-            return " ".join(words)
+            for token in tokens:
+                part_of_speech = token.part_of_speech.split(',')[0]
+                if part_of_speech in ["名詞", "動詞", "形容詞", "副詞"]:
+                    base_form = token.base_form
+                    words.append(base_form)
+            return ' '.join(words)
 
         # テキストデータをトークン化して新しい列に保存
         df['tokenized_text'] = df[selected_text].apply(extract_words)
@@ -110,8 +102,8 @@ if df is not None:
         # nptの初期化
         npt = nlplot.NLPlot(df, target_col='tokenized_text')
 
-        # デフォルトのストップワードを取得
-        stopwords_list = list(STOPWORDS) + npt.get_stopword()
+        # ストップワードをライブラリから取得
+        stopwords_list = npt.get_stopword()
 
         # テキストデータの抽出
         text_data = ' '.join(df['tokenized_text'])
@@ -119,7 +111,9 @@ if df is not None:
 
         st.subheader('【ワードクラウド】')
         # ワードクラウドのパラメータ
-        max_words = st.slider('ワードクラウドの最大単語数', 50, 200, 125, key='max_words_all')
+        unique_words = set(words.split())
+        max_words_default = min(len(unique_words), 125)
+        max_words = st.slider('ワードクラウドの最大単語数', 10, len(unique_words), max_words_default, key='max_words_all')
 
         if words:
             # ワードクラウドの作成と表示
@@ -130,7 +124,7 @@ if df is not None:
                 collocations=False,
                 font_path=font_path,
                 min_font_size=4,
-                stopwords=stopwords_list
+                stopwords=set(stopwords_list)
             ).generate(words)
             fig, ax = plt.subplots()
             ax.imshow(wordcloud, interpolation="bilinear")
@@ -139,11 +133,20 @@ if df is not None:
         else:
             st.warning("トークン化後のテキストデータが空です。ストップワードの設定を見直してください。")
 
-        # 共起ネットワークの作成と表示 (全体の分析)
-        try:
-            st.subheader('【共起ネットワーク】')
+        # 共起ネットワークの構築
+        npt.build_graph(stopwords=stopwords_list, min_edge_frequency=1)
+        if not hasattr(npt, 'edge_df') or npt.edge_df.empty:
+            st.warning("共起ネットワークのエッジリストが空です。ストップワードを調整するか、データを確認してください。")
+        else:
+            max_edge_frequency = int(npt.edge_df['count'].max())
+
             # 共起ネットワークのパラメータ
-            min_edge_frequency = st.slider('最小エッジ頻度', 1, 100, 1, key='co_network_all')
+            min_edge_frequency_default = max(1, int(max_edge_frequency * 0.1))
+
+            st.subheader('【共起ネットワーク】')
+            min_edge_frequency = st.slider('最小エッジ頻度', 1, max_edge_frequency, min_edge_frequency_default, key='co_network_all')
+
+            # 再度グラフを構築（最小エッジ頻度を適用）
             npt.build_graph(stopwords=stopwords_list, min_edge_frequency=min_edge_frequency)
 
             # グラフが構築されているか確認
@@ -154,39 +157,36 @@ if df is not None:
 
                 if num_edges > 0:
                     fig_co_network_all = npt.co_network(
-                        title='共起ネットワーク（全体）',  # タイトルを追加
+                        title='共起ネットワーク（全体）',
                         sizing=100,
                         node_size='adjacency_frequency',
-                        color_palette='hls',
+                        cmap='hls',  # 修正箇所
                         width=1100,
                         height=700,
                         save=False
                     )
-                    st.write(fig_co_network_all)
+                    st.plotly_chart(fig_co_network_all)
                 else:
                     st.warning("共起ネットワークを生成できませんでした。ストップワードを調整するか、データを確認してください。")
             else:
                 st.warning("共起ネットワークのグラフが構築されていません。ストップワードを調整するか、データを確認してください。")
 
-        except ValueError as e:
-            st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
-
-        # 全体のテキストデータから名詞の度数をカウント
+        # 単語の度数をカウント
         if words:
             words_list = words.split()
-            nouns_frequency = Counter(words_list)
+            words_frequency = Counter(words_list)
 
-            # 名詞の度数をデータフレームに変換
-            df_nouns = pd.DataFrame(nouns_frequency.items(), columns=['名詞', '度数']).sort_values(by='度数', ascending=False)
+            # 単語の度数をデータフレームに変換
+            df_words = pd.DataFrame(words_frequency.items(), columns=['単語', '度数']).sort_values(by='度数', ascending=False)
 
-            # 名詞の度数を棒グラフで表示
-            if not df_nouns.empty:
-                fig = px.bar(df_nouns.head(20), x='名詞', y='度数', title="名詞の出現度数")
+            # 単語の度数を棒グラフで表示
+            if not df_words.empty:
+                fig = px.bar(df_words.head(20), x='単語', y='度数', title="単語の出現度数")
                 st.plotly_chart(fig)
             else:
-                st.warning("名詞のカウントに失敗しました。トークン化後のテキストデータを確認してください。")
+                st.warning("単語のカウントに失敗しました。トークン化後のテキストデータを確認してください。")
         else:
-            st.warning("トークン化後のテキストデータが空です。名詞のカウントができません。")
+            st.warning("トークン化後のテキストデータが空です。単語のカウントができません。")
 
         # カテゴリ変数で群分け
         st.subheader('カテゴリ別の分析')
@@ -208,7 +208,9 @@ if df is not None:
             st.subheader('【ワードクラウド】')
 
             # ワードクラウドのパラメータ
-            max_words_group = st.slider('ワードクラウドの最大単語数', 50, 200, 125, key=f'max_words_group_{name}')
+            unique_words_group = set(words_group.split())
+            max_words_default_group = min(len(unique_words_group), 125)
+            max_words_group = st.slider('ワードクラウドの最大単語数', 10, len(unique_words_group), max_words_default_group, key=f'max_words_group_{name}')
 
             if words_group:
                 # ワードクラウドの作成と表示 (カテゴリ別)
@@ -219,7 +221,7 @@ if df is not None:
                     collocations=False,
                     font_path=font_path,
                     min_font_size=4,
-                    stopwords=stopwords_list
+                    stopwords=set(stopwords_list)
                 ).generate(words_group)
                 fig, ax = plt.subplots()
                 ax.imshow(wordcloud_group, interpolation="bilinear")
@@ -228,28 +230,35 @@ if df is not None:
             else:
                 st.warning(f"カテゴリ '{name}' のトークン化後のテキストデータが空です。ストップワードの設定を見直してください。")
 
-            # カテゴリ別のテキストデータから名詞の度数をカウント
+            # 単語の度数をカウント
             if words_group:
                 words_list_group = words_group.split()
-                nouns_frequency_group = Counter(words_list_group)
+                words_frequency_group = Counter(words_list_group)
 
-                # 名詞の度数をデータフレームに変換
-                df_nouns_group = pd.DataFrame(nouns_frequency_group.items(), columns=['名詞', '度数']).sort_values(by='度数', ascending=False)
+                # 単語の度数をデータフレームに変換
+                df_words_group = pd.DataFrame(words_frequency_group.items(), columns=['単語', '度数']).sort_values(by='度数', ascending=False)
 
-                # 名詞の度数を棒グラフで表示
-                if not df_nouns_group.empty:
-                    fig = px.bar(df_nouns_group.head(20), x='名詞', y='度数', title=f"名詞の出現度数　カテゴリ： {name}")
+                # 単語の度数を棒グラフで表示
+                if not df_words_group.empty:
+                    fig = px.bar(df_words_group.head(20), x='単語', y='度数', title=f"単語の出現度数　カテゴリ： {name}")
                     st.plotly_chart(fig)
                 else:
-                    st.warning(f"カテゴリ '{name}' の名詞のカウントに失敗しました。トークン化後のテキストデータを確認してください。")
+                    st.warning(f"カテゴリ '{name}' の単語のカウントに失敗しました。トークン化後のテキストデータを確認してください。")
             else:
-                st.warning(f"カテゴリ '{name}' のトークン化後のテキストデータが空です。名詞のカウントができません。")
+                st.warning(f"カテゴリ '{name}' のトークン化後のテキストデータが空です。単語のカウントができません。")
 
-            # 共起ネットワークの作成と表示
-            try:
-                st.subheader('【共起ネットワーク】')
+            # 共起ネットワークの構築
+            npt_group.build_graph(stopwords=stopwords_list, min_edge_frequency=1)
+            if not hasattr(npt_group, 'edge_df') or npt_group.edge_df.empty:
+                st.warning(f"カテゴリ '{name}' の共起ネットワークのエッジリストが空です。ストップワードを調整するか、データを確認してください。")
+            else:
+                max_edge_frequency_group = int(npt_group.edge_df['count'].max())
+
                 # 共起ネットワークのパラメータ
-                min_edge_frequency_group = st.slider('最小エッジ頻度', 1, 100, 1, key=f'co_network_group_{name}')
+                min_edge_frequency_default_group = max(1, int(max_edge_frequency_group * 0.1))
+                min_edge_frequency_group = st.slider('最小エッジ頻度', 1, max_edge_frequency_group, min_edge_frequency_default_group, key=f'co_network_group_{name}')
+
+                # 再度グラフを構築（最小エッジ頻度を適用）
                 npt_group.build_graph(stopwords=stopwords_list, min_edge_frequency=min_edge_frequency_group)
 
                 # グラフが構築されているか確認
@@ -260,22 +269,19 @@ if df is not None:
 
                     if num_edges_group > 0:
                         fig_co_network_grouped = npt_group.co_network(
-                            title=f'共起ネットワーク（カテゴリ：{name}）',  # タイトルを追加
+                            title=f'共起ネットワーク（カテゴリ：{name}）',
                             sizing=100,
                             node_size='adjacency_frequency',
-                            color_palette='hls',
+                            cmap='hls',  # 修正箇所
                             width=1100,
                             height=700,
                             save=False
                         )
-                        st.write(fig_co_network_grouped)
+                        st.plotly_chart(fig_co_network_grouped)
                     else:
                         st.warning(f"カテゴリ '{name}' の共起ネットワークを生成できませんでした。ストップワードを調整するか、データを確認してください。")
                 else:
                     st.warning(f"カテゴリ '{name}' の共起ネットワークのグラフが構築されていません。ストップワードを調整するか、データを確認してください。")
-
-            except ValueError as e:
-                st.error(f'共起ネットワークの作成に失敗しました（アップデート予定）: {str(e)}')
 
 else:
     st.error('データフレームがありません。ファイルをアップロードするか、デモデータを使用してください。')

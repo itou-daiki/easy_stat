@@ -1,11 +1,8 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from sklearn.linear_model import LinearRegression
-
-
-plt.rcParams['font.family'] = 'IPAexGothic'
+import numpy as np
+import plotly.graph_objects as go
+import statsmodels.api as sm
 
 st.set_page_config(page_title="単回帰分析", layout="wide")
 
@@ -16,17 +13,14 @@ st.write("説明変数と目的変数の関係を単回帰分析を使用して�
 
 st.write("")
 
-# TODO 共通化
 uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
 use_demo_data = st.checkbox('デモデータを使用')
 
 input_df = None
 if use_demo_data:
-     # TODO デモファイルを用意する
-     input_df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
+    input_df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
 else:
     if uploaded_file is not None:
-        print(uploaded_file.type)
         if uploaded_file.type == 'text/csv':
             input_df = pd.read_csv(uploaded_file)
         else:
@@ -56,31 +50,72 @@ if input_df is not None:
     # 単回帰分析の実施
     if st.button('単回帰分析の実行'):
         if feature_col == target_col:
-             st.error("説明変数と目的変数は異なるものを選択してください。")
+            st.error("説明変数と目的変数は異なるものを選択してください。")
         else:
             st.subheader('【分析結果】')
-            st.write('【要約統計量】')
+            st.write('【統計量】')
 
-            feature = input_df[feature_col].to_numpy().reshape(-1, 1)
+            feature = input_df[feature_col]
             target = input_df[target_col]
 
-            model = LinearRegression()
-            model.fit(feature, target)
-            target_pred = model.predict(feature)
+            # 定数項を追加
+            X = sm.add_constant(feature)
+            model = sm.OLS(target, X).fit()
 
-            fig, ax = plt.subplots(figsize=(8, 6))
+            # 回帰係数と切片を取得
+            intercept = model.params['const']
+            slope = model.params[feature_col]
+
+            # 決定係数、F値、自由度、p値を取得
+            r_squared = model.rsquared
+            f_value = model.fvalue
+            f_pvalue = model.f_pvalue
+            df_model = int(model.df_model)
+            df_resid = int(model.df_resid)
+
+            # 統計量をデータフレームにまとめる
+            stats_df = pd.DataFrame({
+                '指標': ['回帰係数（傾き）', '切片', '決定係数 (R²)', 'F値', '自由度（モデル）', '自由度（残差）', 'p値'],
+                '値': [slope, intercept, r_squared, f_value, df_model, df_resid, f_pvalue]
+            })
+
+            # 数値をフォーマット
+            def format_value(row):
+                if row['指標'] in ['自由度（モデル）', '自由度（残差）']:
+                    return f"{int(row['値'])}"
+                elif row['指標'] == 'p値':
+                    return f"{row['値']:.2f}"
+                else:
+                    return f"{row['値']:.2f}"
+
+            stats_df['値'] = stats_df.apply(format_value, axis=1)
+
+            # データフレームを表示
+            st.write(stats_df)
+
+            # 回帰直線の描画用データ
+            x_range = np.linspace(feature.min(), feature.max(), 100)
+            y_pred = intercept + slope * x_range
+
+            # Plotlyによるプロット
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=feature, y=target, mode='markers', name='データ'))
+            fig.add_trace(go.Scatter(x=x_range, y=y_pred, mode='lines', name='回帰直線'))
+
+            fig.update_layout(
+                xaxis_title=feature_col,
+                yaxis_title=target_col
+            )
+
             if show_graph_title:
-                ax.set_title(f'{feature_col}と{target_col}の関係 - 単回帰分析')
-            ax.set_xlabel(feature_col)
-            ax.set_ylabel(target_col)
-            ax.scatter(feature, target, color="blue")
-            ax.plot(feature, target_pred, color="red")
-            st.pyplot(fig)
+                fig.update_layout(title=f'{feature_col}と{target_col}の関係 - 単回帰分析')
 
-            st.write(f"回帰係数: {model.coef_[0]}")
-            st.write(f"切片: {model.intercept_}")
-            st.write("")
+            st.plotly_chart(fig)
 
+            # 数理モデルの表示
+            st.subheader(f"数理モデル: y = {slope:.2f}x + {intercept:.2f}")
+            st.subheader(f"数理モデル（解釈）: {target_col} = {slope:.2f} × {feature_col} + {intercept:.2f}")
+            st.subheader("")
 
 st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 # Copyright
