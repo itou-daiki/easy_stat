@@ -7,7 +7,10 @@ def display_header():
 def set_font():
     import matplotlib.pyplot as plt
     import japanize_matplotlib
-    font_path = "ipaexg.ttf"
+    import os
+    current_dir = os.path.dirname(__file__)                  # .../easy_stat/pages
+    repo_root   = os.path.abspath(os.path.join(current_dir, '..'))  # .../easy_stat
+    font_path   = os.path.join(repo_root, 'ipaexg.ttf')   
     plt.rcParams['font.family'] = 'IPAexGothic'
 
 def display_guide():
