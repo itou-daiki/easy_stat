@@ -5,16 +5,17 @@ from scipy import stats
 from statistics import median, variance
 from PIL import Image
 import plotly.graph_objects as go
+import common
 
 st.set_page_config(page_title="t検定(対応なし)", layout="wide")
 
 st.title("t検定(対応なし)")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
 st.write("")
 
 # 分析のイメージ
-image = Image.open('ttest.png')
+image = Image.open('images/ttest.png')
 st.image(image)
 
 # ファイルアップローダー
@@ -26,7 +27,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('ttest_demo.xlsx', sheet_name=0)
+    df = pd.read_excel('datasets/ttest_demo.xlsx', sheet_name=0)
     st.write(df.head())
 else:
     if uploaded_file is not None:
@@ -196,8 +197,8 @@ if df is not None:
             # サンプルサイズの表示
             st.write('【サンプルサイズ】')
             st.write(f'全体N ＝ {len(df)}')
-            st.write(f'● {groups[0]}： {len(group0_data)}')
-            st.write(f'● {groups[1]}： {len(group1_data)}')
+            st.write(f'● {groups[0]}： {len(df[df[cat_var[0]] == groups[0]])}')
+            st.write(f'● {groups[1]}： {len(df[df[cat_var[0]] == groups[1]])}')
 
             st.subheader('【解釈の補助】')
 
@@ -239,10 +240,18 @@ if df is not None:
 
             # グラフ描画部分の更新
             for var in num_vars:
+                # 各グループのサンプルサイズを取得
+                n0 = len(df[df[cat_var[0]] == groups[0]])
+                n1 = len(df[df[cat_var[0]] == groups[1]])
+                
+                # 標準誤差を計算（df_resultsに格納されている標準偏差を利用）
+                se0 = df_results.at[var, f'{groups[0]}S.D'] / np.sqrt(n0)
+                se1 = df_results.at[var, f'{groups[1]}S.D'] / np.sqrt(n1)
+                
                 data = pd.DataFrame({
                     '群': groups,
                     '平均値': [df_results.at[var, f'{groups[0]}M'], df_results.at[var, f'{groups[1]}M']],
-                    '誤差': [df_results.at[var, f'{groups[0]}S.D'], df_results.at[var, f'{groups[1]}S.D']]
+                    '誤差': [se0, se1] 
                 })
 
                 # カテゴリを数値にマッピング
@@ -265,7 +274,7 @@ if df is not None:
                 )
 
                 if show_graph_title:
-                    fig.update_layout(title_text=f'平均値の比較： {var} by {cat_var_str}')
+                    fig.update_layout(title_text=f'平均値の比較： {var} by {cat_var[0]}')
 
                 # 各統計量を取得
                 p_value = df_results.at[var, 'p']
@@ -284,7 +293,7 @@ if df is not None:
                 else:
                     significance_text = "n.s."
 
-                # 位置を計算
+                # 位置の計算
                 y0_bar = data['平均値'][0]
                 y1_bar = data['平均値'][1]
                 e0 = data['誤差'][0]
@@ -320,12 +329,5 @@ if df is not None:
                            f"【危険率】p値: {p_value:.3f},【効果量】d値: {effect_size:.2f}")
                 
 
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-# Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()

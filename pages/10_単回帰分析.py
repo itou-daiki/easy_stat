@@ -3,14 +3,14 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import statsmodels.api as sm
+import common
 
 st.set_page_config(page_title="単回帰分析", layout="wide")
 
 st.title("単回帰分析")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("")
 st.write("説明変数と目的変数の関係を単回帰分析を使用して分析する補助を行います。")
-
 st.write("")
 
 uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
@@ -18,7 +18,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 
 input_df = None
 if use_demo_data:
-    input_df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
+    input_df = pd.read_excel('datasets/correlation_demo.xlsx', sheet_name=0)
 else:
     if uploaded_file is not None:
         if uploaded_file.type == 'text/csv':
@@ -45,7 +45,7 @@ if input_df is not None:
     st.subheader("【分析前の確認】")
     st.write(f"{feature_col}から{target_col}の値を予測します。")
 
-    show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェックされている
+    show_graph_title = st.checkbox('グラフタイトルを表示する', value=True)  # デフォルトでチェック
 
     # 単回帰分析の実施
     if st.button('単回帰分析の実行'):
@@ -90,14 +90,14 @@ if input_df is not None:
 
             stats_df['値'] = stats_df.apply(format_value, axis=1)
 
-            # データフレームを表示
+            # 統計量を表示
             st.write(stats_df)
 
-            # 回帰直線の描画用データ
+            # 回帰直線の描画用データ作成
             x_range = np.linspace(feature.min(), feature.max(), 100)
             y_pred = intercept + slope * x_range
 
-            # Plotlyによるプロット
+            # Plotly によるプロット作成
             fig = go.Figure()
             fig.add_trace(go.Scatter(x=feature, y=target, mode='markers', name='データ'))
             fig.add_trace(go.Scatter(x=x_range, y=y_pred, mode='lines', name='回帰直線'))
@@ -117,12 +117,6 @@ if input_df is not None:
             st.subheader(f"数理モデル（解釈）: {target_col} = {slope:.2f} × {feature_col} + {intercept:.2f}")
             st.subheader("")
 
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-# Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+# Copyright 表示など
+common.display_copyright()
+common.display_special_thanks()

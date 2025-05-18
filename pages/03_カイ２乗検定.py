@@ -7,16 +7,17 @@ import plotly.figure_factory as ff
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 from PIL import Image
+import common
 
 st.set_page_config(page_title="カイ２乗分析", layout="wide")
 
 st.title("カイ２乗分析")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("２つの変数からクロス表やヒートマップを出力し、度数の偏りを解釈する補助を行います。")
 st.write("")
 
 # 分析のイメージ
-image = Image.open('chi_square.png')
+image = Image.open('images/chi_square.png')
 st.image(image)
 
 # ファイルアップローダー
@@ -28,7 +29,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('chi_square_demo.xlsx', sheet_name=0)
+    df = pd.read_excel('datasets/chi_square_demo.xlsx', sheet_name=0)
     st.write(df.head())
 else:
     if uploaded_file is not None:
@@ -152,12 +153,7 @@ if df is not None:
     # ヒートマップの表示
     st.plotly_chart(fig_heatmap)
 
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 # Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()
+

@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import io
-
+import common
 
 
 
@@ -11,7 +11,7 @@ import io
 st.set_page_config(page_title="データクレンジング", layout="wide")
 
 st.title("データクレンジング")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("データセットに対して、欠損値処理や外れ値の処理などができます")
 st.write("")
 
@@ -80,13 +80,6 @@ if uploaded_file is not None:
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
     
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-# Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()
 

@@ -11,9 +11,11 @@ import japanize_matplotlib
 import networkx as nx
 import matplotlib.patches as mpatches
 import matplotlib.font_manager as font_manager
+import common
+
 
 st.title("重回帰分析")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("")
 st.write("因果を推定した「複数の説明変数と目的変数」の関係を分析し、可視化を行います。")
 
@@ -24,7 +26,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 
 input_df = None
 if use_demo_data:
-    input_df = pd.read_excel('multiple_regression_demo.xlsx', sheet_name=0)
+    input_df = pd.read_excel('datasets/multiple_regression_demo.xlsx', sheet_name=0)
 elif uploaded_file is not None:
     if uploaded_file.type == 'text/csv':
         input_df = pd.read_csv(uploaded_file)
@@ -387,12 +389,6 @@ if input_df is not None:
 
 st.write('')
 st.write('')
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 # Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()

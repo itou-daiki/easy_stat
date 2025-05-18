@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 import japanize_matplotlib
-
+import common
 
 
 
@@ -11,7 +11,7 @@ import japanize_matplotlib
 st.set_page_config(page_title="探索的データ分析（EDA）", layout="wide")
 
 st.title("探索的データ分析（EDA）")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("簡易的な探索的データ分析（EDA）が実行できます")
 st.write("")
 
@@ -24,7 +24,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('eda_demo.xlsx', sheet_name=0)
+    df = pd.read_excel('datasets/eda_demo.xlsx', sheet_name=0)
     st.write(df.head())
 else:
     if uploaded_file is not None:
@@ -156,12 +156,6 @@ if df is not None:
     else:
         st.warning('２つのカテゴリ変数と１つの数値変数を選択してください。')
     
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
 # Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()

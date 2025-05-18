@@ -5,16 +5,17 @@ from scipy import stats
 from statistics import median, variance
 from PIL import Image
 import plotly.graph_objects as go
+import common
 
 st.set_page_config(page_title="t検定(対応あり)", layout="wide")
 
 st.title("t検定(対応あり)")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
 st.write("")
 
 # 分析のイメージ
-image = Image.open('ttest_rel.png')
+image = Image.open('images/ttest_rel.png')
 st.image(image)
 
 # ファイルアップローダー
@@ -26,7 +27,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('ttest_rel_demo.xlsx', sheet_name=0)
+    df = pd.read_excel('datasets/ttest_rel_demo.xlsx', sheet_name=0)
     st.write(df.head())
 else:
     if uploaded_file is not None:
@@ -306,12 +307,6 @@ if df is not None:
                            f"【測定値】 平均値 (SD): {y.mean():.2f} ({y.std(ddof=1):.2f}), "
                            f"【危険率】　p値: {p_value:.3f},【効果量】 d値: {d:.2f}")
 
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9','まで')
 # Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()

@@ -9,15 +9,17 @@ import japanize_matplotlib
 from PIL import Image
 import seaborn as sns
 import numpy as np
+import common
+
 
 st.set_page_config(page_title="相関分析", layout="wide")
 st.title("相関分析")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。")
 st.write("")
 
 # 分析のイメージ
-image = Image.open('correlation.png')
+image = Image.open('images/correlation.png')
 st.image(image)
 
 # ファイルアップローダー
@@ -29,7 +31,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 # データフレームの作成
 df = None
 if use_demo_data:
-    df = pd.read_excel('correlation_demo.xlsx', sheet_name=0)
+    df = pd.read_excel('datasets/correlation_demo.xlsx', sheet_name=0)
     st.write(df.head())
 else:
     if uploaded_file is not None:
@@ -156,13 +158,6 @@ if df is not None:
                         description += f'強い負の相関がある (r={correlation:.2f})'
                     st.write(description)
 
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-
 # Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()

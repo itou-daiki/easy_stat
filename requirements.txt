@@ -4,6 +4,7 @@ pandas
 scipy
 Pillow
 openpyxl
+xlsxwriter
 matplotlib
 japanize-matplotlib
 seaborn
@@ -22,4 +23,6 @@ nlplot[all]
 Counter
 cufflinks
 statsmodels
+pingouin
 janome
+factor_analyzer

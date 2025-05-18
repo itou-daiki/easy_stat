@@ -6,16 +6,18 @@ from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from statistics import median, variance
 from PIL import Image
 import plotly.graph_objects as go
+import common
+
 
 st.set_page_config(page_title="一要因分散分析(対応なし)", layout="wide")
 
 st.title("一要因分散分析(対応なし)")
-st.caption("Created by Dit-Lab.(Daiki Ito)")
+common.display_header()
 st.write("変数の選択　→　分散分析　→　表作成　→　解釈の補助を行います")
 st.write("")
 
 # 分析のイメージ
-image = Image.open('anova.png')
+image = Image.open('images/anova.png')
 st.image(image)
 
 # ファイルアップローダー
@@ -28,7 +30,7 @@ use_demo_data = st.checkbox('デモデータを使用')
 df = None
 if use_demo_data:
     try:
-        df = pd.read_excel('anova_demo.xlsx', sheet_name=0)
+        df = pd.read_excel('datasets/anova_demo.xlsx', sheet_name=0)
         st.write(df.head())
     except FileNotFoundError:
         st.error("デモデータファイルが見つかりません。ファイルパスを確認してください。")
@@ -128,7 +130,7 @@ if df is not None:
                 df_within = N - k     # 群内自由度
 
                 # 分散と効果量の計算
-                ss_between = sum([len(group)*(group.mean() - overall_mean)**2 for group in group_data])
+                ss_between = sum([len(group) * (group.mean() - overall_mean)**2 for group in group_data])
                 ss_total = sum((df[num_var] - overall_mean)**2)
                 ms_within = ss_total / df_within
 
@@ -162,7 +164,8 @@ if df is not None:
                 try:
                     tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var_str])
                     # 結果をデータフレームに変換
-                    tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
+                    tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], 
+                                            columns=tukey_result._results_table.data[0])
                     st.write(f'＜　　{num_var}　　に対する多重比較の結果＞')
                     st.write(tukey_df)
 
@@ -177,7 +180,6 @@ if df is not None:
                             sign_caption += 'p<0.05* '
                         elif p_adj < 0.1 and 'p<0.1†' not in sign_caption:
                             sign_caption += 'p<0.1† '
-
                     st.caption(sign_caption)
                 except Exception as e:
                     st.error(f"TukeyのHSDテスト実行中にエラーが発生しました: {e}")
@@ -227,7 +229,7 @@ if df is not None:
                     yref='y'
                 )
 
-            # レベル割り当て関数
+            # レベル割り当て関数（比較が重ならないようレベルを決定）
             def assign_levels(comparisons):
                 levels = []
                 comparison_levels = []
@@ -235,7 +237,7 @@ if df is not None:
                     group1, group2 = comp
                     placed = False
                     for level_num, level in enumerate(levels):
-                        # 比較レベルが共有するグループがないかチェック
+                        # 比較レベルに共通のグループがなければ追加
                         if group1 not in level and group2 not in level:
                             level.add(group1)
                             level.add(group2)
@@ -252,7 +254,8 @@ if df is not None:
                 try:
                     tukey_result = pairwise_tukeyhsd(df[num_var], df[cat_var_str])
                     # 結果をデータフレームに変換
-                    tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], columns=tukey_result._results_table.data[0])
+                    tukey_df = pd.DataFrame(data=tukey_result._results_table.data[1:], 
+                                            columns=tukey_result._results_table.data[0])
                 except Exception as e:
                     st.error(f"TukeyのHSDテスト実行中にエラーが発生しました: {e}")
                     continue
@@ -276,9 +279,9 @@ if df is not None:
                 comparisons = [(comp[0], comp[1]) for comp in significant_comparisons]
                 comparison_levels, num_levels = assign_levels(comparisons) if comparisons else ([], 0)
 
-                # 群ごとの平均値と標準偏差を計算
+                # 群ごとの平均値と標準誤差を計算
                 group_means = df.groupby(cat_var_str)[num_var].mean()
-                group_errors = df.groupby(cat_var_str)[num_var].std(ddof=1)
+                group_errors = df.groupby(cat_var_str)[num_var].std(ddof=1) / np.sqrt(df.groupby(cat_var_str)[num_var].count())
 
                 # カテゴリを数値にマッピング
                 category_positions = {group: i for i, group in enumerate(group_means.index)}
@@ -308,7 +311,7 @@ if df is not None:
                 step_size = base_y_max * 0.05  # 各レベルごとの高さ
 
                 # レベルごとに必要な余白を計算
-                additional_height = num_levels * (step_size + y_offset)  # 各レベルごとにスペースを増やす
+                additional_height = num_levels * (step_size + y_offset)
                 y_max = base_y_max + additional_height
 
                 # ブラケットとアノテーションを追加
@@ -322,14 +325,13 @@ if df is not None:
                                          group_means[group2] + group_errors[group2]) + y_offset * 0.2
 
                     # ブラケットの上端はレベルに応じて設定
-                    # 各レベルごとに十分なスペースを確保するために step_size と y_offset を組み合わせる
                     bracket_y = y_vline_bottom + (level * (step_size + y_offset)) + y_offset * 0.2
 
                     # ブラケットを追加
                     fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
 
                     # アノテーションを追加
-                    annotation_y = bracket_y + y_offset * 0.2  # ブラケットの上にさらにスペースを追加
+                    annotation_y = bracket_y + y_offset * 0.2
                     fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, f'p < {p_value:.2f} {significance}'))
 
                 # y軸の範囲を設定
@@ -342,16 +344,12 @@ if df is not None:
 
                 # グラフキャプションの追加
                 caption_text = f"グループごとの平均値 (SD): "
-                caption_text += ", ".join([f"{group}: {mean:.2f} ({error:.2f})" for group, mean, error in zip(group_means.index, group_means.values, group_errors.values)])
+                caption_text += ", ".join([f"{group}: {mean:.2f} ({error:.2f})" for group, mean, error in 
+                                           zip(group_means.index, group_means.values, group_errors.values)])
                 caption_text += f", F = {df_results.loc[num_var, 'F']:.2f}, p = {df_results.loc[num_var, 'p']:.3f}, η² = {df_results.loc[num_var, 'η²']:.2f}, ω² = {df_results.loc[num_var, 'ω²']:.2f}"
                 st.caption(caption_text)
 
-st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
+
 # Copyright
-st.subheader('© 2022-2024 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-st.write("easyStat: Open Source for Ubiquitous Statistics")
-st.write("Democratizing data, everywhere.")
-st.write("")
-st.subheader("In collaboration with our esteemed contributors:")
-st.write("・Toshiyuki")
-st.write("With heartfelt appreciation for their dedication and support.")
+common.display_copyright()
+common.display_special_thanks()
