@@ -13,8 +13,7 @@ import nlplot
 import common
 
 # フォント設定
-font_path = "ipaexg.ttf"
-plt.rcParams['font.family'] = 'IPAexGothic'
+common.set_font()
 
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
