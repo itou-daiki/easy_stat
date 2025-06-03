@@ -79,22 +79,60 @@ def create_bracket_shape(x0, x1, y_vline_bottom, bracket_y):
     )
 
 def assign_levels(comparisons):
+    # カテゴリの位置を取得（この関数の外で定義されているcategory_positionsを使用）
+    cat_positions = category_positions
+    
+    # 各比較を位置でソート（左端の位置、次に幅）
+    sorted_comparisons = []
+    for comp in comparisons:
+        pos1 = cat_positions.get(comp[0], -1)
+        pos2 = cat_positions.get(comp[1], -1)
+        if pos1 == -1 or pos2 == -1:
+            continue  # カテゴリが見つからない場合はスキップ
+        left = min(pos1, pos2)
+        right = max(pos1, pos2)
+        sorted_comparisons.append((left, right, comp))
+    
+    # 幅の広い順にソート（広いものを下のレベルに配置）
+    sorted_comparisons.sort(key=lambda x: x[1] - x[0], reverse=True)
+    
+    # レベルを割り当て
     levels = []
     comparison_levels = []
-    for comp in comparisons:
-        grp1, grp2 = comp[0], comp[1]
-        placed = False
-        for level_num, level in enumerate(levels):
-            if grp1 not in level and grp2 not in level:
-                level.add(grp1)
-                level.add(grp2)
-                comparison_levels.append(level_num)
-                placed = True
+    
+    for left, right, comp in sorted_comparisons:
+        # 利用可能な最も低いレベルを見つける
+        assigned_level = None
+        for level_idx, level_ranges in enumerate(levels):
+            # このレベルで重なりがないかチェック
+            can_place = True
+            for existing_left, existing_right in level_ranges:
+                # ブラケットが重なるかチェック
+                if not (right < existing_left or left > existing_right):
+                    can_place = False
+                    break
+            
+            if can_place:
+                level_ranges.append((left, right))
+                assigned_level = level_idx
                 break
-        if not placed:
-            levels.append(set([grp1, grp2]))
-            comparison_levels.append(len(levels)-1)
-    return comparison_levels, len(levels)
+        
+        # 新しいレベルが必要な場合
+        if assigned_level is None:
+            levels.append([(left, right)])
+            assigned_level = len(levels) - 1
+        
+        comparison_levels.append((comp, assigned_level))
+    
+    # 元の順序に戻す
+    result_levels = []
+    for comp in comparisons:
+        for c, level in comparison_levels:
+            if c == comp:
+                result_levels.append(level)
+                break
+    
+    return result_levels, len(levels)
 
 if df is not None:
     st.subheader("【変数の選択】")

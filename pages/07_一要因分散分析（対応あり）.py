@@ -206,22 +206,58 @@ if df is not None:
             )
 
         def assign_levels(comparisons):
+            # カテゴリの位置を取得
+            cat_positions = category_positions
+            
+            # 各比較を位置でソート（左端の位置、次に幅）
+            sorted_comparisons = []
+            for comp in comparisons:
+                pos1 = cat_positions[comp[0]]
+                pos2 = cat_positions[comp[1]]
+                left = min(pos1, pos2)
+                right = max(pos1, pos2)
+                sorted_comparisons.append((left, right, comp))
+            
+            # 幅の広い順にソート（広いものを下のレベルに配置）
+            sorted_comparisons.sort(key=lambda x: x[1] - x[0], reverse=True)
+            
+            # レベルを割り当て
             levels = []
             comparison_levels = []
-            for comp in comparisons:
-                group1, group2 = comp
-                placed = False
-                for level_num, level in enumerate(levels):
-                    if group1 not in level and group2 not in level:
-                        level.add(group1)
-                        level.add(group2)
-                        comparison_levels.append(level_num)
-                        placed = True
+            
+            for left, right, comp in sorted_comparisons:
+                # 利用可能な最も低いレベルを見つける
+                assigned_level = None
+                for level_idx, level_ranges in enumerate(levels):
+                    # このレベルで重なりがないかチェック
+                    can_place = True
+                    for existing_left, existing_right in level_ranges:
+                        # ブラケットが重なるかチェック
+                        if not (right < existing_left or left > existing_right):
+                            can_place = False
+                            break
+                    
+                    if can_place:
+                        level_ranges.append((left, right))
+                        assigned_level = level_idx
                         break
-                if not placed:
-                    levels.append(set([group1, group2]))
-                    comparison_levels.append(len(levels) - 1)
-            return comparison_levels, len(levels)
+                
+                # 新しいレベルが必要な場合
+                if assigned_level is None:
+                    levels.append([(left, right)])
+                    assigned_level = len(levels) - 1
+                
+                comparison_levels.append((comp, assigned_level))
+            
+            # 元の順序に戻す
+            result_levels = []
+            for comp in comparisons:
+                for c, level in comparison_levels:
+                    if c == comp:
+                        result_levels.append(level)
+                        break
+            
+            return result_levels, len(levels)
         
         # 棒グラフの上限を計算
         base_y_max = (group_stats['mean'] + group_stats['sem']).max() * 1.1
