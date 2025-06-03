@@ -132,7 +132,8 @@ if df is not None:
                 # 分散と効果量の計算
                 ss_between = sum([len(group) * (group.mean() - overall_mean)**2 for group in group_data])
                 ss_total = sum((df[num_var] - overall_mean)**2)
-                ms_within = ss_total / df_within
+                ss_within = ss_total - ss_between
+                ms_within = ss_within / df_within
 
                 eta_squared = ss_between / ss_total
                 omega_squared = (ss_between - (df_between * ms_within)) / (ss_total + ms_within)
@@ -307,11 +308,11 @@ if df is not None:
 
                 # y軸の最大値を計算
                 base_y_max = max(group_means + group_errors) * 1.1 if not group_means.empty else 1
-                y_offset = base_y_max * 0.05
-                step_size = base_y_max * 0.05  # 各レベルごとの高さ
+                y_offset = base_y_max * 0.08  # オフセットを増やす
+                step_size = base_y_max * 0.12  # レベル間の高さを増やす
 
                 # レベルごとに必要な余白を計算
-                additional_height = num_levels * (step_size + y_offset)
+                additional_height = num_levels * step_size + y_offset * 2
                 y_max = base_y_max + additional_height
 
                 # ブラケットとアノテーションを追加
@@ -320,22 +321,22 @@ if df is not None:
                     x0 = category_positions[group1]
                     x1 = category_positions[group2]
 
-                    # ブラケットの下端はエラーバーの上端 + 小さな余白
+                    # ブラケットの下端はエラーバーの上端 + 余白
                     y_vline_bottom = max(group_means[group1] + group_errors[group1],
-                                         group_means[group2] + group_errors[group2]) + y_offset * 0.2
+                                         group_means[group2] + group_errors[group2]) + y_offset * 0.5
 
                     # ブラケットの上端はレベルに応じて設定
-                    bracket_y = y_vline_bottom + (level * (step_size + y_offset)) + y_offset * 0.2
+                    bracket_y = y_vline_bottom + (level * step_size) + y_offset * 0.3
 
                     # ブラケットを追加
                     fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
 
-                    # アノテーションを追加
-                    annotation_y = bracket_y + y_offset * 0.2
+                    # アノテーションを追加（ブラケットの上に十分な余白を確保）
+                    annotation_y = bracket_y + y_offset * 0.5
                     fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, f'p < {p_value:.2f} {significance}'))
 
-                # y軸の範囲を設定
-                fig.update_yaxes(range=[0, y_max])
+                # y軸の範囲を設定（上部に余裕を持たせる）
+                fig.update_yaxes(range=[0, y_max * 1.05])
 
                 # 日本語フォントの設定
                 fig.update_layout(font=dict(family="IPAexGothic"))
@@ -343,7 +344,7 @@ if df is not None:
                 st.plotly_chart(fig, use_container_width=True)
 
                 # グラフキャプションの追加
-                caption_text = f"グループごとの平均値 (SD): "
+                caption_text = f"グループごとの平均値 (SE): "
                 caption_text += ", ".join([f"{group}: {mean:.2f} ({error:.2f})" for group, mean, error in 
                                            zip(group_means.index, group_means.values, group_errors.values)])
                 caption_text += f", F = {df_results.loc[num_var, 'F']:.2f}, p = {df_results.loc[num_var, 'p']:.3f}, η² = {df_results.loc[num_var, 'η²']:.2f}, ω² = {df_results.loc[num_var, 'ω²']:.2f}"

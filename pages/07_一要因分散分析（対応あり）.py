@@ -225,8 +225,8 @@ if df is not None:
         
         # 棒グラフの上限を計算
         base_y_max = (group_stats['mean'] + group_stats['sem']).max() * 1.1
-        y_offset = base_y_max * 0.05
-        step_size = base_y_max * 0.05
+        y_offset = base_y_max * 0.08  # オフセットを増やす
+        step_size = base_y_max * 0.12  # レベル間の高さを増やす
         
         # 多重比較で有意な比較結果があれば、ブラケット描画のためレベルを割り当て
         if 'significant_comparisons' in locals() or 'pairwise_df' in locals():
@@ -243,7 +243,7 @@ if df is not None:
             comparison_levels, num_levels = assign_levels(comp_list)
         else:
             comparison_levels, num_levels = ([], 0)
-        additional_height = num_levels * (step_size + y_offset)
+        additional_height = num_levels * step_size + y_offset * 2
         y_max = base_y_max + additional_height
         
         if significant_comparisons:
@@ -253,18 +253,18 @@ if df is not None:
                 y_vline_bottom = max(
                     group_stats[group_stats['条件'] == group1]['mean'].values[0] + group_stats[group_stats['条件'] == group1]['sem'].values[0],
                     group_stats[group_stats['条件'] == group2]['mean'].values[0] + group_stats[group_stats['条件'] == group2]['sem'].values[0]
-                ) + y_offset * 0.2
+                ) + y_offset * 0.5
                 level = comparison_levels[idx]
-                bracket_y = y_vline_bottom + (level * (step_size + y_offset)) + y_offset * 0.2
+                bracket_y = y_vline_bottom + (level * step_size) + y_offset * 0.3
                 fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
-                annotation_y = bracket_y + y_offset * 0.2
+                annotation_y = bracket_y + y_offset * 0.5
                 fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, f"p < {p_value:.2f} {sign}"))
         
-        fig.update_yaxes(range=[0, y_max])
+        fig.update_yaxes(range=[0, y_max * 1.05])
         fig.update_layout(font=dict(family="IPAexGothic"))
         st.plotly_chart(fig, use_container_width=True)
         
-        caption_text = "各条件ごとの平均値 (SEM): " + ", ".join(
+        caption_text = "各条件ごとの平均値 (SE): " + ", ".join(
             [f"{row['条件']}: {row['mean']:.2f} ({row['sem']:.2f})" for _, row in group_stats.iterrows()]
         )
         st.caption(caption_text)

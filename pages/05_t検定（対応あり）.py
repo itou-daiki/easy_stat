@@ -225,10 +225,11 @@ if df is not None:
             for pre_var, post_var in zip(pre_vars, post_vars):
                 x = df[pre_var]
                 y = df[post_var]
+                n = len(x)
                 data = pd.DataFrame({
                     '群': [pre_var, post_var],
                     '平均値': [x.mean(), y.mean()],
-                    '誤差': [x.std(ddof=1), y.std(ddof=1)]
+                    '誤差': [x.std(ddof=1) / np.sqrt(n), y.std(ddof=1) / np.sqrt(n)]  # 標準誤差に修正
                 })
 
                 # カテゴリを数値にマッピング

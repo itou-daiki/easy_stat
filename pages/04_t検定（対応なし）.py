@@ -146,8 +146,9 @@ if df is not None:
                 g1_mean = group1_data.mean()
                 g1_std = group1_data.std(ddof=1)
 
-                # 効果量dの計算（不偏分散を使用）
-                effect_size = abs((g0_mean - g1_mean) / np.sqrt((s1_sq + s2_sq) / 2))
+                # 効果量dの計算（プールされた標準偏差を使用）
+                pooled_std = np.sqrt(((n1 - 1) * s1_sq + (n2 - 1) * s2_sq) / (n1 + n2 - 2))
+                effect_size = abs((g0_mean - g1_mean) / pooled_std)
 
                 if ttest_result.pvalue < 0.01:
                     significance = '**'
