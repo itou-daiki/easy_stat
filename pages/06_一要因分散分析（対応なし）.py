@@ -231,7 +231,7 @@ if df is not None:
                 )
 
             # レベル割り当て関数（比較が重ならないようレベルを決定）
-            def assign_levels(comparisons):
+            def assign_levels(comparisons, category_positions):
                 # カテゴリの位置を取得
                 cat_positions = category_positions
                 
@@ -313,7 +313,7 @@ if df is not None:
 
                 # レベルを割り当て
                 comparisons = [(comp[0], comp[1]) for comp in significant_comparisons]
-                comparison_levels, num_levels = assign_levels(comparisons) if comparisons else ([], 0)
+                comparison_levels, num_levels = assign_levels(comparisons, category_positions) if comparisons else ([], 0)
 
                 # 群ごとの平均値と標準誤差を計算
                 group_means = df.groupby(cat_var_str)[num_var].mean()

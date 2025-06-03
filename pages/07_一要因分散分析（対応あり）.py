@@ -205,7 +205,7 @@ if df is not None:
                 yref='y'
             )
 
-        def assign_levels(comparisons):
+        def assign_levels(comparisons, category_positions):
             # カテゴリの位置を取得
             cat_positions = category_positions
             
@@ -276,7 +276,7 @@ if df is not None:
         
         if significant_comparisons:
             comp_list = [(comp[0], comp[1]) for comp in significant_comparisons]
-            comparison_levels, num_levels = assign_levels(comp_list)
+            comparison_levels, num_levels = assign_levels(comp_list, category_positions)
         else:
             comparison_levels, num_levels = ([], 0)
         additional_height = num_levels * step_size + y_offset * 2

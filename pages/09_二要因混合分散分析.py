@@ -78,8 +78,8 @@ def create_bracket_shape(x0, x1, y_vline_bottom, bracket_y):
         yref='y'
     )
 
-def assign_levels(comparisons):
-    # カテゴリの位置を取得（この関数の外で定義されているcategory_positionsを使用）
+def assign_levels(comparisons, category_positions):
+    # カテゴリの位置を取得
     cat_positions = category_positions
     
     # 各比較を位置でソート（左端の位置、次に幅）
@@ -276,7 +276,7 @@ if df is not None:
                     else:
                         significance = '†'
                     significant_comparisons_pre.append((grp1, grp2, p_value, significance))
-            comp_levels_pre, num_levels_pre = assign_levels(significant_comparisons_pre) if significant_comparisons_pre else ([], 0)
+            comp_levels_pre, num_levels_pre = assign_levels(significant_comparisons_pre, category_positions) if significant_comparisons_pre else ([], 0)
             
             # 後測の比較
             try:
@@ -300,7 +300,7 @@ if df is not None:
                     else:
                         significance = '†'
                     significant_comparisons_post.append((grp1, grp2, p_value, significance))
-            comp_levels_post, num_levels_post = assign_levels(significant_comparisons_post) if significant_comparisons_post else ([], 0)
+            comp_levels_post, num_levels_post = assign_levels(significant_comparisons_post, category_positions) if significant_comparisons_post else ([], 0)
             
             base_y_max = max(max(np.array(pre_means) + np.array(pre_err)),
                              max(np.array(post_means) + np.array(post_err))) * 1.1
