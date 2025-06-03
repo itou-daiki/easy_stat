@@ -1,14 +1,15 @@
-import streamlit as st
-import pandas as pd
 import numpy as np
-import statsmodels.formula.api as smf
-import statsmodels.api as sm
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from PIL import Image
+import pandas as pd
 import plotly.graph_objects as go
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import streamlit as st
+from PIL import Image
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
 import common
 
-# ページ設定
+
 st.set_page_config(page_title="二要因分散分析(対応なし)", layout="wide")
 
 st.title("二要因分散分析(対応なし)")

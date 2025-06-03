@@ -1,10 +1,13 @@
 import io
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
+from PIL import Image
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from PIL import Image
+
 import common
+
 
 common.set_font()
 

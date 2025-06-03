@@ -1,14 +1,17 @@
+import matplotlib.pyplot as plt
+
 import streamlit as st
+import japanize_matplotlib
 
 
 def display_header():
-    st.caption("Created by Dit-Lab.(Daiki Ito)")
+    st.caption('Created by Dit-Lab.(Daiki Ito)')
+
 
 def set_font():
-    import matplotlib.pyplot as plt
-    import japanize_matplotlib
-    font_path = "../ipaexg.ttf"  # pages フォルダから一つ上を見る
+    font_path = '../ipaexg.ttf'  # pages フォルダから一つ上を見る
     plt.rcParams['font.family'] = 'IPAexGothic'
+
 
 def display_guide():
     st.markdown("""
@@ -16,8 +19,9 @@ def display_guide():
     - [**中の人のページ（Dit-Lab.）**](https://dit-lab.notion.site/Dit-Lab-da906d09d3cf42a19a011cf4bf25a673?pvs=4)
     """)
 
+
 def display_link():
-    st.header("リンク")
+    st.header('リンク')
     st.markdown("""
     - [**中の人のページ（Dit-Lab.）**](https://dit-lab.notion.site/Dit-Lab-da906d09d3cf42a19a011cf4bf25a673?pvs=4)
     - [**進数変換学習アプリ**](https://easy-base-converter.streamlit.app)
@@ -33,16 +37,18 @@ def display_link():
     - [**ソースコードはこちら（GitHub）**](https://github.com/itou-daiki/easy_stat)
     """)
 
+
 def display_copyright():
-    st.subheader("")
+    st.subheader('')
     st.write('ご意見・ご要望は→', 'https://forms.gle/G5sMYm7dNpz2FQtU9', 'まで')
-    st.write("")
+    st.write('')
     st.subheader('© 2022-2025 Dit-Lab.(Daiki Ito). All Rights Reserved.')
-    st.write("easyStat: Open Source for Ubiquitous Statistics")
-    st.write("Democratizing data, everywhere.")
-    st.write("")
+    st.write('easyStat: Open Source for Ubiquitous Statistics')
+    st.write('Democratizing data, everywhere.')
+    st.write('')
+
 
 def display_special_thanks():
-    st.subheader("In collaboration with our esteemed contributors:")
-    st.write("・Toshiyuki")
-    st.write("With heartfelt appreciation for their dedication and support.")
+    st.subheader('In collaboration with our esteemed contributors:')
+    st.write('・Toshiyuki')
+    st.write('With heartfelt appreciation for their dedication and support.')

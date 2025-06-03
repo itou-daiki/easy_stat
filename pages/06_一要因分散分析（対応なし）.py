@@ -1,11 +1,13 @@
-import streamlit as st
-import pandas as pd
+from statistics import median, variance
+
 import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+from PIL import Image
 from scipy import stats
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from statistics import median, variance
-from PIL import Image
-import plotly.graph_objects as go
+
 import common
 
 
@@ -385,7 +387,6 @@ if df is not None:
                 caption_text += f", F = {df_results.loc[num_var, 'F']:.2f}, p = {df_results.loc[num_var, 'p']:.3f}, η² = {df_results.loc[num_var, 'η²']:.2f}, ω² = {df_results.loc[num_var, 'ω²']:.2f}"
                 st.caption(caption_text)
 
-
-# Copyright
+# フッター
 common.display_copyright()
 common.display_special_thanks()

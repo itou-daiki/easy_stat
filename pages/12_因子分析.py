@@ -1,18 +1,20 @@
-import streamlit as st
-import pandas as pd
+import io
+
+import japanize_matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import streamlit as st
+from PIL import Image
 from factor_analyzer import FactorAnalyzer
 from factor_analyzer.factor_analyzer import calculate_kmo, calculate_bartlett_sphericity
-import matplotlib.pyplot as plt
-import japanize_matplotlib
-from PIL import Image
-import io
 from scipy.stats import chi2
+
 import common
 
-# ページ設定
+
 st.set_page_config(page_title="因子分析", layout="wide")
 st.title("因子分析")
 common.display_header()

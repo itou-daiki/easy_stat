@@ -1,11 +1,14 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-from scipy import stats
 from statistics import median, variance
-from PIL import Image
+
+import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
+import streamlit as st
+from PIL import Image
+from scipy import stats
+
 import common
+
 
 st.set_page_config(page_title="t検定(対応あり)", layout="wide")
 
@@ -308,6 +311,6 @@ if df is not None:
                            f"【測定値】 平均値 (SD): {y.mean():.2f} ({y.std(ddof=1):.2f}), "
                            f"【危険率】　p値: {p_value:.3f},【効果量】 d値: {d:.2f}")
 
-# Copyright
+# フッター
 common.display_copyright()
 common.display_special_thanks()

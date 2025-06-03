@@ -3,17 +3,16 @@ import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 import japanize_matplotlib
+
 import common
 
 
+st.set_page_config(page_title='探索的データ分析（EDA）', layout='wide')
 
-
-st.set_page_config(page_title="探索的データ分析（EDA）", layout="wide")
-
-st.title("探索的データ分析（EDA）")
+st.title('探索的データ分析（EDA）')
 common.display_header()
-st.write("簡易的な探索的データ分析（EDA）が実行できます")
-st.write("")
+st.write('簡易的な探索的データ分析（EDA）が実行できます')
+st.write('')
 
 # ファイルアップローダー
 uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
@@ -51,11 +50,11 @@ if df is not None:
 
     # カテゴリ変数の可視化
     for col in categorical_cols:
-        # 並び替えのオプションを選択するためのセレクトボックスを追加
+        # 並び替えのオプションを選択
         sort_order = st.selectbox(
             f'【{col}】 の並び替え順を選択してください',
             ('度数', '名前順'),
-            key=col  # このキーは各カテゴリ変数に対してユニークであることを確保します
+            key=col
         )
 
         value_counts = df[col].value_counts()
@@ -85,16 +84,19 @@ if df is not None:
 
     # アップロードされたデータセットに数値変数が含まれている場合
     if numerical_cols:
-        st.subheader("選択した数値変数の可視化（箱ひげ図）")
-        selected_num_cols = st.multiselect('数値変数を選択してください', numerical_cols, default =numerical_cols)
-        fig = px.box(df, x=selected_num_cols, points="all", title=f'選択した数値変数の可視化')
+        st.subheader('選択した数値変数の可視化（箱ひげ図）')
+        selected_num_cols = st.multiselect(
+            '数値変数を選択してください', 
+            numerical_cols, 
+            default=numerical_cols
+        )
+        fig = px.box(df, x=selected_num_cols, points='all', title='選択した数値変数の可視化')
         st.plotly_chart(fig)
-
 
     st.subheader('選択した２変数の可視化')
     
     # 変数選択
-    selected_vars = st.multiselect('変数を２つ選択してください:', df.columns.tolist(),max_selections=2)
+    selected_vars = st.multiselect('変数を２つ選択してください:', df.columns.tolist(), max_selections=2)
 
     if len(selected_vars) > 2:
         st.error('2項目以上を選択することはできません。選択をクリアし、2項目のみを選択してください。')
@@ -104,7 +106,11 @@ if df is not None:
         # カテゴリ×カテゴリ
         if var1 in categorical_cols and var2 in categorical_cols:
             cross_tab = pd.crosstab(df[var1], df[var2])
-            fig = px.imshow(cross_tab,labels=dict(color="Count"),title=f'度数： 【{var1}】 × 【{var2}】')
+            fig = px.imshow(
+                cross_tab,
+                labels=dict(color='Count'),
+                title=f'度数： 【{var1}】 × 【{var2}】'
+            )
             st.plotly_chart(fig)
 
         # 数値×数値
@@ -126,7 +132,12 @@ if df is not None:
     st.subheader('２つのカテゴリ変数と１つの数値変数による棒グラフ')
 
     # カテゴリ変数と数値変数の選択
-    cat_vars = st.multiselect('２つのカテゴリ変数を選択してください:', categorical_cols, key='cat_vars',max_selections=2)
+    cat_vars = st.multiselect(
+        '２つのカテゴリ変数を選択してください:', 
+        categorical_cols, 
+        key='cat_vars',
+        max_selections=2
+    )
     num_var = st.selectbox('１つの数値変数を選択してください:', numerical_cols, key='num_var')
 
     if len(cat_vars) == 2 and num_var:
@@ -145,7 +156,7 @@ if df is not None:
             labels={num_var: 'AVE: ' + num_var, cat_var1: cat_var1, cat_var2: cat_var2},
             title=f'【{cat_var1}】 と 【{cat_var2}】 による 【{num_var}】 の比較'
         )
-        # グラフのレイアウトを更新（オプショナル）
+        # グラフのレイアウトを更新
         fig.update_layout(
             xaxis_title=cat_var1,
             yaxis_title=f'AVE:  {num_var}',
@@ -155,7 +166,7 @@ if df is not None:
         st.plotly_chart(fig)
     else:
         st.warning('２つのカテゴリ変数と１つの数値変数を選択してください。')
-    
-# Copyright
+
+# フッター
 common.display_copyright()
 common.display_special_thanks()

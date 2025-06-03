@@ -1,13 +1,14 @@
-import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pingouin as pg
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from PIL import Image
 import plotly.graph_objects as go
+import streamlit as st
+from PIL import Image
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
 import common
 
-# ページ設定
+
 st.set_page_config(page_title="二要因混合分散分析", layout="wide")
 
 st.title("二要因混合分散分析")

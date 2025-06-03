@@ -1,9 +1,11 @@
-import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 import statsmodels.api as sm
+import streamlit as st
+
 import common
+
 
 st.set_page_config(page_title="単回帰分析", layout="wide")
 
@@ -117,6 +119,6 @@ if input_df is not None:
             st.subheader(f"数理モデル（解釈）: {target_col} = {slope:.2f} × {feature_col} + {intercept:.2f}")
             st.subheader("")
 
-# Copyright 表示など
+# フッター
 common.display_copyright()
 common.display_special_thanks()

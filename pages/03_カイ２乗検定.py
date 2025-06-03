@@ -1,13 +1,15 @@
-import streamlit as st
-import pandas as pd
+import japanize_matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
-import scipy.stats as stats
+import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
-import matplotlib.pyplot as plt
-import japanize_matplotlib
+import scipy.stats as stats
+import streamlit as st
 from PIL import Image
+
 import common
+
 
 st.set_page_config(page_title="カイ２乗分析", layout="wide")
 
@@ -145,7 +147,6 @@ if df is not None:
                 }
             })
 
-
     # ヒートマップに観測度数を表示
     fig_heatmap.update_layout(annotations=annotations)
     fig_heatmap.update_layout(scene=dict(aspectmode="manual", aspectratio=dict(x=1, y=1, z=0.05)))
@@ -153,7 +154,7 @@ if df is not None:
     # ヒートマップの表示
     st.plotly_chart(fig_heatmap)
 
-# Copyright
+# フッター
 common.display_copyright()
 common.display_special_thanks()
 

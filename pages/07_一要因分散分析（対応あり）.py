@@ -1,15 +1,18 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-from scipy import stats
+from itertools import combinations
 from statistics import median, variance
-from PIL import Image
+
+import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 import statsmodels.api as sm
+import streamlit as st
+from PIL import Image
+from scipy import stats
 from statsmodels.stats.anova import AnovaRM
 from statsmodels.stats.multitest import multipletests
-from itertools import combinations
+
 import common
+
 
 st.set_page_config(page_title="一要因分散分析（対応あり）", layout="wide")
 
@@ -344,7 +347,6 @@ if df is not None:
         else:
             st.write("多重比較の結果、特に有意な差は認められませんでした。")
 
-
-# Copyright
+# フッター
 common.display_copyright()
 common.display_special_thanks()

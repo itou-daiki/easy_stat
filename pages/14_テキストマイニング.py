@@ -1,20 +1,21 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-from wordcloud import WordCloud
-import networkx as nx
-import plotly.express as px
-import matplotlib.pyplot as plt
+import os
+from collections import Counter
+
 import japanize_matplotlib
+import matplotlib.pyplot as plt
+import networkx as nx
+import nlplot
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import streamlit as st
 from PIL import Image
 from janome.tokenizer import Tokenizer
-from collections import Counter
-import nlplot
+from wordcloud import WordCloud
+
 import common
 
-import os
 
-# フォント設定
 common.set_font()
 
 # ワードクラウド用のフォントパス設定
@@ -242,6 +243,6 @@ if df is not None and not df.empty:
                 ax_nx2.axis('off')
                 st.pyplot(fig_nx2)
 
-# フッター表示
+# フッター
 common.display_copyright()
 common.display_special_thanks()

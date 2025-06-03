@@ -1,16 +1,18 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import os
-from sklearn.metrics import r2_score
-from scipy import stats
-import statsmodels.api as sm
 import itertools
-import matplotlib.pyplot as plt
+import os
+
 import japanize_matplotlib
-import networkx as nx
-import matplotlib.patches as mpatches
 import matplotlib.font_manager as font_manager
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import streamlit as st
+from scipy import stats
+from sklearn.metrics import r2_score
+
 import common
 
 
@@ -389,6 +391,6 @@ if input_df is not None:
 
 st.write('')
 st.write('')
-# Copyright
+# フッター
 common.display_copyright()
 common.display_special_thanks()

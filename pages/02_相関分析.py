@@ -1,22 +1,24 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import plotly.figure_factory as ff
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib
-from PIL import Image
 import seaborn as sns
-import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+import plotly.figure_factory as ff
+from plotly.subplots import make_subplots
+from PIL import Image
+
 import common
 
 
-st.set_page_config(page_title="相関分析", layout="wide")
-st.title("相関分析")
+st.set_page_config(page_title='相関分析', layout='wide')
+
+st.title('相関分析')
 common.display_header()
-st.write("２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。")
-st.write("")
+st.write('２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。')
+st.write('')
 
 # 分析のイメージ
 image = Image.open('images/correlation.png')
@@ -47,7 +49,7 @@ if df is not None:
     numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
     
     # 数値変数の選択
-    st.subheader("数値変数の選択")
+    st.subheader('数値変数の選択')
     selected_cols = st.multiselect('数値変数を選択してください', numerical_cols)
     
     if len(selected_cols) < 2:
@@ -61,9 +63,11 @@ if df is not None:
         st.dataframe(corr_matrix)
         
         # ヒートマップの表示
-        fig_heatmap = px.imshow(corr_matrix, 
-                               color_continuous_scale='rdbu', 
-                               labels=dict(color="相関係数"))
+        fig_heatmap = px.imshow(
+            corr_matrix, 
+            color_continuous_scale='rdbu', 
+            labels=dict(color='相関係数')
+        )
         
         # アノテーションの追加
         annotations = []
@@ -74,22 +78,24 @@ if df is not None:
                     'y': i,
                     'xref': 'x',
                     'yref': 'y',
-                    'text': f"{value:.2f}",
+                    'text': f'{value:.2f}',
                     'showarrow': False,
                     'font': {
                         'color': 'black' if -0.5 < value < 0.5 else 'white'
                     }
                 })
-        fig_heatmap.update_layout(title="相関係数のヒートマップ", annotations=annotations)
+        fig_heatmap.update_layout(title='相関係数のヒートマップ', annotations=annotations)
         st.plotly_chart(fig_heatmap)
 
         # 散布図行列の作成
         st.subheader('散布図行列')
         
         # Plotlyで散布図行列を作成
-        fig = make_subplots(rows=len(selected_cols), 
-                           cols=len(selected_cols),
-                           subplot_titles=['' for _ in range(len(selected_cols) * len(selected_cols))])
+        fig = make_subplots(
+            rows=len(selected_cols), 
+            cols=len(selected_cols),
+            subplot_titles=['' for _ in range(len(selected_cols) * len(selected_cols))]
+        )
 
         # ヒストグラムと散布図の作成
         for i, var1 in enumerate(selected_cols):
@@ -119,10 +125,10 @@ if df is not None:
             height=200 * len(selected_cols),
             width=200 * len(selected_cols),
             showlegend=False,
-            title="散布図行列とヒストグラム"
+            title='散布図行列とヒストグラム'
         )
         
-        # 軸ラベルの追加 (修正部分)
+        # 軸ラベルの追加
         for i, var1 in enumerate(selected_cols):
             for j, var2 in enumerate(selected_cols):
                 # 横軸のラベルを最下の行のみに設定
@@ -158,6 +164,6 @@ if df is not None:
                         description += f'強い負の相関がある (r={correlation:.2f})'
                     st.write(description)
 
-# Copyright
+# フッター
 common.display_copyright()
 common.display_special_thanks()
