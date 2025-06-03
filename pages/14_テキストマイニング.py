@@ -12,10 +12,41 @@ from collections import Counter
 import nlplot
 import common
 
+import os
+
 # フォント設定
 common.set_font()
+
 # ワードクラウド用のフォントパス設定
-font_path = 'ipaexg.ttf'
+# システムフォントを探す
+font_candidates = [
+    # プロジェクト内のフォント
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ipaexg.ttf'),
+    'ipaexg.ttf',
+    # システムフォント（Linux/Ubuntu）
+    '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+    '/usr/share/fonts/truetype/fonts-japanese-gothic.ttf',
+    '/usr/share/fonts/truetype/takao-gothic/TakaoGothic.ttf',
+    # デフォルトフォント
+    None
+]
+
+font_path = None
+for candidate in font_candidates:
+    if candidate and os.path.exists(candidate):
+        # Git LFSポインターファイルでないことを確認
+        try:
+            with open(candidate, 'rb') as f:
+                header = f.read(100)
+                if b'git-lfs' not in header:
+                    font_path = candidate
+                    break
+        except:
+            pass
+
+if font_path is None:
+    # フォントが見つからない場合はWordCloudのデフォルトフォントを使用
+    st.warning("日本語フォントが見つかりません。デフォルトフォントを使用します。")
 
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
