@@ -14,6 +14,8 @@ import common
 
 # フォント設定
 common.set_font()
+# ワードクラウド用のフォントパス設定
+font_path = 'ipaexg.ttf'
 
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 

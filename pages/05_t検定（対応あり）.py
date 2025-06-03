@@ -132,7 +132,7 @@ if df is not None:
 
                 # 効果量dの計算（対応のあるデータの標準偏差を使用）
                 diff = x - y
-                d = (x_mean - y_mean) / diff.std(ddof=1)
+                d = abs((x_mean - y_mean) / diff.std(ddof=1))
 
                 # p値の判定をsignに格納
                 if p < 0.01:
@@ -261,7 +261,7 @@ if df is not None:
                 df_t = n - 1  # 自由度
 
                 diff = x - y
-                d = (x.mean() - y.mean()) / diff.std(ddof=1)
+                d = abs((x.mean() - y.mean()) / diff.std(ddof=1))
 
                 if p_value < 0.01:
                     significance_text = "p < 0.01 **"
