@@ -311,16 +311,16 @@ if df is not None:
                             significance = '†'
                         significant_comparisons.append((group1, group2, p_value, significance))
 
-                # レベルを割り当て
-                comparisons = [(comp[0], comp[1]) for comp in significant_comparisons]
-                comparison_levels, num_levels = assign_levels(comparisons, category_positions) if comparisons else ([], 0)
-
                 # 群ごとの平均値と標準誤差を計算
                 group_means = df.groupby(cat_var_str)[num_var].mean()
                 group_errors = df.groupby(cat_var_str)[num_var].std(ddof=1) / np.sqrt(df.groupby(cat_var_str)[num_var].count())
 
                 # カテゴリを数値にマッピング
                 category_positions = {group: i for i, group in enumerate(group_means.index)}
+                
+                # レベルを割り当て
+                comparisons = [(comp[0], comp[1]) for comp in significant_comparisons]
+                comparison_levels, num_levels = assign_levels(comparisons, category_positions) if comparisons else ([], 0)
                 x_values = [category_positions[group] for group in group_means.index]
 
                 fig = go.Figure()
