@@ -360,7 +360,6 @@ st.html("""
     </h2>
     <p style="color: var(--text-secondary); line-height: 1.8;">
         easyStatは、ブラウザ上で手軽に統計分析を行えるウェブアプリケーションです。
-        複雑な設定は不要で、iPadなどのモバイルデバイスでも快適にご利用いただけます。
         データサイエンスの初心者から上級者まで、幅広いユーザーに対応しています。
     </p>
 </div>
@@ -484,7 +483,7 @@ st.html("""
     </h2>
     <div class="update-timeline">
         <div class="update-item">
-            <div class="update-date">2025/1/3</div>
+            <div class="update-date">2025/6/4</div>
             <div class="update-content">
                 <ul>
                     <li>トップページのデザインを刷新しました。</li>
@@ -492,7 +491,7 @@ st.html("""
             </div>
         </div>
         <div class="update-item">
-            <div class="update-date">2024/4/18</div>
+            <div class="update-date">2025/4/18</div>
             <div class="update-content">
                 <ul>
                     <li>テキストマイニングの共起ネットワーク描画機能を実装しました。</li>
@@ -500,7 +499,7 @@ st.html("""
             </div>
         </div>
         <div class="update-item">
-            <div class="update-date">2024/2/9</div>
+            <div class="update-date">2025/2/9</div>
             <div class="update-content">
                 <ul>
                     <li>二要因分散分析を実装しました。</li>
@@ -508,7 +507,7 @@ st.html("""
             </div>
         </div>
         <div class="update-item">
-            <div class="update-date">2024/2/7</div>
+            <div class="update-date">2025/2/7</div>
             <div class="update-content">
                 <ul>
                     <li>グラフの描画機能を修正しました。</li>
