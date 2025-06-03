@@ -5,7 +5,7 @@ import common
 st.set_page_config(page_title="easyStat", layout="wide")
 
 # カスタムCSSの適用（モダンなデザイン）
-st.markdown("""
+st.html("""
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -333,24 +333,24 @@ st.markdown("""
         animation: fadeIn 0.6s ease-out forwards;
     }
     </style>
-""", unsafe_allow_html=True)
+""")
 
 # メインコンテナ
-st.markdown('<div class="main-container">', unsafe_allow_html=True)
+st.html('<div class="main-container">')
 
 # ヒーローセクション
-st.markdown("""
+st.html("""
 <div class="hero-section fade-in">
     <h1 class="hero-title">easyStat</h1>
     <p class="hero-subtitle">ブラウザで簡単に統計分析を実行</p>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # ヘッダー表示
 common.display_header()
 
 # 概要セクション
-st.markdown("""
+st.html("""
 <div class="section fade-in">
     <h2 class="section-title">
         <div class="section-icon"><i class="fas fa-info-circle"></i></div>
@@ -362,13 +362,13 @@ st.markdown("""
         データサイエンスの初心者から上級者まで、幅広いユーザーに対応しています。
     </p>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # ガイド表示
 common.display_guide()
 
 # 機能一覧セクション
-st.markdown("""
+st.html("""
 <div class="section fade-in">
     <h2 class="section-title">
         <div class="section-icon"><i class="fas fa-chart-line"></i></div>
@@ -471,10 +471,10 @@ st.markdown("""
         </div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # 更新履歴セクション
-st.markdown("""
+st.html("""
 <div class="section fade-in">
     <h2 class="section-title">
         <div class="section-icon"><i class="fas fa-history"></i></div>
@@ -482,10 +482,10 @@ st.markdown("""
     </h2>
     <div class="update-timeline">
         <div class="update-item">
-            <div class="update-date">2024/6/4</div>
+            <div class="update-date">2025/1/3</div>
             <div class="update-content">
                 <ul>
-                    <li>デザインなどの軽微な修正を行いました。</li>
+                    <li>トップページのデザインを刷新しました。</li>
                 </ul>
             </div>
         </div>
@@ -644,16 +644,16 @@ st.markdown("""
         </div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # リンク・連絡先情報
-st.markdown('<div class="section fade-in">', unsafe_allow_html=True)
+st.html('<div class="section fade-in">')
 common.display_link()
-st.markdown('</div>', unsafe_allow_html=True)
+st.html('</div>')
 
 # その他の表示
 common.display_copyright()
 common.display_special_thanks()
 
 # メインコンテナ終了
-st.markdown('</div>', unsafe_allow_html=True)
+st.html('</div>')
