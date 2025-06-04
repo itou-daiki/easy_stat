@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
-
+import os
 import streamlit as st
 import japanize_matplotlib
+import matplotlib.font_manager as font_manager
 
 
 def display_header():
@@ -9,7 +10,9 @@ def display_header():
 
 
 def set_font():
-    font_path = '../ipaexg.ttf'  # pages フォルダから一つ上を見る
+    # font_path = '../ipaexg.ttf'  # pages フォルダから一つ上を見る
+    font_path = os.path.join(os.path.dirname(__file__), '..', 'ipaexg.ttf')
+
     plt.rcParams['font.family'] = 'IPAexGothic'
 
 
