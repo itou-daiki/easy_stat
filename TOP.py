@@ -361,6 +361,7 @@ st.html("""
     <p style="color: var(--text-secondary); line-height: 1.8;">
         easyStatは、ブラウザ上で手軽に統計分析を行えるウェブアプリケーションです。
         データサイエンスの初心者から上級者まで、幅広いユーザーに対応しています。
+        PCやタブレット端末など、様々な環境に対応しています。
     </p>
 </div>
 """)
@@ -642,7 +643,7 @@ st.html("""
 """)
 
 # リンク・連絡先情報
-st.html('<div class="section fade-in">')
+# st.html('<div class="section fade-in">')
 common.display_link()
 st.html('</div>')
 
