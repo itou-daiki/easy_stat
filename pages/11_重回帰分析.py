@@ -245,7 +245,7 @@ if input_df is not None:
                     offset = label_alignment[node]['pos']
                     text_obj = ax.text(x + offset[0], y_pos_node + offset[1], labels[node], fontsize=10,
                                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black"),
-                                       fontproperties=font_prop, horizontalalignment=ha, verticalalignment='center')
+                                       horizontalalignment=ha, verticalalignment='center')
                     renderer = fig.canvas.get_renderer()
                     bbox = text_obj.get_window_extent(renderer=renderer)
                     inv = ax.transData.inverted()
@@ -260,8 +260,7 @@ if input_df is not None:
                 
                 # エッジラベルの描画
                 edge_labels = nx.get_edge_attributes(G, 'label')
-                nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10, ax=ax,
-                                             font_family=font_prop.get_name())
+                nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10, ax=ax)
                 
                 # 統計情報のアノテーション（目的変数のラベルの左端に合わせる）
                 x, y_pos_text = pos[y_column]
@@ -269,7 +268,7 @@ if input_df is not None:
                 bbox = node_bboxes[y_column]
                 annotation_x = bbox.x0  # 左端のx座標
                 ax.text(annotation_x, y_pos_text - 0.5, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
-                        horizontalalignment='left', verticalalignment='top', fontsize=10, fontproperties=font_prop)
+                        horizontalalignment='left', verticalalignment='top', fontsize=10)
                 
                 # 軸の範囲を調整
                 x_margin = 0.6  # 左右の余白を増やす
@@ -338,7 +337,7 @@ if input_df is not None:
                 offset = label_alignment[node]['pos']
                 text_obj = ax.text(x + offset[0], y_pos_node + offset[1], labels[node], fontsize=10,
                                    bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black"),
-                                   fontproperties=font_prop, horizontalalignment=ha, verticalalignment='center')
+                                   horizontalalignment=ha, verticalalignment='center')
                 renderer = fig.canvas.get_renderer()
                 bbox = text_obj.get_window_extent(renderer=renderer)
                 inv = ax.transData.inverted()
@@ -353,8 +352,7 @@ if input_df is not None:
             
             # エッジラベルの描画
             edge_labels = nx.get_edge_attributes(G_combined, 'label')
-            nx.draw_networkx_edge_labels(G_combined, pos, edge_labels=edge_labels, font_size=10, ax=ax,
-                                         font_family=font_prop.get_name())
+            nx.draw_networkx_edge_labels(G_combined, pos, edge_labels=edge_labels, font_size=10, ax=ax)
             
             # 統計情報のアノテーション（目的変数のラベルの左端に合わせる）
             for y_column in y_columns:
@@ -370,7 +368,7 @@ if input_df is not None:
                     bbox = node_bboxes[y_column]
                     annotation_x = bbox.x0  # 左端のx座標
                     ax.text(annotation_x, y_pos_text - 1.5, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
-                            horizontalalignment='left', verticalalignment='top', fontsize=10, fontproperties=font_prop)
+                            horizontalalignment='left', verticalalignment='top', fontsize=10)
             
             # 軸の範囲を調整
             x_margin = 0.6  # 左右の余白を増やす
