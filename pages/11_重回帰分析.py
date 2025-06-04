@@ -16,6 +16,8 @@ from sklearn.metrics import r2_score
 import common
 
 
+common.set_font()
+
 st.title("重回帰分析")
 common.display_header()
 st.write("")
