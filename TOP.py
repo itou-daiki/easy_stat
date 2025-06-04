@@ -407,16 +407,10 @@ st.html("""
         <div class="feature-card">
             <h3 class="feature-card-title">
                 <i class="fas fa-vial feature-card-icon"></i>
-                t検定（対応なし）
+                t検定
+                <span class="badge">対応あり/なし</span>
             </h3>
-            <p class="feature-card-description">2群間の平均値の差を検定</p>
-        </div>
-        <div class="feature-card">
-            <h3 class="feature-card-title">
-                <i class="fas fa-vials feature-card-icon"></i>
-                t検定（対応あり）
-            </h3>
-            <p class="feature-card-description">対応のあるデータの平均値差を検定</p>
+            <p class="feature-card-description">2群の平均値の差を検定</p>
         </div>
         <div class="feature-card">
             <h3 class="feature-card-title">
