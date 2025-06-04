@@ -53,9 +53,9 @@ if input_df is not None:
     st.write(f"{X_columns}から{y_columns}の値を予測します。")
     
     # フォント設定（日本語対応）
-    font_path = os.path.join(os.path.dirname(__file__), '..', 'ipaexg.ttf')  # フォントパスはそのままにします
-    font_prop = font_manager.FontProperties(fname=font_path)
-    plt.rcParams['font.family'] = font_prop.get_name()
+    # font_path = os.path.join(os.path.dirname(__file__), '..', 'ipaexg.ttf')  # フォントパスはそのままにします
+    # font_prop = font_manager.FontProperties(fname=font_path)
+    # plt.rcParams['font.family'] = font_prop.get_name()
     
     # 重回帰分析の実施
     if st.button('重回帰分析の実行'):
