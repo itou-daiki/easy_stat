@@ -424,7 +424,7 @@ st.html("""
             <h3 class="feature-card-title">
                 <i class="fas fa-chart-area feature-card-icon"></i>
                 二要因分散分析
-                <span class="badge-new">New</span>
+                <span class="badge-new"> New! </span>
             </h3>
             <p class="feature-card-description">2つの要因の効果を同時に分析</p>
         </div>
@@ -460,7 +460,7 @@ st.html("""
             <h3 class="feature-card-title">
                 <i class="fas fa-file-alt feature-card-icon"></i>
                 テキストマイニング
-                <span class="badge-new">Updated</span>
+                <span class="badge-new">Update!</span>
             </h3>
             <p class="feature-card-description">テキストデータの分析と可視化</p>
         </div>
