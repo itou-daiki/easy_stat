@@ -1,10 +1,10 @@
 import itertools
 import os
 
-import japanize_matplotlib
 import matplotlib.font_manager as font_manager
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import japanize_matplotlib
 import networkx as nx
 import numpy as np
 import pandas as pd
