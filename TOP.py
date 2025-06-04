@@ -356,7 +356,7 @@ st.html("""
 <div class="section fade-in">
     <h2 class="section-title">
         <div class="section-icon"><i class="fas fa-info-circle"></i></div>
-        概要
+        About easyStat
     </h2>
     <p style="color: var(--text-secondary); line-height: 1.8;">
         easyStatは、ブラウザ上で手軽に統計分析を行えるウェブアプリケーションです。
@@ -643,7 +643,6 @@ st.html("""
 """)
 
 # リンク・連絡先情報
-# st.html('<div class="section fade-in">')
 common.display_link()
 st.html('</div>')
 
