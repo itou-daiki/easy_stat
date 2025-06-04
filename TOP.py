@@ -344,7 +344,7 @@ st.html('<div class="main-container">')
 st.html("""
 <div class="hero-section fade-in">
     <h1 class="hero-title">easyStat</h1>
-    <p class="hero-subtitle">ブラウザで簡単に統計分析-データ駆動型探究を促進-</p>
+    <p class="hero-subtitle">ブラウザで簡単に統計分析　-データ駆動型探究を促進-　</p>
 </div>
 """)
 
