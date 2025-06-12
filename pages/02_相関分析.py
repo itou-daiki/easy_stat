@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import plotly.figure_factory as ff
 from plotly.subplots import make_subplots
 from PIL import Image
+from scipy import stats
 
 import common
 
@@ -17,6 +18,22 @@ st.set_page_config(page_title='相関分析', layout='wide')
 
 st.title('相関分析')
 common.display_header()
+
+# 学習支援機能の統合
+learning_assistant = common.StatisticalLearningAssistant()
+learning_assistant.check_learning_progress("相関分析")
+
+# 学習レベル選択
+level = st.selectbox("学習レベルを選択してください", 
+                     ["beginner", "intermediate", "advanced"],
+                     format_func=lambda x: {"beginner": "初級者", "intermediate": "中級者", "advanced": "上級者"}[x])
+
+# 概念説明
+learning_assistant.show_concept_explanation('correlation', level)
+
+# インタラクティブガイド
+common.show_interactive_guide('correlation')
+
 st.write('２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。')
 st.write('')
 
@@ -31,61 +48,126 @@ uploaded_file = st.file_uploader('ファイルをアップロードしてくだ�
 use_demo_data = st.checkbox('デモデータを使用')
 
 # データフレームの作成
+validator = common.StatisticalValidator()
 df = None
+
 if use_demo_data:
-    df = pd.read_excel('datasets/correlation_demo.xlsx', sheet_name=0)
-    st.write(df.head())
+    try:
+        df = pd.read_excel('datasets/correlation_demo.xlsx', sheet_name=0)
+        st.success("✅ デモデータを読み込みました")
+        st.write(df.head())
+    except Exception as e:
+        st.error(f"⚠️ デモデータの読み込みに失敗しました: {e}")
 else:
     if uploaded_file is not None:
-        if uploaded_file.type == 'text/csv':
-            df = pd.read_csv(uploaded_file)
-            st.write(df.head())
-        else:
-            df = pd.read_excel(uploaded_file)
+        df = validator.safe_file_load(uploaded_file)
+        if df is not None:
+            st.success("✅ ファイルを正常に読み込みました")
             st.write(df.head())
 
 if df is not None:
+    # 基本的なデータ検証
+    if not validator.validate_sample_size(df, min_size=5, analysis_type="相関分析"):
+        st.stop()
+    
     # 数値変数の抽出
     numerical_cols = df.select_dtypes(exclude=['object', 'category']).columns.tolist()
+    
+    if len(numerical_cols) < 2:
+        st.error("⚠️ 相関分析には最低2つの数値変数が必要です。")
+        st.info("💡 **解決方法:** データクレンジングページで変数を数値型に変換してください。")
+        st.stop()
     
     # 数値変数の選択
     st.subheader('数値変数の選択')
     selected_cols = st.multiselect('数値変数を選択してください', numerical_cols)
     
     if len(selected_cols) < 2:
-        st.write('少なくとも2つの変数を選択してください。')
+        st.warning('少なくとも2つの変数を選択してください。')
     else:
-        # 相関マトリックスの計算
-        corr_matrix = df[selected_cols].corr()
+        # データ型の検証
+        if not validator.validate_data_types(df, selected_cols, 'numeric'):
+            st.stop()
         
-        # 相関マトリックスの表示
-        st.subheader('相関マトリックス')
-        st.dataframe(corr_matrix)
+        # 欠損値のチェック
+        missing_info = validator.check_missing_values(df, selected_cols)
+        
+        # 欠損値がある場合は除外して継続
+        clean_df = df[selected_cols].dropna()
+        if len(clean_df) < len(df):
+            removed_rows = len(df) - len(clean_df)
+            st.info(f"📋 欠損値のある{removed_rows}行を除外して分析を実行します。")
+        
+        if len(clean_df) < 3:
+            st.error("⚠️ 欠損値を除外した結果、十分なデータがありません。")
+            st.stop()
+        # 相関マトリックスの計算
+        try:
+            corr_matrix = clean_df.corr()
+            
+            # 有意性検定の実行（2変数の場合）
+            if len(selected_cols) == 2:
+                var1, var2 = selected_cols
+                r_value = corr_matrix.iloc[0, 1]
+                # ピアソンの相関係数の有意性検定
+                correlation_coef, p_value = stats.pearsonr(clean_df[var1], clean_df[var2])
+                
+                st.subheader('🔍 詳細な相関分析結果')
+                
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("相関係数 (r)", f"{r_value:.3f}")
+                with col2:
+                    st.metric("p値", f"{p_value:.3f}")
+                with col3:
+                    significance = "有意" if p_value < 0.05 else "非有意"
+                    st.metric("有意性 (α=0.05)", significance)
+                
+                # 結果解釈の表示
+                interpreter = common.ResultInterpreter()
+                interpretation = interpreter.interpret_correlation(r_value, p_value)
+                st.markdown(interpretation)
+            
+            # 相関マトリックスの表示
+            st.subheader('相関マトリックス')
+            st.dataframe(corr_matrix.round(3))
+            
+        except Exception as e:
+            st.error(f"⚠️ 相関分析の計算中にエラーが発生しました: {e}")
+            st.info("💡 **確認事項:**\n- 選択した変数がすべて数値型か\n- データに十分な値が含まれているか")
+            st.stop()
         
         # ヒートマップの表示
-        fig_heatmap = px.imshow(
-            corr_matrix, 
-            color_continuous_scale='rdbu', 
-            labels=dict(color='相関係数')
-        )
-        
-        # アノテーションの追加
-        annotations = []
-        for i, row in enumerate(corr_matrix.values):
-            for j, value in enumerate(row):
-                annotations.append({
-                    'x': j,
-                    'y': i,
-                    'xref': 'x',
-                    'yref': 'y',
-                    'text': f'{value:.2f}',
-                    'showarrow': False,
-                    'font': {
-                        'color': 'black' if -0.5 < value < 0.5 else 'white'
-                    }
-                })
-        fig_heatmap.update_layout(title='相関係数のヒートマップ', annotations=annotations)
-        st.plotly_chart(fig_heatmap)
+        try:
+            fig_heatmap = px.imshow(
+                corr_matrix, 
+                color_continuous_scale='rdbu', 
+                labels=dict(color='相関係数'),
+                aspect='auto'
+            )
+            
+            # アノテーションの追加
+            annotations = []
+            for i, row in enumerate(corr_matrix.values):
+                for j, value in enumerate(row):
+                    if not np.isnan(value):  # NaN値をチェック
+                        annotations.append({
+                            'x': j,
+                            'y': i,
+                            'xref': 'x',
+                            'yref': 'y',
+                            'text': f'{value:.2f}',
+                            'showarrow': False,
+                            'font': {
+                                'color': 'black' if -0.5 < value < 0.5 else 'white'
+                            }
+                        })
+            fig_heatmap.update_layout(title='相関係数のヒートマップ', annotations=annotations)
+            st.plotly_chart(fig_heatmap, use_container_width=True)
+            
+        except Exception as e:
+            st.error(f"⚠️ ヒートマップの作成中にエラーが発生しました: {e}")
+            st.info("💡 基本的な相関マトリックスは上記の表をご確認ください。")
 
         # 散布図行列の作成
         st.subheader('散布図行列')

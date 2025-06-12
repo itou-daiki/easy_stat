@@ -351,6 +351,10 @@ st.html("""
 # ヘッダー表示
 common.display_header()
 
+# 学習機能の統合
+common.create_learning_dashboard()
+common.show_beginner_tips()
+
 # 概要セクション
 st.html("""
 <div class="section fade-in">
@@ -359,8 +363,13 @@ st.html("""
         About easyStat
     </h2>
     <p style="color: var(--text-secondary); line-height: 1.8;">
-        easyStatは、ブラウザ上で手軽に統計分析を行えるウェブアプリケーションです。
-        PCやタブレット端末など、様々な環境に対応しています。
+        easyStatは、<strong>統計初学者向け</strong>のブラウザベース統計分析アプリケーションです。
+        <br>
+        <strong>🎓 学習重視設計</strong>：エラー処理、仮定確認、結果解釈まで統合サポート
+        <br>
+        <strong>📊 実践的学習</strong>：14種類の分析手法を段階的に学習できます
+        <br>
+        <strong>🌐 アクセス性</strong>：PCやタブレット端末など、様々な環境に対応
     </p>
 </div>
 """)
@@ -476,6 +485,18 @@ st.html("""
         更新履歴
     </h2>
     <div class="update-timeline">
+        <div class="update-item">
+            <div class="update-date">2025/6/12</div>
+            <div class="update-content">
+                <ul>
+                    <li><strong>統計初学者向け学習支援機能を大幅実装</strong></li>
+                    <li>エラーハンドリング・データ検証フレームワーク追加</li>
+                    <li>統計的仮定の自動チェック機能実装</li>
+                    <li>インタラクティブ学習ガイド・結果解釈支援追加</li>
+                    <li>学習進捗トラッキング機能実装</li>
+                </ul>
+            </div>
+        </div>
         <div class="update-item">
             <div class="update-date">2025/6/4</div>
             <div class="update-content">
