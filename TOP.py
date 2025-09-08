@@ -4,7 +4,7 @@ import common
 
 
 # ページ設定
-st.set_page_config(page_title='easyStat', layout='wide')
+st.set_page_config(page_title='easyStat!', layout='wide')
 
 # カスタムCSSの適用（モダンなデザイン）
 st.html("""
