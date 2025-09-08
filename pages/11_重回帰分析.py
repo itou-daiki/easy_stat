@@ -1,5 +1,7 @@
 import itertools
 import os
+import json
+import requests
 
 import matplotlib.font_manager as font_manager
 import matplotlib.patches as mpatches
@@ -18,10 +20,137 @@ import common
 
 common.set_font()
 
+def call_gemini_api(api_key, prompt):
+    """Gemini 2.0 Flash APIを呼び出す関数"""
+    if not api_key:
+        return "APIキーが設定されていません。"
+    
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent"
+    headers = {
+        "Content-Type": "application/json",
+    }
+    
+    data = {
+        "contents": [{
+            "parts": [{
+                "text": prompt
+            }]
+        }],
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 2048,
+        }
+    }
+    
+    try:
+        response = requests.post(f"{url}?key={api_key}", headers=headers, json=data)
+        if response.status_code == 200:
+            result = response.json()
+            if 'candidates' in result and len(result['candidates']) > 0:
+                return result['candidates'][0]['content']['parts'][0]['text']
+            else:
+                return "APIからの応答が予期しない形式です。"
+        else:
+            return f"APIエラー: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"エラーが発生しました: {str(e)}"
+
+def create_statistics_interpretation_prompt(coefficients_df, summary_df, equation, y_column):
+    """統計指標の解釈プロンプトを作成"""
+    prompt = f"""
+あなたは統計分析の専門家です。以下の重回帰分析の結果を読み取り、統計指標の意味と変数間の関係性について日本語で詳しく解釈・考察してください。
+
+【分析対象】
+目的変数: {y_column}
+
+【回帰係数の結果】
+{coefficients_df.to_string(index=False)}
+
+【統計指標】
+{summary_df.to_string(index=False)}
+
+【数理モデル】
+{equation}
+
+【解釈・考察してほしい内容】
+1. 決定係数(R²)の値から見たモデルの説明力
+2. F値とp値から見た回帰式全体の有意性
+3. 各説明変数の偏回帰係数と標準化係数の解釈
+4. 各変数のp値から見た統計的有意性の判断
+5. 変数間の関係性の強さと方向性
+6. 実際の業務や研究での活用方法の提案
+7. モデルの限界や注意点
+
+統計の専門知識がない人にも分かりやすく、具体的で実践的な解釈を提供してください。
+"""
+    return prompt
+
+def create_comprehensive_interpretation_prompt(all_results, X_columns, y_columns):
+    """包括的な変数間関係性の解釈プロンプトを作成"""
+    # すべての結果をまとめたテキストを構築
+    results_summary = ""
+    for y_col, result_data in all_results.items():
+        results_summary += f"\n【目的変数: {y_col}】\n"
+        results_summary += f"回帰係数:\n{result_data['coefficients'].to_string(index=False)}\n"
+        results_summary += f"統計指標:\n{result_data['summary'].to_string(index=False)}\n"
+        results_summary += f"数理モデル: {result_data['equation']}\n"
+    
+    prompt = f"""
+あなたは統計分析の専門家です。以下の重回帰分析の包括的な結果から、変数間の複雑な関係性とシステム全体の構造について深く解釈・考察してください。
+
+【分析概要】
+説明変数: {', '.join(X_columns)}
+目的変数: {', '.join(y_columns)}
+
+【全分析結果】
+{results_summary}
+
+【包括的な解釈・考察してほしい内容】
+1. 変数システム全体の構造分析
+   - 各説明変数がどの目的変数に最も強く影響するか
+   - 説明変数間の相対的な重要度比較
+   
+2. 変数間関係のパターン分析
+   - 一貫性のある影響パターンの発見
+   - 目的変数間での説明変数の影響の違い
+   
+3. 多重共線性や交互作用の可能性
+   - 説明変数間の関係性の推測
+   - 隠れた交互作用効果の示唆
+   
+4. システム的な解釈
+   - ビジネスや研究文脈での変数関係の意味
+   - 因果関係の可能性と限界
+   
+5. 実践的な活用戦略
+   - 最も効果的な介入ポイント
+   - 予測精度向上のための提案
+   - リスク管理の観点
+   
+6. 分析の限界と改善提案
+   - 現在のモデルの制約
+   - 追加すべきデータや変数の提案
+   - より高度な分析手法の推奨
+
+統計の専門知識がない人にも理解できるよう、具体例を交えながら実践的で洞察に富んだ解釈を提供してください。
+"""
+    return prompt
+
 st.title("重回帰分析")
 common.display_header()
 st.write("")
 st.write("因果を推定した「複数の説明変数と目的変数」の関係を分析し、可視化を行います。")
+
+# AI解釈機能の設定
+st.sidebar.subheader("🤖 AI統計解釈機能")
+st.sidebar.write("Gemini 2.0 Flash APIを使用して統計結果を自動解釈します")
+gemini_api_key = st.sidebar.text_input("Gemini APIキーを入力してください", type="password", help="Google AI Studio (https://aistudio.google.com/) でAPIキーを取得できます")
+enable_ai_interpretation = st.sidebar.checkbox("AI解釈機能を有効にする", disabled=not gemini_api_key)
+
+if gemini_api_key and enable_ai_interpretation:
+    st.sidebar.success("✅ AI解釈機能が有効になりました")
+elif enable_ai_interpretation and not gemini_api_key:
+    st.sidebar.error("❌ APIキーを入力してください")
 
 st.write("")
 
@@ -75,6 +204,9 @@ if input_df is not None:
             
             # 各目的変数の統計情報を保存する辞書を初期化
             dependent_var_stats = {}
+            
+            # AI解釈用の全結果を保存する辞書を初期化
+            all_analysis_results = {}
             
             for y_column in y_columns:
                 y = input_df[y_column]
@@ -158,6 +290,35 @@ if input_df is not None:
                 st.write("数理モデル：")
                 st.write(equation)
                 
+                # AI解釈機能の追加
+                if gemini_api_key and enable_ai_interpretation:
+                    st.subheader(f"🤖 AI統計解釈：{y_column}")
+                    if st.button(f"統計結果を解釈する - {y_column}", key=f"interpret_{y_column}"):
+                        with st.spinner("AIが統計結果を分析中..."):
+                            # プロンプトを作成
+                            prompt = create_statistics_interpretation_prompt(coefficients, summary_df, equation, y_column)
+                            
+                            # API呼び出し
+                            interpretation = call_gemini_api(gemini_api_key, prompt)
+                            
+                            # 結果を表示
+                            st.markdown("### 📊 統計解釈結果")
+                            st.write(interpretation)
+                            
+                            # 結果をセッション状態に保存（再実行時に表示を維持）
+                            if f"interpretation_{y_column}" not in st.session_state:
+                                st.session_state[f"interpretation_{y_column}"] = interpretation
+                    
+                    # 既に解釈結果がある場合は表示
+                    if f"interpretation_{y_column}" in st.session_state:
+                        st.markdown("### 📊 統計解釈結果")
+                        st.write(st.session_state[f"interpretation_{y_column}"])
+                        
+                        # 解釈をクリアするボタン
+                        if st.button(f"解釈をクリア - {y_column}", key=f"clear_{y_column}"):
+                            del st.session_state[f"interpretation_{y_column}"]
+                            st.rerun()
+                
                 # p値に応じたアノテーション
                 if p_value < 0.01:
                     p_annotation = 'p<0.01 **'
@@ -175,6 +336,13 @@ if input_df is not None:
                     'df_model': df_model,
                     'df_resid': df_resid,
                     'p_annotation': p_annotation
+                }
+                
+                # AI解釈用の結果を保存
+                all_analysis_results[y_column] = {
+                    'coefficients': coefficients.copy(),
+                    'summary': summary_df.copy(),
+                    'equation': equation
                 }
                 
                 # パス図の作成
@@ -383,6 +551,38 @@ if input_df is not None:
             
             st.pyplot(fig)
             plt.close(fig)
+            
+            # 包括的なAI解釈機能の追加
+            if gemini_api_key and enable_ai_interpretation and len(y_columns) > 0:
+                st.subheader("🤖 包括的なAI統計解釈")
+                st.write("すべての分析結果を統合して、変数間の関係性とシステム全体を解釈します")
+                
+                if st.button("全体的な変数関係を解釈する", key="comprehensive_interpret"):
+                    with st.spinner("AIが全体の統計結果を統合分析中..."):
+                        # 包括的なプロンプトを作成
+                        comprehensive_prompt = create_comprehensive_interpretation_prompt(
+                            all_analysis_results, X_columns, y_columns
+                        )
+                        
+                        # API呼び出し
+                        comprehensive_interpretation = call_gemini_api(gemini_api_key, comprehensive_prompt)
+                        
+                        # 結果を表示
+                        st.markdown("### 📊 包括的統計解釈結果")
+                        st.write(comprehensive_interpretation)
+                        
+                        # 結果をセッション状態に保存
+                        st.session_state["comprehensive_interpretation"] = comprehensive_interpretation
+                
+                # 既に包括的解釈結果がある場合は表示
+                if "comprehensive_interpretation" in st.session_state:
+                    st.markdown("### 📊 包括的統計解釈結果")
+                    st.write(st.session_state["comprehensive_interpretation"])
+                    
+                    # 解釈をクリアするボタン
+                    if st.button("包括的解釈をクリア", key="clear_comprehensive"):
+                        del st.session_state["comprehensive_interpretation"]
+                        st.rerun()
 
 st.write('')
 st.write('')
