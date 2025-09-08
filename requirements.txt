@@ -26,3 +26,4 @@ statsmodels
 pingouin
 janome
 factor_analyzer
+requests

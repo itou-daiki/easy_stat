@@ -293,30 +293,31 @@ if input_df is not None:
                 # AI解釈機能の追加
                 if gemini_api_key and enable_ai_interpretation:
                     st.subheader(f"🤖 AI統計解釈：{y_column}")
-                    if st.button(f"統計結果を解釈する - {y_column}", key=f"interpret_{y_column}"):
-                        with st.spinner("AIが統計結果を分析中..."):
-                            # プロンプトを作成
-                            prompt = create_statistics_interpretation_prompt(coefficients, summary_df, equation, y_column)
-                            
-                            # API呼び出し
-                            interpretation = call_gemini_api(gemini_api_key, prompt)
-                            
-                            # 結果を表示
-                            st.markdown("### 📊 統計解釈結果")
-                            st.write(interpretation)
-                            
-                            # 結果をセッション状態に保存（再実行時に表示を維持）
-                            if f"interpretation_{y_column}" not in st.session_state:
-                                st.session_state[f"interpretation_{y_column}"] = interpretation
                     
-                    # 既に解釈結果がある場合は表示
-                    if f"interpretation_{y_column}" in st.session_state:
+                    # 解釈ボタンまたは解釈結果の表示
+                    interpretation_key = f"interpretation_{y_column}"
+                    
+                    if interpretation_key not in st.session_state:
+                        # まだ解釈が実行されていない場合はボタンを表示
+                        if st.button(f"統計結果を解釈する - {y_column}", key=f"interpret_{y_column}"):
+                            with st.spinner("AIが統計結果を分析中..."):
+                                # プロンプトを作成
+                                prompt = create_statistics_interpretation_prompt(coefficients, summary_df, equation, y_column)
+                                
+                                # API呼び出し
+                                interpretation = call_gemini_api(gemini_api_key, prompt)
+                                
+                                # 結果をセッション状態に保存
+                                st.session_state[interpretation_key] = interpretation
+                                st.rerun()
+                    else:
+                        # 既に解釈結果がある場合は表示
                         st.markdown("### 📊 統計解釈結果")
-                        st.write(st.session_state[f"interpretation_{y_column}"])
+                        st.write(st.session_state[interpretation_key])
                         
                         # 解釈をクリアするボタン
                         if st.button(f"解釈をクリア - {y_column}", key=f"clear_{y_column}"):
-                            del st.session_state[f"interpretation_{y_column}"]
+                            del st.session_state[interpretation_key]
                             st.rerun()
                 
                 # p値に応じたアノテーション
@@ -557,31 +558,31 @@ if input_df is not None:
                 st.subheader("🤖 包括的なAI統計解釈")
                 st.write("すべての分析結果を統合して、変数間の関係性とシステム全体を解釈します")
                 
-                if st.button("全体的な変数関係を解釈する", key="comprehensive_interpret"):
-                    with st.spinner("AIが全体の統計結果を統合分析中..."):
-                        # 包括的なプロンプトを作成
-                        comprehensive_prompt = create_comprehensive_interpretation_prompt(
-                            all_analysis_results, X_columns, y_columns
-                        )
-                        
-                        # API呼び出し
-                        comprehensive_interpretation = call_gemini_api(gemini_api_key, comprehensive_prompt)
-                        
-                        # 結果を表示
-                        st.markdown("### 📊 包括的統計解釈結果")
-                        st.write(comprehensive_interpretation)
-                        
-                        # 結果をセッション状態に保存
-                        st.session_state["comprehensive_interpretation"] = comprehensive_interpretation
+                comprehensive_key = "comprehensive_interpretation"
                 
-                # 既に包括的解釈結果がある場合は表示
-                if "comprehensive_interpretation" in st.session_state:
+                if comprehensive_key not in st.session_state:
+                    # まだ包括的解釈が実行されていない場合はボタンを表示
+                    if st.button("全体的な変数関係を解釈する", key="comprehensive_interpret"):
+                        with st.spinner("AIが全体の統計結果を統合分析中..."):
+                            # 包括的なプロンプトを作成
+                            comprehensive_prompt = create_comprehensive_interpretation_prompt(
+                                all_analysis_results, X_columns, y_columns
+                            )
+                            
+                            # API呼び出し
+                            comprehensive_interpretation = call_gemini_api(gemini_api_key, comprehensive_prompt)
+                            
+                            # 結果をセッション状態に保存
+                            st.session_state[comprehensive_key] = comprehensive_interpretation
+                            st.rerun()
+                else:
+                    # 既に包括的解釈結果がある場合は表示
                     st.markdown("### 📊 包括的統計解釈結果")
-                    st.write(st.session_state["comprehensive_interpretation"])
+                    st.write(st.session_state[comprehensive_key])
                     
                     # 解釈をクリアするボタン
                     if st.button("包括的解釈をクリア", key="clear_comprehensive"):
-                        del st.session_state["comprehensive_interpretation"]
+                        del st.session_state[comprehensive_key]
                         st.rerun()
 
 st.write('')
