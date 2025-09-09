@@ -55,45 +55,131 @@ def call_gemini_api(api_key, prompt):
     except Exception as e:
         return f"エラーが発生しました: {str(e)}"
 
-def create_statistics_interpretation_prompt(coefficients_df, summary_df, equation, y_column):
+def create_statistics_interpretation_prompt(coefficients_df, summary_df, equation, y_column, input_data_info=None, method_info=None):
     """統計指標の解釈プロンプトを作成"""
+    
+    # データフレーム情報の構築
+    data_info_text = ""
+    if input_data_info is not None:
+        data_info_text = f"""
+【元データ情報】
+データ形状: {input_data_info.get('shape', '不明')}
+変数一覧: {', '.join(input_data_info.get('columns', []))}
+データ型情報: {input_data_info.get('dtypes_summary', '不明')}
+基本統計量（抜粋）:
+{input_data_info.get('describe_summary', '利用不可')}
+"""
+    
+    # 分析手法情報の構築
+    method_info_text = ""
+    if method_info is not None:
+        method_info_text = f"""
+【分析手法詳細】
+手法名: {method_info.get('method_name', '重回帰分析')}
+説明変数数: {method_info.get('n_features', '不明')}
+観測数: {method_info.get('n_observations', '不明')}
+交互作用項: {method_info.get('interaction_terms', '不明')}
+欠損値処理: {method_info.get('missing_handling', 'リストワイズ削除')}
+"""
+    
+    # 回帰係数データフレームの詳細分析
+    coefficients_analysis = f"""
+【回帰係数データフレーム詳細】
+変数数: {len(coefficients_df)}列
+データ形状: {coefficients_df.shape}
+列名: {list(coefficients_df.columns)}
+
+完全なデータフレーム内容:
+{coefficients_df.to_string(index=True)}
+"""
+    
+    # 統計指標データフレームの詳細分析  
+    summary_analysis = f"""
+【統計指標データフレーム詳細】
+指標数: {len(summary_df)}行
+データ形状: {summary_df.shape}
+列名: {list(summary_df.columns)}
+
+完全なデータフレーム内容:
+{summary_df.to_string(index=True)}
+"""
+    
     prompt = f"""
-あなたは統計分析の専門家です。以下の重回帰分析の結果を読み取り、統計指標の意味と変数間の関係性について日本語で詳しく解釈・考察してください。
+あなたは統計分析の専門家です。以下の重回帰分析の結果を詳細に読み取り、統計指標の意味と変数間の関係性について日本語で詳しく解釈・考察してください。
 
 【分析対象】
 目的変数: {y_column}
+{data_info_text}
+{method_info_text}
 
-【回帰係数の結果】
-{coefficients_df.to_string(index=False)}
+{coefficients_analysis}
 
-【統計指標】
-{summary_df.to_string(index=False)}
+{summary_analysis}
 
 【数理モデル】
 {equation}
 
 【解釈・考察してほしい内容】
-1. 決定係数(R²)の値から見たモデルの説明力
-2. F値とp値から見た回帰式全体の有意性
-3. 各説明変数の偏回帰係数と標準化係数の解釈
-4. 各変数のp値から見た統計的有意性の判断
-5. 変数間の関係性の強さと方向性
-6. 実際の業務や研究での活用方法の提案
-7. モデルの限界や注意点
+1. データフレームの構造と内容の詳細分析
+   - 各変数の統計的特性の読み取り
+   - データ品質と分析適合性の評価
+   
+2. 決定係数(R²)の値から見たモデルの説明力
+   - 数値の具体的な意味と解釈
+   - 分野における妥当性評価
+   
+3. F値とp値から見た回帰式全体の有意性
+   - 統計的検定結果の詳細解釈
+   - 帰無仮説と対立仮説の判断
+   
+4. 各説明変数の偏回帰係数と標準化係数の解釈
+   - 係数の符号と大きさの意味
+   - 変数間の相対的重要度比較
+   - 実用的な影響度の評価
+   
+5. 各変数のp値から見た統計的有意性の判断
+   - 有意性レベルに基づく判定
+   - 実際的な意味での重要性評価
+   
+6. 変数間の関係性の強さと方向性
+   - 正・負の関係の実用的意味
+   - 交互作用効果の可能性
+   
+7. 実際の業務や研究での活用方法の提案
+   - 予測モデルとしての有用性
+   - 意思決定への応用方法
+   
+8. モデルの限界や注意点
+   - 統計的前提の確認
+   - 解釈上の制約
+   - 改善提案
 
-統計の専門知識がない人にも分かりやすく、具体的で実践的な解釈を提供してください。
+データフレームの内容を具体的に参照しながら、統計の専門知識がない人にも分かりやすく、データドリブンで実践的な解釈を提供してください。
 """
     return prompt
 
-def create_comprehensive_interpretation_prompt(all_results, X_columns, y_columns):
+def create_comprehensive_interpretation_prompt(all_results, X_columns, y_columns, input_data_info=None):
     """包括的な変数間関係性の解釈プロンプトを作成"""
     # すべての結果をまとめたテキストを構築
     results_summary = ""
     for y_col, result_data in all_results.items():
         results_summary += f"\n【目的変数: {y_col}】\n"
-        results_summary += f"回帰係数:\n{result_data['coefficients'].to_string(index=False)}\n"
-        results_summary += f"統計指標:\n{result_data['summary'].to_string(index=False)}\n"
+        results_summary += f"回帰係数データフレーム:\n{result_data['coefficients'].to_string(index=True)}\n"
+        results_summary += f"統計指標データフレーム:\n{result_data['summary'].to_string(index=True)}\n"
         results_summary += f"数理モデル: {result_data['equation']}\n"
+        results_summary += f"データフレーム形状 - 回帰係数: {result_data['coefficients'].shape}, 統計指標: {result_data['summary'].shape}\n"
+    
+    # データ情報の構築
+    data_info_text = ""
+    if input_data_info is not None:
+        data_info_text = f"""
+【元データ情報】
+データ形状: {input_data_info.get('shape', '不明')}
+変数一覧: {', '.join(input_data_info.get('columns', []))}
+データ型情報: {input_data_info.get('dtypes_summary', '不明')}
+基本統計量:
+{input_data_info.get('describe_summary', '利用不可')}
+"""
     
     prompt = f"""
 あなたは統計分析の専門家です。以下の重回帰分析の包括的な結果から、変数間の複雑な関係性とシステム全体の構造について深く解釈・考察してください。
@@ -101,38 +187,48 @@ def create_comprehensive_interpretation_prompt(all_results, X_columns, y_columns
 【分析概要】
 説明変数: {', '.join(X_columns)}
 目的変数: {', '.join(y_columns)}
+{data_info_text}
 
-【全分析結果】
+【全データフレーム分析結果】
 {results_summary}
 
 【包括的な解釈・考察してほしい内容】
-1. 変数システム全体の構造分析
-   - 各説明変数がどの目的変数に最も強く影響するか
-   - 説明変数間の相対的な重要度比較
+1. データフレーム全体の詳細分析
+   - 各データフレームの構造と内容の詳細読み取り
+   - データ品質と分析適合性の総合評価
+   - 統計的前提条件の確認
    
-2. 変数間関係のパターン分析
-   - 一貫性のある影響パターンの発見
-   - 目的変数間での説明変数の影響の違い
+2. 変数システム全体の構造分析
+   - 各説明変数がどの目的変数に最も強く影響するか（データフレーム値に基づく）
+   - 説明変数間の相対的な重要度比較（係数値の詳細比較）
+   - システム全体での変数の役割分担
    
-3. 多重共線性や交互作用の可能性
-   - 説明変数間の関係性の推測
-   - 隠れた交互作用効果の示唆
+3. 変数間関係のパターン分析
+   - 一貫性のある影響パターンの発見（データフレーム横断分析）
+   - 目的変数間での説明変数の影響の違い（数値的比較）
+   - 予期しない関係性パターンの発見
    
-4. システム的な解釈
-   - ビジネスや研究文脈での変数関係の意味
-   - 因果関係の可能性と限界
+4. 多重共線性や交互作用の可能性
+   - 説明変数間の関係性の推測（係数パターンから）
+   - 隠れた交互作用効果の示唆（数値的根拠に基づく）
+   - モデルの安定性に関する評価
    
-5. 実践的な活用戦略
-   - 最も効果的な介入ポイント
-   - 予測精度向上のための提案
-   - リスク管理の観点
+5. システム的な解釈
+   - ビジネスや研究文脈での変数関係の意味（具体的数値に基づく）
+   - 因果関係の可能性と限界（統計的根拠）
+   - 実世界への応用可能性
    
-6. 分析の限界と改善提案
-   - 現在のモデルの制約
-   - 追加すべきデータや変数の提案
-   - より高度な分析手法の推奨
+6. 実践的な活用戦略
+   - 最も効果的な介入ポイント（係数値に基づく）
+   - 予測精度向上のための具体的提案
+   - リスク管理の観点（不確実性の評価）
+   
+7. 分析の限界と改善提案
+   - 現在のモデルの制約（データフレーム分析に基づく）
+   - 追加すべきデータや変数の提案（不足要因の特定）
+   - より高度な分析手法の推奨（現在の結果を踏まえた）
 
-統計の専門知識がない人にも理解できるよう、具体例を交えながら実践的で洞察に富んだ解釈を提供してください。
+データフレームの具体的な数値を詳細に参照・引用しながら、統計の専門知識がない人にも理解できるよう、データドリブンで実践的かつ洞察に富んだ解釈を提供してください。
 """
     return prompt
 
@@ -455,6 +551,23 @@ if input_df is not None:
                 st.pyplot(fig)
                 plt.close(fig)
             
+            # 元データ情報を作成
+            input_data_info = {
+                'shape': f"{input_df.shape[0]}行 {input_df.shape[1]}列",
+                'columns': input_df.columns.tolist(),
+                'dtypes_summary': input_df.dtypes.value_counts().to_dict(),
+                'describe_summary': input_df.describe().round(2).to_string()
+            }
+            
+            # 分析手法情報を作成
+            method_info = {
+                'method_name': '重回帰分析（交互作用項含む）',
+                'n_features': len(X_columns),
+                'n_observations': len(input_df),
+                'interaction_terms': 'すべての組み合わせを自動生成',
+                'missing_handling': 'リストワイズ削除'
+            }
+            
             # 結果をセッション状態に保存
             st.session_state[results_key] = {
                 'X_columns': X_columns,
@@ -463,7 +576,9 @@ if input_df is not None:
                 'all_edges': all_edges,
                 'dependent_var_stats': dependent_var_stats,
                 'all_analysis_results': all_analysis_results,
-                'individual_results': []  # 個別結果を保存するリスト
+                'individual_results': [],  # 個別結果を保存するリスト
+                'input_data_info': input_data_info,
+                'method_info': method_info
             }
             
             # 個別結果を再度生成してセッション状態に保存
@@ -701,8 +816,16 @@ if results_key in st.session_state:
             # 解釈ボタン
             if st.button(f"統計結果を解釈する - {y_column}", key=f"interpret_{y_column}"):
                 with st.spinner("AIが統計結果を分析中..."):
+                    # セッション状態から情報を取得
+                    input_data_info = results.get('input_data_info', None)
+                    method_info = results.get('method_info', None)
+                    
                     # プロンプトを作成
-                    prompt = create_statistics_interpretation_prompt(coefficients, summary_df, equation, y_column)
+                    prompt = create_statistics_interpretation_prompt(
+                        coefficients, summary_df, equation, y_column,
+                        input_data_info=input_data_info,
+                        method_info=method_info
+                    )
                     
                     # API呼び出し
                     interpretation = call_gemini_api(gemini_api_key, prompt)
@@ -832,9 +955,12 @@ if results_key in st.session_state:
         # 包括的解釈ボタン
         if st.button("全体的な変数関係を解釈する", key="comprehensive_interpret"):
             with st.spinner("AIが全体の統計結果を統合分析中..."):
+                # セッション状態から元データ情報を取得
+                input_data_info = results.get('input_data_info', None)
+                
                 # 包括的なプロンプトを作成
                 comprehensive_prompt = create_comprehensive_interpretation_prompt(
-                    all_analysis_results, X_columns, y_columns
+                    all_analysis_results, X_columns, y_columns, input_data_info=input_data_info
                 )
                 
                 # API呼び出し
