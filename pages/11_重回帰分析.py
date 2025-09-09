@@ -185,6 +185,8 @@ if input_df is not None:
     if st.button('重回帰分析の実行'):
     
         if len(X_columns) > 0 and len(y_columns) > 0:
+            # 結果をセッション状態に保存するためのキー
+            results_key = "regression_results"
             X = input_df[X_columns].copy()
             
             # 交互作用項の生成（総当たり）
@@ -453,6 +455,85 @@ if input_df is not None:
                 st.pyplot(fig)
                 plt.close(fig)
             
+            # 結果をセッション状態に保存
+            st.session_state[results_key] = {
+                'X_columns': X_columns,
+                'y_columns': y_columns,
+                'all_nodes': all_nodes,
+                'all_edges': all_edges,
+                'dependent_var_stats': dependent_var_stats,
+                'all_analysis_results': all_analysis_results,
+                'individual_results': []  # 個別結果を保存するリスト
+            }
+            
+            # 個別結果を再度生成してセッション状態に保存
+            for y_column in y_columns:
+                y = input_df[y_column]
+                X_with_const = sm.add_constant(X)
+                model = sm.OLS(y, X_with_const).fit()
+                
+                # 統計結果を再計算
+                unstandardized_coefs = model.params.values
+                X_std = X.std()
+                y_std = y.std()
+                standardized_coefs = unstandardized_coefs[1:] * (X_std / y_std)
+                
+                coefficients = pd.DataFrame({
+                    "変数": X_with_const.columns,
+                    "偏回帰係数": unstandardized_coefs,
+                    "標準化係数": np.insert(standardized_coefs.values, 0, np.nan)
+                })
+                
+                coefficients['p値'] = model.pvalues.values
+                
+                def significance(p):
+                    if p < 0.01:
+                        return '**'
+                    elif p < 0.05:
+                        return '*'
+                    elif p < 0.1:
+                        return '†'
+                    else:
+                        return 'n.s.'
+                coefficients['Sign'] = coefficients['p値'].apply(significance)
+                
+                coefficients = coefficients[coefficients['変数'] != 'const']
+                coefficients = coefficients.reset_index(drop=True)
+                
+                def format_numbers(x):
+                    if pd.isnull(x):
+                        return ''
+                    elif isinstance(x, float):
+                        return f"{x:.2f}"
+                    else:
+                        return x
+                coefficients = coefficients.applymap(format_numbers)
+                
+                r2 = model.rsquared
+                f_value = model.fvalue
+                df_model = int(model.df_model)
+                df_resid = int(model.df_resid)
+                p_value = model.f_pvalue
+                
+                summary_df = pd.DataFrame({
+                    '指標': ['決定係数', 'F値', '自由度', 'p値'],
+                    '値': [f"{r2:.2f}", f"{f_value:.2f}", f"({df_model}, {df_resid})", f"{p_value:.2f}"]
+                })
+                summary_df = summary_df.reset_index(drop=True)
+                
+                intercept = model.params[0]
+                coefs = model.params[1:]
+                equation_terms = [f"{coef:.2f} × {var}" for coef, var in zip(coefs, X_with_const.columns[1:])]
+                equation = f"{y_column} = {intercept:.2f} + " + " + ".join(equation_terms)
+                
+                # 個別結果を保存
+                st.session_state[results_key]['individual_results'].append({
+                    'y_column': y_column,
+                    'coefficients': coefficients,
+                    'summary_df': summary_df,
+                    'equation': equation
+                })
+            
             # まとめたパス図の作成
             st.subheader("結合されたパス図")
             G_combined = nx.DiGraph()
@@ -585,6 +666,194 @@ if input_df is not None:
                         if st.button("包括的解釈をクリア", key="clear_comprehensive"):
                             del st.session_state[comprehensive_key]
                             st.rerun()
+
+# セッション状態から結果を表示
+results_key = "regression_results"
+if results_key in st.session_state:
+    results = st.session_state[results_key]
+    X_columns = results['X_columns']
+    y_columns = results['y_columns']
+    all_nodes = results['all_nodes']
+    all_edges = results['all_edges']
+    dependent_var_stats = results['dependent_var_stats']
+    all_analysis_results = results['all_analysis_results']
+    individual_results = results['individual_results']
+    
+    # 個別結果の表示
+    for result in individual_results:
+        y_column = result['y_column']
+        coefficients = result['coefficients']
+        summary_df = result['summary_df']
+        equation = result['equation']
+        
+        st.subheader(f"重回帰分析の結果：目的変数 {y_column}")
+        st.dataframe(coefficients)
+        st.dataframe(summary_df)
+        st.write("数理モデル：")
+        st.write(equation)
+        
+        # AI解釈機能
+        if gemini_api_key and enable_ai_interpretation:
+            st.subheader(f"🤖 AI統計解釈：{y_column}")
+            
+            interpretation_key = f"interpretation_{y_column}"
+            
+            # 解釈ボタン
+            if st.button(f"統計結果を解釈する - {y_column}", key=f"interpret_{y_column}"):
+                with st.spinner("AIが統計結果を分析中..."):
+                    # プロンプトを作成
+                    prompt = create_statistics_interpretation_prompt(coefficients, summary_df, equation, y_column)
+                    
+                    # API呼び出し
+                    interpretation = call_gemini_api(gemini_api_key, prompt)
+                    
+                    # 結果をセッション状態に保存
+                    st.session_state[interpretation_key] = interpretation
+            
+            # 解釈結果がある場合は常に表示
+            if interpretation_key in st.session_state:
+                st.markdown("### 📊 統計解釈結果")
+                st.write(st.session_state[interpretation_key])
+                
+                # 解釈をクリアするボタン
+                col1, col2 = st.columns([1, 1])
+                with col2:
+                    if st.button(f"解釈をクリア", key=f"clear_{y_column}"):
+                        del st.session_state[interpretation_key]
+                        st.rerun()
+    
+    # まとめたパス図の作成
+    st.subheader("結合されたパス図")
+    G_combined = nx.DiGraph()
+    
+    # ノードの追加
+    for node in all_nodes:
+        G_combined.add_node(node)
+    
+    # エッジの追加
+    for edge in all_edges:
+        G_combined.add_edge(edge['from'], edge['to'], weight=edge['weight'], label=edge['coef'])
+    
+    # ノードの位置設定（ユーザーが選択した順番）
+    pos = {}
+    # 説明変数を左側に配置
+    num_X = len(X_columns)
+    for idx, var in enumerate(X_columns):
+        pos[var] = (-1, num_X - idx)
+    # 目的変数を右側に配置（R値、F値、判定の表示を考慮して間隔を調整）
+    num_Y = len(y_columns)
+    spacing = 4  # 目的変数間の縦方向の間隔
+    for idx, var in enumerate(y_columns):
+        pos[var] = (1, num_Y * spacing - idx * spacing)
+    
+    # 図のサイズを計算
+    max_var_name_length = max([len(var) for var in X_columns + y_columns])
+    width = max(8, max_var_name_length * 0.5)  # 文字数に応じて横幅を調整
+    height = max(6, (num_X + num_Y * spacing) * 0.6)  # 変数の数に応じて縦幅を調整
+    
+    # 描画
+    fig, ax = plt.subplots(figsize=(width, height))
+    
+    # ノードラベルの描画
+    labels = {node: node for node in G_combined.nodes()}
+    
+    # ラベルのアライメントを設定
+    label_alignment = {}
+    for node in G_combined.nodes():
+        if node in X_columns:
+            label_alignment[node] = {'horizontalalignment': 'right', 'pos':(-0.05,0)}
+        elif node in y_columns:
+            label_alignment[node] = {'horizontalalignment': 'left', 'pos':(0.05,0)}
+        else:
+            label_alignment[node] = {'horizontalalignment': 'center', 'pos':(0,0)}
+    
+    # ノードラベルを個別に描画
+    node_bboxes = {}  # ノードのバウンディングボックスを保存
+    for node in G_combined.nodes():
+        x, y_pos_node = pos[node]
+        ha = label_alignment[node]['horizontalalignment']
+        offset = label_alignment[node]['pos']
+        text_obj = ax.text(x + offset[0], y_pos_node + offset[1], labels[node], fontsize=10,
+                           bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black"),
+                           horizontalalignment=ha, verticalalignment='center')
+        renderer = fig.canvas.get_renderer()
+        bbox = text_obj.get_window_extent(renderer=renderer)
+        inv = ax.transData.inverted()
+        bbox_data = bbox.transformed(inv)
+        node_bboxes[node] = bbox_data
+    
+    # エッジの描画
+    edges = G_combined.edges()
+    weights = [G_combined[u][v]['weight'] * 1.5 for u, v in edges]
+    nx.draw_networkx_edges(G_combined, pos, edgelist=edges, width=weights, arrows=True,
+                           arrowstyle='-|>', arrowsize=20, ax=ax, connectionstyle='arc3,rad=0.0')
+    
+    # エッジラベルの描画
+    edge_labels = nx.get_edge_attributes(G_combined, 'label')
+    nx.draw_networkx_edge_labels(G_combined, pos, edge_labels=edge_labels, font_size=10, ax=ax)
+    
+    # 統計情報のアノテーション（目的変数のラベルの左端に合わせる）
+    for y_column in y_columns:
+        if y_column in pos:
+            x, y_pos_text = pos[y_column]
+            dep_stats = dependent_var_stats[y_column]
+            r2 = dep_stats['r2']
+            f_value = dep_stats['f_value']
+            df_model = dep_stats['df_model']
+            df_resid = dep_stats['df_resid']
+            p_annotation = dep_stats['p_annotation']
+            # 目的変数のバウンディングボックスから左端の座標を取得
+            bbox = node_bboxes[y_column]
+            annotation_x = bbox.x0  # 左端のx座標
+            ax.text(annotation_x, y_pos_text - 1.5, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
+                    horizontalalignment='left', verticalalignment='top', fontsize=10)
+    
+    # 軸の範囲を調整
+    x_margin = 0.6  # 左右の余白を増やす
+    ax.set_xlim(-1 - x_margin, 1 + x_margin)
+    y_margin = 2  # 上下の余白を増やす
+    y_min = min(pos[node][1] for node in pos) - y_margin
+    y_max = max(pos[node][1] for node in pos) + y_margin
+    ax.set_ylim(y_min, y_max)
+    
+    # 軸の非表示
+    plt.axis('off')
+    
+    st.pyplot(fig)
+    plt.close(fig)
+    
+    # 包括的なAI解釈機能の追加
+    if gemini_api_key and enable_ai_interpretation and len(y_columns) > 0:
+        st.subheader("🤖 包括的なAI統計解釈")
+        st.write("すべての分析結果を統合して、変数間の関係性とシステム全体を解釈します")
+        
+        comprehensive_key = "comprehensive_interpretation"
+        
+        # 包括的解釈ボタン
+        if st.button("全体的な変数関係を解釈する", key="comprehensive_interpret"):
+            with st.spinner("AIが全体の統計結果を統合分析中..."):
+                # 包括的なプロンプトを作成
+                comprehensive_prompt = create_comprehensive_interpretation_prompt(
+                    all_analysis_results, X_columns, y_columns
+                )
+                
+                # API呼び出し
+                comprehensive_interpretation = call_gemini_api(gemini_api_key, comprehensive_prompt)
+                
+                # 結果をセッション状態に保存
+                st.session_state[comprehensive_key] = comprehensive_interpretation
+        
+        # 包括的解釈結果がある場合は常に表示
+        if comprehensive_key in st.session_state:
+            st.markdown("### 📊 包括的統計解釈結果")
+            st.write(st.session_state[comprehensive_key])
+            
+            # 解釈をクリアするボタン
+            col1, col2 = st.columns([1, 1])
+            with col2:
+                if st.button("包括的解釈をクリア", key="clear_comprehensive"):
+                    del st.session_state[comprehensive_key]
+                    st.rerun()
 
 st.write('')
 st.write('')
