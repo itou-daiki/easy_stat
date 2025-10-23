@@ -14,23 +14,6 @@ st.set_page_config(page_title='t検定(対応なし)', layout='wide')
 
 st.title('t検定(対応なし)')
 common.display_header()
-
-# 学習支援機能の統合
-learning_assistant = common.StatisticalLearningAssistant()
-learning_assistant.check_learning_progress("t検定（対応なし）")
-
-# 学習レベル選択
-level = st.selectbox("学習レベルを選択してください", 
-                     ["beginner", "intermediate", "advanced"],
-                     format_func=lambda x: {"beginner": "初級者", "intermediate": "中級者", "advanced": "上級者"}[x],
-                     key="ttest_level")
-
-# 概念説明
-learning_assistant.show_concept_explanation('ttest', level)
-
-# インタラクティブガイド
-common.show_interactive_guide('ttest')
-
 st.write('変数の選択　→　t検定　→　表作成　→　解釈の補助を行います')
 st.write('')
 
@@ -45,21 +28,17 @@ uploaded_file = st.file_uploader('ファイルをアップロードしてくだ�
 use_demo_data = st.checkbox('デモデータを使用')
 
 # データフレームの作成
-validator = common.StatisticalValidator()
 df = None
-
 if use_demo_data:
-    try:
-        df = pd.read_excel('datasets/ttest_demo.xlsx', sheet_name=0)
-        st.success("✅ デモデータを読み込みました")
-        st.write(df.head())
-    except Exception as e:
-        st.error(f"⚠️ デモデータの読み込みに失敗しました: {e}")
+    df = pd.read_excel('datasets/ttest_demo.xlsx', sheet_name=0)
+    st.write(df.head())
 else:
     if uploaded_file is not None:
-        df = validator.safe_file_load(uploaded_file)
-        if df is not None:
-            st.success("✅ ファイルを正常に読み込みました")
+        if uploaded_file.type == 'text/csv':
+            df = pd.read_csv(uploaded_file)
+            st.write(df.head())
+        else:
+            df = pd.read_excel(uploaded_file)
             st.write(df.head())
 
 if df is not None:
