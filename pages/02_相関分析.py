@@ -20,6 +20,9 @@ common.display_header()
 st.write('２つの変数から相関係数を表やヒートマップで出力し、相関関係の解釈の補助を行います。')
 st.write('')
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 # 分析のイメージ
 image = Image.open('images/correlation.png')
 st.image(image)
@@ -163,6 +166,54 @@ if df is not None:
                     else:
                         description += f'強い負の相関がある (r={correlation:.2f})'
                     st.write(description)
+
+        # AI解釈機能の追加（ペアごと）
+        if gemini_api_key and enable_ai_interpretation:
+            st.subheader('🤖 AI統計解釈（変数ペア選択）')
+            st.write('特定の変数ペアについて詳細なAI解釈を取得できます')
+
+            # 変数ペアを選択
+            pairs = [(col1, col2) for i, col1 in enumerate(selected_cols)
+                     for j, col2 in enumerate(selected_cols) if i < j]
+
+            if pairs:
+                pair_options = [f'{col1} × {col2}' for col1, col2 in pairs]
+                selected_pair_str = st.selectbox('解釈したい変数ペアを選択', pair_options)
+
+                if selected_pair_str:
+                    # 選択されたペアを取得
+                    selected_pair_idx = pair_options.index(selected_pair_str)
+                    var1, var2 = pairs[selected_pair_idx]
+
+                    # p値を計算（相関係数の有意性検定）
+                    from scipy import stats as scipy_stats
+                    n = len(df[[var1, var2]].dropna())
+                    r = corr_matrix.loc[var1, var2]
+
+                    # t統計量とp値の計算
+                    if abs(r) < 1:
+                        t_stat = r * np.sqrt(n - 2) / np.sqrt(1 - r**2)
+                        p_value = 2 * (1 - scipy_stats.t.cdf(abs(t_stat), n - 2))
+                    else:
+                        p_value = 0.0
+
+                    # 結果をまとめる
+                    correlation_results = {
+                        'correlation': r,
+                        'p_value': p_value,
+                        'var1': var1,
+                        'var2': var2,
+                        'sample_size': n
+                    }
+
+                    # AI解釈を表示
+                    common.AIStatisticalInterpreter.display_ai_interpretation(
+                        api_key=gemini_api_key,
+                        enabled=enable_ai_interpretation,
+                        results=correlation_results,
+                        analysis_type='correlation',
+                        key_prefix=f'correlation_{var1}_{var2}'
+                    )
 
 # フッター
 common.display_copyright()

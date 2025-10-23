@@ -8,6 +8,8 @@ import numpy as np
 from scipy import stats
 import warnings
 from typing import Optional, Dict, Any, Tuple
+import requests
+import json
 
 
 def display_header():
@@ -474,3 +476,338 @@ def create_learning_dashboard():
         st.sidebar.info("📈 中級者レベル達成！")
     elif completed_count >= 3:
         st.sidebar.info("🌱 順調に学習中！")
+
+
+# ==========================================
+# 生成AI統計解釈支援機能
+# ==========================================
+
+class AIStatisticalInterpreter:
+    """生成AIによる統計解釈支援クラス"""
+
+    @staticmethod
+    def call_gemini_api(api_key: str, prompt: str) -> str:
+        """Gemini 2.0 Flash APIを呼び出す関数"""
+        if not api_key:
+            return "APIキーが設定されていません。"
+
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent"
+        headers = {
+            "Content-Type": "application/json",
+        }
+
+        data = {
+            "contents": [{
+                "parts": [{
+                    "text": prompt
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.3,
+                "maxOutputTokens": 2048,
+            }
+        }
+
+        try:
+            response = requests.post(f"{url}?key={api_key}", headers=headers, json=data)
+            if response.status_code == 200:
+                result = response.json()
+                if 'candidates' in result and len(result['candidates']) > 0:
+                    return result['candidates'][0]['content']['parts'][0]['text']
+                else:
+                    return "APIからの応答が予期しない形式です。"
+            else:
+                return f"APIエラー: {response.status_code} - {response.text}"
+        except Exception as e:
+            return f"エラーが発生しました: {str(e)}"
+
+    @staticmethod
+    def setup_ai_sidebar() -> Tuple[str, bool]:
+        """AI機能のサイドバー設定"""
+        st.sidebar.subheader("🤖 AI統計解釈機能")
+        st.sidebar.write("Gemini 2.0 Flash APIを使用して統計結果を自動解釈します")
+        gemini_api_key = st.sidebar.text_input(
+            "Gemini APIキーを入力してください",
+            type="password",
+            help="Google AI Studio (https://aistudio.google.com/) でAPIキーを取得できます"
+        )
+        enable_ai_interpretation = st.sidebar.checkbox(
+            "AI解釈機能を有効にする",
+            disabled=not gemini_api_key
+        )
+
+        if gemini_api_key and enable_ai_interpretation:
+            st.sidebar.success("✅ AI解釈機能が有効になりました")
+        elif enable_ai_interpretation and not gemini_api_key:
+            st.sidebar.error("❌ APIキーを入力してください")
+
+        return gemini_api_key, enable_ai_interpretation
+
+    @staticmethod
+    def create_correlation_interpretation_prompt(correlation_results: Dict[str, Any]) -> str:
+        """相関分析の解釈プロンプト"""
+        r = correlation_results.get('correlation', 0)
+        p_value = correlation_results.get('p_value', 1)
+        var1 = correlation_results.get('var1', '変数1')
+        var2 = correlation_results.get('var2', '変数2')
+        n = correlation_results.get('sample_size', 0)
+
+        prompt = f"""
+あなたは統計分析の専門家です。以下の相関分析の結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 変数1: {var1}
+- 変数2: {var2}
+- サンプルサイズ: {n}
+- 相関係数 (r): {r:.4f}
+- p値: {p_value:.4f}
+
+【解釈・考察してほしい内容】
+1. 相関係数の値から見た関係の強さと方向性
+   - 数値の具体的な意味
+   - 相関の強度の評価（弱い/中程度/強い）
+
+2. 統計的有意性の判断
+   - p値の解釈
+   - 帰無仮説と対立仮説の判断
+
+3. 実用的な解釈
+   - ビジネスや研究文脈での意味
+   - 実際的な影響度の評価
+
+4. 注意点と限界
+   - 相関と因果の区別
+   - 第三の変数の可能性
+   - サンプルサイズの妥当性
+
+5. 今後の分析提案
+   - 追加で実施すべき分析
+   - 深掘りすべきポイント
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def create_chi_square_interpretation_prompt(chi_square_results: Dict[str, Any]) -> str:
+        """カイ二乗検定の解釈プロンプト"""
+        chi2 = chi_square_results.get('chi2', 0)
+        p_value = chi_square_results.get('p_value', 1)
+        dof = chi_square_results.get('dof', 0)
+        var1 = chi_square_results.get('var1', '変数1')
+        var2 = chi_square_results.get('var2', '変数2')
+        crosstab = chi_square_results.get('crosstab', None)
+        expected = chi_square_results.get('expected', None)
+
+        crosstab_str = crosstab.to_string() if crosstab is not None else "データなし"
+        expected_str = expected.to_string() if expected is not None else "データなし"
+
+        prompt = f"""
+あなたは統計分析の専門家です。以下のカイ二乗検定の結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 変数1: {var1}
+- 変数2: {var2}
+- カイ二乗統計量: {chi2:.4f}
+- 自由度: {dof}
+- p値: {p_value:.4f}
+
+【観測度数（クロス表）】
+{crosstab_str}
+
+【期待度数】
+{expected_str}
+
+【解釈・考察してほしい内容】
+1. クロス表の読み取り
+   - 観測度数のパターン
+   - 顕著な偏りの特定
+
+2. カイ二乗統計量とp値の解釈
+   - 統計的有意性の判断
+   - 実際的な関連の強さ
+
+3. 期待度数との差異分析
+   - どのセルで大きな差があるか
+   - その実際的な意味
+
+4. 変数間の関連性の解釈
+   - 独立性の検定結果
+   - 関連のパターン
+
+5. 実用的な示唆
+   - ビジネス・研究での活用
+   - 意思決定への応用
+
+6. 注意点と限界
+   - 期待度数の妥当性
+   - 因果関係の解釈制限
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def create_ttest_interpretation_prompt(ttest_results: Dict[str, Any]) -> str:
+        """t検定の解釈プロンプト"""
+        t_stat = ttest_results.get('t_statistic', 0)
+        p_value = ttest_results.get('p_value', 1)
+        dof = ttest_results.get('dof', 0)
+        mean1 = ttest_results.get('mean1', 0)
+        mean2 = ttest_results.get('mean2', 0)
+        std1 = ttest_results.get('std1', 0)
+        std2 = ttest_results.get('std2', 0)
+        n1 = ttest_results.get('n1', 0)
+        n2 = ttest_results.get('n2', 0)
+        effect_size = ttest_results.get('effect_size', 0)
+        test_type = ttest_results.get('test_type', 't検定')
+        group1_name = ttest_results.get('group1_name', 'グループ1')
+        group2_name = ttest_results.get('group2_name', 'グループ2')
+
+        prompt = f"""
+あなたは統計分析の専門家です。以下の{test_type}の結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 検定タイプ: {test_type}
+- グループ1 ({group1_name}): 平均={mean1:.4f}, 標準偏差={std1:.4f}, n={n1}
+- グループ2 ({group2_name}): 平均={mean2:.4f}, 標準偏差={std2:.4f}, n={n2}
+- t統計量: {t_stat:.4f}
+- 自由度: {dof}
+- p値: {p_value:.4f}
+- 効果量 (Cohen's d): {effect_size:.4f}
+
+【解釈・考察してほしい内容】
+1. 記述統計の比較
+   - 平均値の差の実際的な大きさ
+   - 標準偏差から見るばらつき
+
+2. t統計量とp値の解釈
+   - 統計的有意性の判断
+   - 帰無仮説の採択/棄却
+
+3. 効果量の評価
+   - Cohen's dの解釈（小/中/大）
+   - 実際的な意味での差の大きさ
+
+4. グループ間の差の実用的解釈
+   - ビジネス・研究での意味
+   - 意思決定への示唆
+
+5. サンプルサイズの妥当性
+   - 統計的検出力の評価
+   - 結果の信頼性
+
+6. 注意点と限界
+   - 前提条件の確認
+   - 因果推論の制限
+   - 追加分析の提案
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def create_anova_interpretation_prompt(anova_results: Dict[str, Any]) -> str:
+        """分散分析の解釈プロンプト"""
+        f_stat = anova_results.get('f_statistic', 0)
+        p_value = anova_results.get('p_value', 1)
+        df_between = anova_results.get('df_between', 0)
+        df_within = anova_results.get('df_within', 0)
+        group_means = anova_results.get('group_means', {})
+        eta_squared = anova_results.get('eta_squared', 0)
+        analysis_type = anova_results.get('analysis_type', '分散分析')
+
+        means_str = "\n".join([f"- {group}: 平均={mean:.4f}" for group, mean in group_means.items()])
+
+        prompt = f"""
+あなたは統計分析の専門家です。以下の{analysis_type}の結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 分析タイプ: {analysis_type}
+- F統計量: {f_stat:.4f}
+- 自由度: 群間={df_between}, 群内={df_within}
+- p値: {p_value:.4f}
+- 効果量 (η²): {eta_squared:.4f}
+
+【各グループの平均値】
+{means_str}
+
+【解釈・考察してほしい内容】
+1. 記述統計の比較
+   - 各グループの平均値の傾向
+   - 最大・最小の差
+
+2. F統計量とp値の解釈
+   - 統計的有意性の判断
+   - グループ間の差の存在
+
+3. 効果量の評価
+   - η²の解釈
+   - 実際的な差の大きさ
+
+4. 多重比較の必要性
+   - どのグループ間で差があるか
+   - 事後検定の推奨
+
+5. 実用的な示唆
+   - ビジネス・研究での意味
+   - 最適なグループの特定
+
+6. 注意点と限界
+   - 前提条件の確認
+   - Type Iエラーの制御
+   - 追加分析の提案
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def display_ai_interpretation(
+        api_key: str,
+        enabled: bool,
+        results: Dict[str, Any],
+        analysis_type: str,
+        key_prefix: str = "ai_interp"
+    ):
+        """AI解釈を表示する共通関数"""
+        if not enabled or not api_key:
+            return
+
+        st.subheader(f"🤖 AI統計解釈")
+
+        interpretation_key = f"{key_prefix}_interpretation"
+
+        # 解釈ボタン
+        if st.button(f"統計結果を解釈する", key=f"{key_prefix}_button"):
+            with st.spinner("AIが統計結果を分析中..."):
+                # 分析タイプに応じたプロンプトを作成
+                if analysis_type == 'correlation':
+                    prompt = AIStatisticalInterpreter.create_correlation_interpretation_prompt(results)
+                elif analysis_type == 'chi_square':
+                    prompt = AIStatisticalInterpreter.create_chi_square_interpretation_prompt(results)
+                elif analysis_type == 'ttest':
+                    prompt = AIStatisticalInterpreter.create_ttest_interpretation_prompt(results)
+                elif analysis_type == 'anova':
+                    prompt = AIStatisticalInterpreter.create_anova_interpretation_prompt(results)
+                else:
+                    st.error("未対応の分析タイプです。")
+                    return
+
+                # API呼び出し
+                interpretation = AIStatisticalInterpreter.call_gemini_api(api_key, prompt)
+
+                # 結果をセッション状態に保存
+                st.session_state[interpretation_key] = interpretation
+
+        # 解釈結果がある場合は常に表示
+        if interpretation_key in st.session_state:
+            st.markdown("### 📊 統計解釈結果")
+            st.write(st.session_state[interpretation_key])
+
+            # 解釈をクリアするボタン
+            col1, col2 = st.columns([1, 1])
+            with col2:
+                if st.button(f"解釈をクリア", key=f"{key_prefix}_clear"):
+                    del st.session_state[interpretation_key]
+                    st.rerun()

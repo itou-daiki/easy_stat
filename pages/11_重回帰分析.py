@@ -14,6 +14,7 @@ import statsmodels.api as sm
 import streamlit as st
 from scipy import stats
 from sklearn.metrics import r2_score
+from sklearn.preprocessing import StandardScaler
 
 import common
 
@@ -308,28 +309,34 @@ if input_df is not None:
             
             for y_column in y_columns:
                 y = input_df[y_column]
-                
+
                 # 元のデータで回帰分析（偏回帰係数用）
                 X_with_const = sm.add_constant(X)
                 model = sm.OLS(y, X_with_const).fit()
-                
+
                 # 偏回帰係数の取得
                 unstandardized_coefs = model.params.values
-                
-                # 標準偏差の取得
-                X_std = X.std()
-                y_std = y.std()
-                
-                # 標準化係数の計算（定数項は除外）
-                standardized_coefs = unstandardized_coefs[1:] * (X_std / y_std)
-                
+
+                # 標準化されたデータで回帰分析（標準化係数用）
+                # SPSS/HADと同じ方法：各変数を標準化してから回帰分析
+                # 説明変数と目的変数を標準化
+                scaler_X = StandardScaler()
+                scaler_y = StandardScaler()
+
+                X_standardized = scaler_X.fit_transform(X)
+                y_standardized = scaler_y.fit_transform(y.values.reshape(-1, 1)).flatten()
+
+                # 標準化されたデータで回帰分析（定数項なし）
+                model_standardized = sm.OLS(y_standardized, X_standardized).fit()
+                standardized_coefs = model_standardized.params
+
                 # 偏回帰係数と標準化係数をデータフレームにまとめる
                 coefficients = pd.DataFrame({
                     "変数": X_with_const.columns,
                     "偏回帰係数": unstandardized_coefs,
-                    "標準化係数": np.insert(standardized_coefs.values, 0, np.nan)  # 定数項にnanを挿入
+                    "標準化係数": np.insert(standardized_coefs, 0, np.nan)  # 定数項にnanを挿入
                 })
-                
+
                 coefficients['p値'] = model.pvalues.values
                 
                 # 有意判定の追加
@@ -586,19 +593,24 @@ if input_df is not None:
                 y = input_df[y_column]
                 X_with_const = sm.add_constant(X)
                 model = sm.OLS(y, X_with_const).fit()
-                
+
                 # 統計結果を再計算
                 unstandardized_coefs = model.params.values
-                X_std = X.std()
-                y_std = y.std()
-                standardized_coefs = unstandardized_coefs[1:] * (X_std / y_std)
-                
+
+                # 標準化されたデータで回帰分析（標準化係数用）
+                scaler_X = StandardScaler()
+                scaler_y = StandardScaler()
+                X_standardized = scaler_X.fit_transform(X)
+                y_standardized = scaler_y.fit_transform(y.values.reshape(-1, 1)).flatten()
+                model_standardized = sm.OLS(y_standardized, X_standardized).fit()
+                standardized_coefs = model_standardized.params
+
                 coefficients = pd.DataFrame({
                     "変数": X_with_const.columns,
                     "偏回帰係数": unstandardized_coefs,
-                    "標準化係数": np.insert(standardized_coefs.values, 0, np.nan)
+                    "標準化係数": np.insert(standardized_coefs, 0, np.nan)
                 })
-                
+
                 coefficients['p値'] = model.pvalues.values
                 
                 def significance(p):

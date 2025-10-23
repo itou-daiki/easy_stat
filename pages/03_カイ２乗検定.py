@@ -18,6 +18,9 @@ common.display_header()
 st.write("２つの変数からクロス表やヒートマップを出力し、度数の偏りを解釈する補助を行います。")
 st.write("")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 # 分析のイメージ
 image = Image.open('images/chi_square.png')
 st.image(image)
@@ -169,6 +172,28 @@ if df is not None:
 
                         # ヒートマップの表示
                         st.plotly_chart(fig_heatmap)
+
+                        # AI解釈機能の追加
+                        if gemini_api_key and enable_ai_interpretation:
+                            # 結果をまとめる
+                            chi_square_results = {
+                                'chi2': chi2,
+                                'p_value': p_value,
+                                'dof': dof,
+                                'var1': selected_col1,
+                                'var2': selected_col2,
+                                'crosstab': crosstab.iloc[:-1, :-1],  # 合計行・列を除く
+                                'expected': expected_df
+                            }
+
+                            # AI解釈を表示
+                            common.AIStatisticalInterpreter.display_ai_interpretation(
+                                api_key=gemini_api_key,
+                                enabled=enable_ai_interpretation,
+                                results=chi_square_results,
+                                analysis_type='chi_square',
+                                key_prefix=f'chi_square_{selected_col1}_{selected_col2}'
+                            )
 
                     except ValueError as e:
                         st.error(f'エラー: カイ二乗検定の実行中にエラーが発生しました。\n詳細: {str(e)}\n\n期待度数が小さすぎる可能性があります（各セルの期待度数が5以上必要）。')
