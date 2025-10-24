@@ -352,14 +352,12 @@ if df is not None:
             fig.update_layout(font=dict(family="IPAexGothic"), barmode="group", title_text=f"{pre}・{post} の 前後まとめた結果")
             st.plotly_chart(fig, use_container_width=True)
 
-            # Excelダウンロードボタン
+            # Excelダウンロードリンク
             excel_data = common.export_plotly_to_excel(fig, filename=f"二要因混合分散分析_{pre}_{post}.xlsx", sheet_name="グラフ")
-            st.download_button(
-                label="📊 グラフをExcelでダウンロード",
-                data=excel_data,
-                file_name=f"二要因混合分散分析_{pre}_{post}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+            import base64
+            b64 = base64.b64encode(excel_data).decode()
+            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="二要因混合分散分析_{pre}_{post}.xlsx">📊 グラフをExcelでダウンロード</a>'
+            st.markdown(href, unsafe_allow_html=True)
 
             # 各群の平均値 (SD) を計算（全ての時間点の値の平均を使用）
             group_summary = df_long.groupby(selected_between)["value"].agg(['mean', 'std', 'count']).reset_index()

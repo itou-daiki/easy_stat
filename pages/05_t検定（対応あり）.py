@@ -306,14 +306,12 @@ if df is not None:
 
                 st.plotly_chart(fig)
 
-                # Excelダウンロードボタン
+                # Excelダウンロードリンク
                 excel_data = common.export_plotly_to_excel(fig, filename=f"t検定対応あり_{pre_var}_{post_var}.xlsx", sheet_name="グラフ")
-                st.download_button(
-                    label="📊 グラフをExcelでダウンロード",
-                    data=excel_data,
-                    file_name=f"t検定対応あり_{pre_var}_{post_var}.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+                import base64
+                b64 = base64.b64encode(excel_data).decode()
+                href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="t検定対応あり_{pre_var}_{post_var}.xlsx">📊 グラフをExcelでダウンロード</a>'
+                st.markdown(href, unsafe_allow_html=True)
 
                 # キャプションの追加
                 st.caption(f"【観測値】 平均値 (SD): {x.mean():.2f} ({x.std(ddof=1):.2f}), "

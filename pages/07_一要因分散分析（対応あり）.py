@@ -316,14 +316,12 @@ if df is not None:
         fig.update_layout(font=dict(family="IPAexGothic"))
         st.plotly_chart(fig, use_container_width=True)
 
-        # Excelダウンロードボタン
+        # Excelダウンロードリンク
         excel_data = common.export_plotly_to_excel(fig, filename="一要因分散分析対応あり.xlsx", sheet_name="グラフ")
-        st.download_button(
-            label="📊 グラフをExcelでダウンロード",
-            data=excel_data,
-            file_name="一要因分散分析対応あり.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        import base64
+        b64 = base64.b64encode(excel_data).decode()
+        href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="一要因分散分析対応あり.xlsx">📊 グラフをExcelでダウンロード</a>'
+        st.markdown(href, unsafe_allow_html=True)
 
         caption_text = "各条件ごとの平均値 (SE): " + ", ".join(
             [f"{row['条件']}: {row['mean']:.2f} ({row['sem']:.2f})" for _, row in group_stats.iterrows()]
