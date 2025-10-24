@@ -263,10 +263,13 @@ if df is not None:
             
             return result_levels, len(levels)
         
-        # 棒グラフの上限を計算
+        # 棒グラフの上限を計算（群の数とレベル数に応じて動的に調整）
         base_y_max = (group_stats['mean'] + group_stats['sem']).max() * 1.1
-        y_offset = base_y_max * 0.08  # オフセットを増やす
-        step_size = base_y_max * 0.12  # レベル間の高さを増やす
+        num_groups = len(group_stats)
+
+        # オフセットとステップサイズを群数とレベル数に応じて調整
+        y_offset = base_y_max * max(0.06, 0.15 / num_groups)  # 群が多いほど相対的に小さく
+        step_size = base_y_max * max(0.10, 0.25 / num_groups)  # 群が多いほど相対的に小さく
         
         # 多重比較で有意な比較結果があれば、ブラケット描画のためレベルを割り当て
         if 'significant_comparisons' in locals() or 'pairwise_df' in locals():
@@ -281,11 +284,20 @@ if df is not None:
         if significant_comparisons:
             comp_list = [(comp[0], comp[1]) for comp in significant_comparisons]
             comparison_levels, num_levels = assign_levels(comp_list, category_positions)
+
+            # レベル数が多い場合はさらに調整
+            if num_levels > 3:
+                step_size = step_size * (1 + (num_levels - 3) * 0.1)
         else:
             comparison_levels, num_levels = ([], 0)
-        additional_height = num_levels * step_size + y_offset * 2
+        additional_height = num_levels * step_size + y_offset * 2.5
         y_max = base_y_max + additional_height
         
+        # アノテーション配置の調整係数（群数に応じて動的に調整）
+        vline_bottom_factor = max(0.3, 0.8 / num_groups)  # ブラケット下端の余白
+        bracket_offset_factor = max(0.2, 0.5 / num_groups)  # ブラケット上端の追加余白
+        annotation_offset_factor = max(0.3, 0.8 / num_groups)  # アノテーションの余白
+
         if significant_comparisons:
             for idx, (group1, group2, p_value, sign) in enumerate(significant_comparisons):
                 x0 = category_positions[group1]
@@ -293,11 +305,11 @@ if df is not None:
                 y_vline_bottom = max(
                     group_stats[group_stats['条件'] == group1]['mean'].values[0] + group_stats[group_stats['条件'] == group1]['sem'].values[0],
                     group_stats[group_stats['条件'] == group2]['mean'].values[0] + group_stats[group_stats['条件'] == group2]['sem'].values[0]
-                ) + y_offset * 0.5
+                ) + y_offset * vline_bottom_factor
                 level = comparison_levels[idx]
-                bracket_y = y_vline_bottom + (level * step_size) + y_offset * 0.3
+                bracket_y = y_vline_bottom + (level * step_size) + y_offset * bracket_offset_factor
                 fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
-                annotation_y = bracket_y + y_offset * 0.5
+                annotation_y = bracket_y + y_offset * annotation_offset_factor
                 fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, f"p < {p_value:.2f} {sign}"))
         
         fig.update_yaxes(range=[0, y_max * 1.05])

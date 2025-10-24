@@ -306,9 +306,22 @@ if df is not None:
             
             base_y_max = max(max(np.array(pre_means) + np.array(pre_err)),
                              max(np.array(post_means) + np.array(post_err))) * 1.1
-            y_offset = base_y_max * 0.08  # オフセットを増やす
-            step_size = base_y_max * 0.12  # レベル間の高さを増やす
-            
+            num_groups = len(levels)
+
+            # オフセットとステップサイズを群数とレベル数に応じて調整
+            y_offset = base_y_max * max(0.06, 0.15 / num_groups)  # 群が多いほど相対的に小さく
+            step_size = base_y_max * max(0.10, 0.25 / num_groups)  # 群が多いほど相対的に小さく
+
+            # レベル数が多い場合はさらに調整
+            max_num_levels = max(num_levels_pre, num_levels_post)
+            if max_num_levels > 3:
+                step_size = step_size * (1 + (max_num_levels - 3) * 0.1)
+
+            # アノテーション配置の調整係数（群数に応じて動的に調整）
+            vline_bottom_factor = max(0.3, 0.8 / num_groups)  # ブラケット下端の余白
+            bracket_offset_factor = max(0.2, 0.5 / num_groups)  # ブラケット上端の追加余白
+            annotation_offset_factor = max(0.3, 0.8 / num_groups)  # アノテーションの余白
+
             # 前測のブラケット・アノテーション
             for idx, (comp, level) in enumerate(zip(significant_comparisons_pre, comp_levels_pre)):
                 grp1, grp2, p_value, significance = comp
@@ -316,12 +329,12 @@ if df is not None:
                     x0 = category_positions[grp1] - delta
                     x1 = category_positions[grp2] - delta
                     y_vline_bottom = max(pre_means[levels.index(grp1)] + pre_err[levels.index(grp1)],
-                                         pre_means[levels.index(grp2)] + pre_err[levels.index(grp2)]) + y_offset * 0.5
-                    bracket_y = y_vline_bottom + (level * step_size) + y_offset * 0.3
+                                         pre_means[levels.index(grp2)] + pre_err[levels.index(grp2)]) + y_offset * vline_bottom_factor
+                    bracket_y = y_vline_bottom + (level * step_size) + y_offset * bracket_offset_factor
                     fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
-                    annotation_y = bracket_y + y_offset * 0.5
+                    annotation_y = bracket_y + y_offset * annotation_offset_factor
                     fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, f'p < {p_value:.2f} {significance}'))
-            
+
             # 後測のブラケット・アノテーション
             for idx, (comp, level) in enumerate(zip(significant_comparisons_post, comp_levels_post)):
                 grp1, grp2, p_value, significance = comp
@@ -329,13 +342,13 @@ if df is not None:
                     x0 = category_positions[grp1] + delta
                     x1 = category_positions[grp2] + delta
                     y_vline_bottom = max(post_means[levels.index(grp1)] + post_err[levels.index(grp1)],
-                                         post_means[levels.index(grp2)] + post_err[levels.index(grp2)]) + y_offset * 0.5
-                    bracket_y = y_vline_bottom + (level * step_size) + y_offset * 0.3
+                                         post_means[levels.index(grp2)] + post_err[levels.index(grp2)]) + y_offset * vline_bottom_factor
+                    bracket_y = y_vline_bottom + (level * step_size) + y_offset * bracket_offset_factor
                     fig.add_shape(create_bracket_shape(x0, x1, y_vline_bottom, bracket_y))
-                    annotation_y = bracket_y + y_offset * 0.5
+                    annotation_y = bracket_y + y_offset * annotation_offset_factor
                     fig.add_annotation(create_bracket_annotation(x0, x1, annotation_y, f'p < {p_value:.2f} {significance}'))
             
-            fig.update_yaxes(range=[0, base_y_max + (max(num_levels_pre, num_levels_post) * step_size) + y_offset * 2])
+            fig.update_yaxes(range=[0, base_y_max + (max_num_levels * step_size) + y_offset * 2.5])
             fig.update_layout(font=dict(family="IPAexGothic"), barmode="group", title_text=f"{pre}・{post} の 前後まとめた結果")
             st.plotly_chart(fig, use_container_width=True)
             
