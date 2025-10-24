@@ -419,7 +419,7 @@ if input_df is not None:
                         return f"{x:.2f}"
                     else:
                         return x
-                coefficients = coefficients.map(format_numbers)
+                coefficients = coefficients.applymap(format_numbers)
                 
                 # データフレームを表示（行番号を非表示）
                 st.subheader(f"重回帰分析の結果：目的変数 {y_column}")
