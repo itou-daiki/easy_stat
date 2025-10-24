@@ -206,7 +206,16 @@ if df is not None:
                                   xaxis_title="Interaction",
                                   yaxis_title=dv)
                 st.plotly_chart(fig, use_container_width=True)
-                
+
+                # Excelダウンロードボタン
+                excel_data = common.export_plotly_to_excel(fig, filename=f"二要因分散分析_{dv}.xlsx", sheet_name="グラフ")
+                st.download_button(
+                    label="📊 グラフをExcelでダウンロード",
+                    data=excel_data,
+                    file_name=f"二要因分散分析_{dv}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
                 # ⑥ Final Table（全体結果のまとめ）の作成（ピボット形式）
                 st.subheader("【全体結果のまとめ（Final Table）】")
                 # 各セル（因子1と因子2の組み合わせ）の平均値と標準偏差を集計

@@ -10,6 +10,7 @@ japanize-matplotlib
 seaborn
 scikit-learn
 plotly
+kaleido
 factor_analyzer
 ipython
 tqdm

@@ -306,6 +306,15 @@ if df is not None:
 
                 st.plotly_chart(fig)
 
+                # Excelダウンロードボタン
+                excel_data = common.export_plotly_to_excel(fig, filename=f"t検定対応あり_{pre_column}_{post_column}.xlsx", sheet_name="グラフ")
+                st.download_button(
+                    label="📊 グラフをExcelでダウンロード",
+                    data=excel_data,
+                    file_name=f"t検定対応あり_{pre_column}_{post_column}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
                 # キャプションの追加
                 st.caption(f"【観測値】 平均値 (SD): {x.mean():.2f} ({x.std(ddof=1):.2f}), "
                            f"【測定値】 平均値 (SD): {y.mean():.2f} ({y.std(ddof=1):.2f}), "

@@ -351,7 +351,16 @@ if df is not None:
             fig.update_yaxes(range=[0, base_y_max + (max_num_levels * step_size) + y_offset * 2.5])
             fig.update_layout(font=dict(family="IPAexGothic"), barmode="group", title_text=f"{pre}・{post} の 前後まとめた結果")
             st.plotly_chart(fig, use_container_width=True)
-            
+
+            # Excelダウンロードボタン
+            excel_data = common.export_plotly_to_excel(fig, filename=f"二要因混合分散分析_{pre}_{post}.xlsx", sheet_name="グラフ")
+            st.download_button(
+                label="📊 グラフをExcelでダウンロード",
+                data=excel_data,
+                file_name=f"二要因混合分散分析_{pre}_{post}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
             # 各群の平均値 (SD) を計算（全ての時間点の値の平均を使用）
             group_summary = df_long.groupby(selected_between)["value"].agg(['mean', 'std', 'count']).reset_index()
             group_summary['se'] = group_summary['std'] / np.sqrt(group_summary['count'])

@@ -394,6 +394,15 @@ if df is not None:
 
                 st.plotly_chart(fig, use_container_width=True)
 
+                # Excelダウンロードボタン
+                excel_data = common.export_plotly_to_excel(fig, filename=f"一要因分散分析_{y_column}.xlsx", sheet_name="グラフ")
+                st.download_button(
+                    label="📊 グラフをExcelでダウンロード",
+                    data=excel_data,
+                    file_name=f"一要因分散分析_{y_column}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
                 # グラフキャプションの追加
                 caption_text = f"グループごとの平均値 (SE): "
                 caption_text += ", ".join([f"{group}: {mean:.2f} ({error:.2f})" for group, mean, error in 

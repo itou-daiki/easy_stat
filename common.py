@@ -811,3 +811,191 @@ class AIStatisticalInterpreter:
                 if st.button(f"解釈をクリア", key=f"{key_prefix}_clear"):
                     del st.session_state[interpretation_key]
                     st.rerun()
+
+# ==========================================
+# グラフExport機能
+# ==========================================
+
+def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
+    """
+    PlotlyグラフをExcelネイティブグラフとしてExcelファイルに変換する
+    
+    Parameters:
+    -----------
+    fig : plotly.graph_objects.Figure
+        変換するPlotlyグラフ
+    filename : str
+        保存するファイル名
+    sheet_name : str
+        Excelシート名
+        
+    Returns:
+    --------
+    bytes
+        Excelファイルのバイナリデータ
+    """
+    import io
+    import pandas as pd
+    from openpyxl import Workbook
+    from openpyxl.chart import BarChart, ScatterChart, LineChart, Reference
+    from openpyxl.chart.text import RichText
+    from openpyxl.drawing.text import Paragraph, ParagraphProperties, CharacterProperties, RichTextProperties
+    
+    # Excelワークブックを作成
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet_name
+    
+    # Plotlyグラフからデータを抽出
+    data_dict = {}
+    categories = []
+    
+    # グラフの種類を判定
+    graph_type = None
+    if fig.data:
+        first_trace = fig.data[0]
+        if hasattr(first_trace, 'type'):
+            graph_type = first_trace.type
+    
+    # データを抽出してワークシートに書き込む
+    if graph_type == 'bar':
+        # 棒グラフの場合
+        # X軸のカテゴリを取得
+        if hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
+            categories = list(fig.data[0].x)
+        
+        # データを収集
+        for trace in fig.data:
+            if hasattr(trace, 'name') and trace.name:
+                series_name = trace.name
+            else:
+                series_name = f"系列{len(data_dict) + 1}"
+            
+            if hasattr(trace, 'y') and trace.y is not None:
+                data_dict[series_name] = list(trace.y)
+        
+        # データをワークシートに書き込む
+        ws.cell(row=1, column=1, value="カテゴリ")
+        for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+            ws.cell(row=1, column=col_idx, value=series_name)
+        
+        for row_idx, category in enumerate(categories, start=2):
+            ws.cell(row=row_idx, column=1, value=category)
+            for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+                if row_idx - 2 < len(data_dict[series_name]):
+                    ws.cell(row=row_idx, column=col_idx, value=data_dict[series_name][row_idx - 2])
+        
+        # 棒グラフを作成
+        chart = BarChart()
+        chart.type = "col"  # 縦棒グラフ
+        chart.style = 10
+        chart.title = fig.layout.title.text if fig.layout.title and fig.layout.title.text else "グラフ"
+        chart.y_axis.title = fig.layout.yaxis.title.text if fig.layout.yaxis and fig.layout.yaxis.title else ""
+        chart.x_axis.title = fig.layout.xaxis.title.text if fig.layout.xaxis and fig.layout.xaxis.title else ""
+        
+        # データ範囲を設定
+        data_ref = Reference(ws, min_col=2, min_row=1, max_row=len(categories) + 1, max_col=len(data_dict) + 1)
+        cats_ref = Reference(ws, min_col=1, min_row=2, max_row=len(categories) + 1)
+        chart.add_data(data_ref, titles_from_data=True)
+        chart.set_categories(cats_ref)
+        
+        # グラフの配置
+        ws.add_chart(chart, "A" + str(len(categories) + 3))
+        
+    elif graph_type == 'scatter':
+        # 散布図の場合
+        for trace_idx, trace in enumerate(fig.data):
+            if hasattr(trace, 'name') and trace.name:
+                series_name = trace.name
+            else:
+                series_name = f"系列{trace_idx + 1}"
+            
+            if hasattr(trace, 'x') and trace.x is not None:
+                x_data = list(trace.x)
+            else:
+                x_data = []
+            
+            if hasattr(trace, 'y') and trace.y is not None:
+                y_data = list(trace.y)
+            else:
+                y_data = []
+            
+            # データをワークシートに書き込む
+            start_col = trace_idx * 2 + 1
+            ws.cell(row=1, column=start_col, value=f"{series_name} (X)")
+            ws.cell(row=1, column=start_col + 1, value=f"{series_name} (Y)")
+            
+            for row_idx, (x_val, y_val) in enumerate(zip(x_data, y_data), start=2):
+                ws.cell(row=row_idx, column=start_col, value=x_val)
+                ws.cell(row=row_idx, column=start_col + 1, value=y_val)
+        
+        # 散布図を作成
+        chart = ScatterChart()
+        chart.title = fig.layout.title.text if fig.layout.title and fig.layout.title.text else "グラフ"
+        chart.y_axis.title = fig.layout.yaxis.title.text if fig.layout.yaxis and fig.layout.yaxis.title else ""
+        chart.x_axis.title = fig.layout.xaxis.title.text if fig.layout.xaxis and fig.layout.xaxis.title else ""
+        
+        # 各系列を追加
+        for trace_idx in range(len(fig.data)):
+            start_col = trace_idx * 2 + 1
+            max_row = len(list(fig.data[trace_idx].y)) + 1 if hasattr(fig.data[trace_idx], 'y') else 2
+            
+            xvalues = Reference(ws, min_col=start_col, min_row=2, max_row=max_row)
+            yvalues = Reference(ws, min_col=start_col + 1, min_row=2, max_row=max_row)
+            series = chart.series.append(yvalues)
+            series.xvalues = xvalues
+            series.title = ws.cell(row=1, column=start_col + 1).value
+        
+        # グラフの配置
+        max_data_row = max([len(list(trace.y)) for trace in fig.data if hasattr(trace, 'y')]) if fig.data else 2
+        ws.add_chart(chart, "A" + str(max_data_row + 3))
+    
+    else:
+        # その他のグラフタイプ（デフォルトは折れ線グラフとして処理）
+        # X軸のカテゴリを取得
+        if fig.data and hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
+            categories = list(fig.data[0].x)
+        
+        # データを収集
+        for trace in fig.data:
+            if hasattr(trace, 'name') and trace.name:
+                series_name = trace.name
+            else:
+                series_name = f"系列{len(data_dict) + 1}"
+            
+            if hasattr(trace, 'y') and trace.y is not None:
+                data_dict[series_name] = list(trace.y)
+        
+        if data_dict:  # データがある場合のみ処理
+            # データをワークシートに書き込む
+            ws.cell(row=1, column=1, value="カテゴリ")
+            for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+                ws.cell(row=1, column=col_idx, value=series_name)
+            
+            for row_idx, category in enumerate(categories, start=2):
+                ws.cell(row=row_idx, column=1, value=category)
+                for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+                    if row_idx - 2 < len(data_dict[series_name]):
+                        ws.cell(row=row_idx, column=col_idx, value=data_dict[series_name][row_idx - 2])
+            
+            # 折れ線グラフを作成
+            chart = LineChart()
+            chart.title = fig.layout.title.text if fig.layout.title and fig.layout.title.text else "グラフ"
+            chart.y_axis.title = fig.layout.yaxis.title.text if fig.layout.yaxis and fig.layout.yaxis.title else ""
+            chart.x_axis.title = fig.layout.xaxis.title.text if fig.layout.xaxis and fig.layout.xaxis.title else ""
+            
+            # データ範囲を設定
+            data_ref = Reference(ws, min_col=2, min_row=1, max_row=len(categories) + 1, max_col=len(data_dict) + 1)
+            cats_ref = Reference(ws, min_col=1, min_row=2, max_row=len(categories) + 1)
+            chart.add_data(data_ref, titles_from_data=True)
+            chart.set_categories(cats_ref)
+            
+            # グラフの配置
+            ws.add_chart(chart, "A" + str(len(categories) + 3))
+    
+    # ExcelファイルをBytesIOに保存
+    excel_buffer = io.BytesIO()
+    wb.save(excel_buffer)
+    excel_buffer.seek(0)
+    
+    return excel_buffer.getvalue()

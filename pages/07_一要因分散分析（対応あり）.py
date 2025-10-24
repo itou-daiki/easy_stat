@@ -315,7 +315,16 @@ if df is not None:
         fig.update_yaxes(range=[0, y_max * 1.05])
         fig.update_layout(font=dict(family="IPAexGothic"))
         st.plotly_chart(fig, use_container_width=True)
-        
+
+        # Excelダウンロードボタン
+        excel_data = common.export_plotly_to_excel(fig, filename=f"一要因分散分析対応あり_{y_column}.xlsx", sheet_name="グラフ")
+        st.download_button(
+            label="📊 グラフをExcelでダウンロード",
+            data=excel_data,
+            file_name=f"一要因分散分析対応あり_{y_column}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
         caption_text = "各条件ごとの平均値 (SE): " + ", ".join(
             [f"{row['条件']}: {row['mean']:.2f} ({row['sem']:.2f})" for _, row in group_stats.iterrows()]
         )
