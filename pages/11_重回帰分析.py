@@ -574,14 +574,13 @@ if input_df is not None:
                     else:
                         label_alignment[node] = {'horizontalalignment': 'center', 'pos':(0,0)}
                 
-                # ノードラベルを個別に描画
+                # ノードラベルを個別に描画（枠線なし）
                 node_bboxes = {}  # ノードのバウンディングボックスを保存
                 for node in G.nodes():
                     x, y_pos_node = pos[node]
                     ha = label_alignment[node]['horizontalalignment']
                     offset = label_alignment[node]['pos']
                     text_obj = ax.text(x + offset[0], y_pos_node + offset[1], labels[node], fontsize=10,
-                                       bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black"),
                                        horizontalalignment=ha, verticalalignment='center')
                     renderer = fig.canvas.get_renderer()
                     bbox = text_obj.get_window_extent(renderer=renderer)
@@ -599,13 +598,13 @@ if input_df is not None:
                 edge_labels = nx.get_edge_attributes(G, 'label')
                 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10, ax=ax)
                 
-                # 統計情報のアノテーション（目的変数のラベルの左端に合わせる）
+                # 統計情報のアノテーション（目的変数のラベルの直下に配置）
                 x, y_pos_text = pos[y_column]
-                # 目的変数のバウンディングボックスから左端の座標を取得
+                # 目的変数のバウンディングボックスから下端の座標を取得
                 bbox = node_bboxes[y_column]
-                annotation_x = bbox.x0  # 左端のx座標
-                ax.text(annotation_x, y_pos_text - 0.5, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
-                        horizontalalignment='left', verticalalignment='top', fontsize=10)
+                annotation_y = bbox.y0 - 0.15  # テキストの下端から少し下に配置
+                ax.text(x + 0.05, annotation_y, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
+                        horizontalalignment='left', verticalalignment='top', fontsize=9)
                 
                 # 軸の範囲を調整
                 x_margin = 0.6  # 左右の余白を増やす
@@ -700,14 +699,13 @@ if input_df is not None:
                 else:
                     label_alignment[node] = {'horizontalalignment': 'center', 'pos':(0,0)}
             
-            # ノードラベルを個別に描画
+            # ノードラベルを個別に描画（枠線なし）
             node_bboxes = {}  # ノードのバウンディングボックスを保存
             for node in G_combined.nodes():
                 x, y_pos_node = pos[node]
                 ha = label_alignment[node]['horizontalalignment']
                 offset = label_alignment[node]['pos']
                 text_obj = ax.text(x + offset[0], y_pos_node + offset[1], labels[node], fontsize=10,
-                                   bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black"),
                                    horizontalalignment=ha, verticalalignment='center')
                 renderer = fig.canvas.get_renderer()
                 bbox = text_obj.get_window_extent(renderer=renderer)
@@ -725,7 +723,7 @@ if input_df is not None:
             edge_labels = nx.get_edge_attributes(G_combined, 'label')
             nx.draw_networkx_edge_labels(G_combined, pos, edge_labels=edge_labels, font_size=10, ax=ax)
             
-            # 統計情報のアノテーション（目的変数のラベルの左端に合わせる）
+            # 統計情報のアノテーション（目的変数のラベルの直下に配置）
             for y_column in y_columns:
                 if y_column in pos:
                     x, y_pos_text = pos[y_column]
@@ -735,11 +733,11 @@ if input_df is not None:
                     df_model = dep_stats['df_model']
                     df_resid = dep_stats['df_resid']
                     p_annotation = dep_stats['p_annotation']
-                    # 目的変数のバウンディングボックスから左端の座標を取得
+                    # 目的変数のバウンディングボックスから下端の座標を取得
                     bbox = node_bboxes[y_column]
-                    annotation_x = bbox.x0  # 左端のx座標
-                    ax.text(annotation_x, y_pos_text - 1.5, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
-                            horizontalalignment='left', verticalalignment='top', fontsize=10)
+                    annotation_y = bbox.y0 - 0.15  # テキストの下端から少し下に配置
+                    ax.text(x + 0.05, annotation_y, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
+                            horizontalalignment='left', verticalalignment='top', fontsize=9)
             
             # 軸の範囲を調整
             x_margin = 0.6  # 左右の余白を増やす
@@ -896,14 +894,13 @@ if results_key in st.session_state:
         else:
             label_alignment[node] = {'horizontalalignment': 'center', 'pos':(0,0)}
     
-    # ノードラベルを個別に描画
+    # ノードラベルを個別に描画（枠線なし）
     node_bboxes = {}  # ノードのバウンディングボックスを保存
     for node in G_combined.nodes():
         x, y_pos_node = pos[node]
         ha = label_alignment[node]['horizontalalignment']
         offset = label_alignment[node]['pos']
         text_obj = ax.text(x + offset[0], y_pos_node + offset[1], labels[node], fontsize=10,
-                           bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black"),
                            horizontalalignment=ha, verticalalignment='center')
         renderer = fig.canvas.get_renderer()
         bbox = text_obj.get_window_extent(renderer=renderer)
@@ -921,7 +918,7 @@ if results_key in st.session_state:
     edge_labels = nx.get_edge_attributes(G_combined, 'label')
     nx.draw_networkx_edge_labels(G_combined, pos, edge_labels=edge_labels, font_size=10, ax=ax)
     
-    # 統計情報のアノテーション（目的変数のラベルの左端に合わせる）
+    # 統計情報のアノテーション（目的変数のラベルの直下に配置）
     for y_column in y_columns:
         if y_column in pos:
             x, y_pos_text = pos[y_column]
@@ -931,11 +928,11 @@ if results_key in st.session_state:
             df_model = dep_stats['df_model']
             df_resid = dep_stats['df_resid']
             p_annotation = dep_stats['p_annotation']
-            # 目的変数のバウンディングボックスから左端の座標を取得
+            # 目的変数のバウンディングボックスから下端の座標を取得
             bbox = node_bboxes[y_column]
-            annotation_x = bbox.x0  # 左端のx座標
-            ax.text(annotation_x, y_pos_text - 1.5, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
-                    horizontalalignment='left', verticalalignment='top', fontsize=10)
+            annotation_y = bbox.y0 - 0.15  # テキストの下端から少し下に配置
+            ax.text(x + 0.05, annotation_y, f"R={np.sqrt(r2):.2f}\nF=({df_model},{df_resid})={f_value:.2f}\n{p_annotation}",
+                    horizontalalignment='left', verticalalignment='top', fontsize=9)
     
     # 軸の範囲を調整
     x_margin = 0.6  # 左右の余白を増やす
