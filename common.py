@@ -865,16 +865,29 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="グラフ"):
     # データを抽出してワークシートに書き込む
     if graph_type == 'bar':
         # 棒グラフの場合
-        # X軸のカテゴリを取得（ticktextがあればそれを使用、なければxの値を使用）
+        # X軸のカテゴリを取得（ticktextを優先的に使用）
         categories = []
-        if hasattr(fig.layout, 'xaxis') and hasattr(fig.layout.xaxis, 'ticktext'):
-            ticktext = fig.layout.xaxis.ticktext
-            if ticktext is not None and len(ticktext) > 0:
-                categories = list(ticktext)
 
-        # ticktextが取得できなかった場合、xの値を使用
-        if not categories and hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
-            categories = list(fig.data[0].x)
+        # まずticktextを確認
+        try:
+            if hasattr(fig.layout, 'xaxis') and fig.layout.xaxis is not None:
+                if hasattr(fig.layout.xaxis, 'ticktext') and fig.layout.xaxis.ticktext is not None:
+                    ticktext = fig.layout.xaxis.ticktext
+                    # タプルまたはリストをリストに変換
+                    if isinstance(ticktext, (list, tuple)) and len(ticktext) > 0:
+                        categories = [str(t) for t in ticktext]
+        except Exception as e:
+            pass
+
+        # ticktextが取得できなかった場合のみ、xの値を使用
+        if not categories:
+            try:
+                if hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
+                    x_data = fig.data[0].x
+                    if isinstance(x_data, (list, tuple)) and len(x_data) > 0:
+                        categories = [str(x) for x in x_data]
+            except Exception as e:
+                categories = ["カテゴリ1", "カテゴリ2"]  # フォールバック
         
         # データを収集
         for trace in fig.data:
@@ -1008,16 +1021,28 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="グラフ"):
     
     else:
         # その他のグラフタイプ（デフォルトは折れ線グラフとして処理）
-        # X軸のカテゴリを取得（ticktextがあればそれを使用）
+        # X軸のカテゴリを取得（ticktextを優先的に使用）
         categories = []
-        if hasattr(fig.layout, 'xaxis') and hasattr(fig.layout.xaxis, 'ticktext'):
-            ticktext = fig.layout.xaxis.ticktext
-            if ticktext is not None and len(ticktext) > 0:
-                categories = list(ticktext)
 
-        # ticktextが取得できなかった場合、xの値を使用
-        if not categories and fig.data and hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
-            categories = list(fig.data[0].x)
+        # まずticktextを確認
+        try:
+            if hasattr(fig.layout, 'xaxis') and fig.layout.xaxis is not None:
+                if hasattr(fig.layout.xaxis, 'ticktext') and fig.layout.xaxis.ticktext is not None:
+                    ticktext = fig.layout.xaxis.ticktext
+                    if isinstance(ticktext, (list, tuple)) and len(ticktext) > 0:
+                        categories = [str(t) for t in ticktext]
+        except Exception as e:
+            pass
+
+        # ticktextが取得できなかった場合のみ、xの値を使用
+        if not categories:
+            try:
+                if fig.data and hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
+                    x_data = fig.data[0].x
+                    if isinstance(x_data, (list, tuple)) and len(x_data) > 0:
+                        categories = [str(x) for x in x_data]
+            except Exception as e:
+                categories = []
         
         # データを収集
         for trace in fig.data:
