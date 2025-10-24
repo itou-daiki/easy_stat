@@ -317,11 +317,11 @@ if df is not None:
         st.plotly_chart(fig, use_container_width=True)
 
         # Excelダウンロードボタン
-        excel_data = common.export_plotly_to_excel(fig, filename=f"一要因分散分析対応あり_{y_column}.xlsx", sheet_name="グラフ")
+        excel_data = common.export_plotly_to_excel(fig, filename="一要因分散分析対応あり.xlsx", sheet_name="グラフ")
         st.download_button(
             label="📊 グラフをExcelでダウンロード",
             data=excel_data,
-            file_name=f"一要因分散分析対応あり_{y_column}.xlsx",
+            file_name="一要因分散分析対応あり.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 

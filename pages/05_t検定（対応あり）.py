@@ -307,11 +307,11 @@ if df is not None:
                 st.plotly_chart(fig)
 
                 # Excelダウンロードボタン
-                excel_data = common.export_plotly_to_excel(fig, filename=f"t検定対応あり_{pre_column}_{post_column}.xlsx", sheet_name="グラフ")
+                excel_data = common.export_plotly_to_excel(fig, filename=f"t検定対応あり_{pre_var}_{post_var}.xlsx", sheet_name="グラフ")
                 st.download_button(
                     label="📊 グラフをExcelでダウンロード",
                     data=excel_data,
-                    file_name=f"t検定対応あり_{pre_column}_{post_column}.xlsx",
+                    file_name=f"t検定対応あり_{pre_var}_{post_var}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
