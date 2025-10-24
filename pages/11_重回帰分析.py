@@ -18,6 +18,7 @@ from sklearn.preprocessing import StandardScaler
 
 import common
 
+st.set_page_config(page_title='重回帰分析', layout='wide')
 
 common.set_font()
 
