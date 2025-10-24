@@ -816,7 +816,7 @@ class AIStatisticalInterpreter:
 # グラフExport機能
 # ==========================================
 
-def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
+def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="グラフ"):
     """
     PlotlyグラフをExcelネイティブグラフとしてExcelファイルに変換する
     
@@ -846,6 +846,11 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
     ws = wb.active
     ws.title = sheet_name
     
+    # グラフタイトルを取得
+    graph_title = ""
+    if fig.layout.title and fig.layout.title.text:
+        graph_title = fig.layout.title.text
+    
     # Plotlyグラフからデータを抽出
     data_dict = {}
     categories = []
@@ -869,27 +874,34 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
             if hasattr(trace, 'name') and trace.name:
                 series_name = trace.name
             else:
-                series_name = f"系列{len(data_dict) + 1}"
+                series_name = "系列1"
             
             if hasattr(trace, 'y') and trace.y is not None:
                 data_dict[series_name] = list(trace.y)
         
-        # データをワークシートに書き込む
+        # データをワークシートに書き込む（グラフタイトルを1行目の3列目に配置）
         ws.cell(row=1, column=1, value="カテゴリ")
-        for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+        col_idx = 2
+        for series_name in data_dict.keys():
             ws.cell(row=1, column=col_idx, value=series_name)
+            col_idx += 1
+        # グラフタイトルを1行目の最後の列の次に配置
+        ws.cell(row=1, column=col_idx, value=graph_title)
         
         for row_idx, category in enumerate(categories, start=2):
             ws.cell(row=row_idx, column=1, value=category)
-            for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+            col_idx = 2
+            for series_name in data_dict.keys():
                 if row_idx - 2 < len(data_dict[series_name]):
                     ws.cell(row=row_idx, column=col_idx, value=data_dict[series_name][row_idx - 2])
+                col_idx += 1
         
         # 棒グラフを作成
         chart = BarChart()
         chart.type = "col"  # 縦棒グラフ
         chart.style = 10
-        chart.title = fig.layout.title.text if fig.layout.title and fig.layout.title.text else "グラフ"
+        if graph_title:
+            chart.title = graph_title
         chart.y_axis.title = fig.layout.yaxis.title.text if fig.layout.yaxis and fig.layout.yaxis.title else ""
         chart.x_axis.title = fig.layout.xaxis.title.text if fig.layout.xaxis and fig.layout.xaxis.title else ""
         
@@ -899,11 +911,19 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
         chart.add_data(data_ref, titles_from_data=True)
         chart.set_categories(cats_ref)
         
-        # グラフの配置
+        # グラフのサイズを設定
+        chart.width = 15  # 幅（cm単位）
+        chart.height = 10  # 高さ（cm単位）
+        
+        # グラフの配置（データの下に配置）
         ws.add_chart(chart, "A" + str(len(categories) + 3))
         
     elif graph_type == 'scatter':
         # 散布図の場合
+        # グラフタイトルを1行目の最初に配置
+        ws.cell(row=1, column=1, value=graph_title)
+        
+        col_offset = 0
         for trace_idx, trace in enumerate(fig.data):
             if hasattr(trace, 'name') and trace.name:
                 series_name = trace.name
@@ -921,34 +941,46 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
                 y_data = []
             
             # データをワークシートに書き込む
-            start_col = trace_idx * 2 + 1
-            ws.cell(row=1, column=start_col, value=f"{series_name} (X)")
-            ws.cell(row=1, column=start_col + 1, value=f"{series_name} (Y)")
+            start_col = col_offset + 1
+            if trace_idx == 0:
+                # 最初の系列のみヘッダー行にグラフタイトルを配置
+                ws.cell(row=2, column=start_col, value=f"{series_name} (X)")
+                ws.cell(row=2, column=start_col + 1, value=f"{series_name} (Y)")
+            else:
+                ws.cell(row=2, column=start_col, value=f"{series_name} (X)")
+                ws.cell(row=2, column=start_col + 1, value=f"{series_name} (Y)")
             
-            for row_idx, (x_val, y_val) in enumerate(zip(x_data, y_data), start=2):
+            for row_idx, (x_val, y_val) in enumerate(zip(x_data, y_data), start=3):
                 ws.cell(row=row_idx, column=start_col, value=x_val)
                 ws.cell(row=row_idx, column=start_col + 1, value=y_val)
+            
+            col_offset += 2
         
         # 散布図を作成
         chart = ScatterChart()
-        chart.title = fig.layout.title.text if fig.layout.title and fig.layout.title.text else "グラフ"
+        if graph_title:
+            chart.title = graph_title
         chart.y_axis.title = fig.layout.yaxis.title.text if fig.layout.yaxis and fig.layout.yaxis.title else ""
         chart.x_axis.title = fig.layout.xaxis.title.text if fig.layout.xaxis and fig.layout.xaxis.title else ""
         
         # 各系列を追加
         for trace_idx in range(len(fig.data)):
             start_col = trace_idx * 2 + 1
-            max_row = len(list(fig.data[trace_idx].y)) + 1 if hasattr(fig.data[trace_idx], 'y') else 2
+            max_row = len(list(fig.data[trace_idx].y)) + 2 if hasattr(fig.data[trace_idx], 'y') else 3
             
-            xvalues = Reference(ws, min_col=start_col, min_row=2, max_row=max_row)
-            yvalues = Reference(ws, min_col=start_col + 1, min_row=2, max_row=max_row)
+            xvalues = Reference(ws, min_col=start_col, min_row=3, max_row=max_row)
+            yvalues = Reference(ws, min_col=start_col + 1, min_row=3, max_row=max_row)
             series = chart.series.append(yvalues)
             series.xvalues = xvalues
-            series.title = ws.cell(row=1, column=start_col + 1).value
+            series.title = ws.cell(row=2, column=start_col + 1).value
+        
+        # グラフのサイズを設定
+        chart.width = 15
+        chart.height = 10
         
         # グラフの配置
-        max_data_row = max([len(list(trace.y)) for trace in fig.data if hasattr(trace, 'y')]) if fig.data else 2
-        ws.add_chart(chart, "A" + str(max_data_row + 3))
+        max_data_row = max([len(list(trace.y)) for trace in fig.data if hasattr(trace, 'y')]) if fig.data else 3
+        ws.add_chart(chart, "A" + str(max_data_row + 4))
     
     else:
         # その他のグラフタイプ（デフォルトは折れ線グラフとして処理）
@@ -969,18 +1001,25 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
         if data_dict:  # データがある場合のみ処理
             # データをワークシートに書き込む
             ws.cell(row=1, column=1, value="カテゴリ")
-            for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+            col_idx = 2
+            for series_name in data_dict.keys():
                 ws.cell(row=1, column=col_idx, value=series_name)
+                col_idx += 1
+            # グラフタイトルを1行目の最後の列の次に配置
+            ws.cell(row=1, column=col_idx, value=graph_title)
             
             for row_idx, category in enumerate(categories, start=2):
                 ws.cell(row=row_idx, column=1, value=category)
-                for col_idx, series_name in enumerate(data_dict.keys(), start=2):
+                col_idx = 2
+                for series_name in data_dict.keys():
                     if row_idx - 2 < len(data_dict[series_name]):
                         ws.cell(row=row_idx, column=col_idx, value=data_dict[series_name][row_idx - 2])
+                    col_idx += 1
             
             # 折れ線グラフを作成
             chart = LineChart()
-            chart.title = fig.layout.title.text if fig.layout.title and fig.layout.title.text else "グラフ"
+            if graph_title:
+                chart.title = graph_title
             chart.y_axis.title = fig.layout.yaxis.title.text if fig.layout.yaxis and fig.layout.yaxis.title else ""
             chart.x_axis.title = fig.layout.xaxis.title.text if fig.layout.xaxis and fig.layout.xaxis.title else ""
             
@@ -989,6 +1028,10 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="Graph"):
             cats_ref = Reference(ws, min_col=1, min_row=2, max_row=len(categories) + 1)
             chart.add_data(data_ref, titles_from_data=True)
             chart.set_categories(cats_ref)
+            
+            # グラフのサイズを設定
+            chart.width = 15
+            chart.height = 10
             
             # グラフの配置
             ws.add_chart(chart, "A" + str(len(categories) + 3))
