@@ -13,6 +13,9 @@ import common
 
 st.set_page_config(page_title="一要因分散分析(対応なし)", layout="wide")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title("一要因分散分析(対応なし)")
 common.display_header()
 st.write("変数の選択　→　分散分析　→　表作成　→　解釈の補助を行います")
@@ -206,6 +209,30 @@ if df is not None:
                 p_value = row['p']
                 st.write(f'{cat_var_str}によって、【{index}】には{significance}')
                 st.write(f'（ p = {p_value:.2f} ）')
+
+                # AI解釈機能を各変数ごとに追加
+                if enable_ai_interpretation and gemini_api_key:
+                    # グループの平均値を辞書形式で取得
+                    group_means = {}
+                    for group in groups:
+                        group_means[str(group)] = row[f'{group}M']
+
+                    anova_results = {
+                        'f_statistic': row['F'],
+                        'p_value': row['p'],
+                        'df_between': row['群間自由度'],
+                        'df_within': row['群内自由度'],
+                        'group_means': group_means,
+                        'eta_squared': row['η²'],
+                        'analysis_type': '一要因分散分析（対応なし）'
+                    }
+                    common.AIStatisticalInterpreter.display_ai_interpretation(
+                        api_key=gemini_api_key,
+                        enabled=enable_ai_interpretation,
+                        results=anova_results,
+                        analysis_type='anova',
+                        key_prefix=f'anova_oneway_{index}'
+                    )
 
             st.subheader('【可視化】')
 

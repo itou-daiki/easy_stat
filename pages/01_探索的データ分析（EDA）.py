@@ -14,6 +14,9 @@ common.display_header()
 st.write('簡易的な探索的データ分析（EDA）が実行できます')
 st.write('')
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 # ファイルアップローダー
 uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
 
@@ -81,6 +84,32 @@ if df is not None:
         st.plotly_chart(fig)
         fig = px.box(df, x=col, title=f'【{col}】 の可視化（箱ひげ図）')
         st.plotly_chart(fig)
+        
+        # AI解釈機能の追加（数値変数ごと）
+        if gemini_api_key and enable_ai_interpretation:
+            # 統計量を取得
+            col_stats = df[col].describe()
+            eda_results = {
+                'variable_name': col,
+                'mean': col_stats['mean'],
+                'median': df[col].median(),
+                'std': col_stats['std'],
+                'min': col_stats['min'],
+                'max': col_stats['max'],
+                'q1': col_stats['25%'],
+                'q3': col_stats['75%'],
+                'skewness': df[col].skew(),
+                'kurtosis': df[col].kurtosis()
+            }
+            
+            # AI解釈を表示
+            common.AIStatisticalInterpreter.display_ai_interpretation(
+                api_key=gemini_api_key,
+                enabled=enable_ai_interpretation,
+                results=eda_results,
+                analysis_type='eda',
+                key_prefix=f'eda_{col}'
+            )
 
     # アップロードされたデータセットに数値変数が含まれている場合
     if numerical_cols:

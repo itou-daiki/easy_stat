@@ -12,6 +12,9 @@ import common
 
 st.set_page_config(page_title="二要因分散分析(対応なし)", layout="wide")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title("二要因分散分析(対応なし)")
 common.display_header()
 st.write("2つの独立変数（因子）と1つ以上の従属変数を用いて、二要因分散分析（主効果・交互作用効果）を実施します。")
@@ -151,6 +154,38 @@ if df is not None:
                     else:
                         interpretation = "有意な差は認められない"
                     st.write(f"【{effect}】 → {interpretation}（p = {p_value:.3f}）")
+
+                # AI解釈機能を追加（各従属変数ごと）
+                if enable_ai_interpretation and gemini_api_key:
+                    # グループの平均値を辞書形式で取得
+                    group_means = {}
+                    for _, row_summary in df_summary.iterrows():
+                        group_key = f"{row_summary[factor1]}_{row_summary[factor2]}"
+                        group_means[group_key] = row_summary['平均値']
+
+                    # 主効果と交互作用のp値を取得
+                    effect_names = {
+                        "factor1": f'C(Q("{factor1}"))',
+                        "factor2": f'C(Q("{factor2}"))',
+                        "interaction": f'C(Q("{factor1}")):C(Q("{factor2}"))'
+                    }
+
+                    anova_ai_results = {
+                        'f_statistic': anova_results.loc[effect_names["interaction"], 'F'] if effect_names["interaction"] in anova_results.index else 0,
+                        'p_value': anova_results.loc[effect_names["interaction"], 'PR(>F)'] if effect_names["interaction"] in anova_results.index else 1,
+                        'df_between': 0,
+                        'df_within': anova_results.loc['Residual', 'df'] if 'Residual' in anova_results.index else 0,
+                        'group_means': group_means,
+                        'eta_squared': 0.0,
+                        'analysis_type': f'二要因分散分析（対応なし）- {dv}'
+                    }
+                    common.AIStatisticalInterpreter.display_ai_interpretation(
+                        api_key=gemini_api_key,
+                        enabled=enable_ai_interpretation,
+                        results=anova_ai_results,
+                        analysis_type='anova',
+                        key_prefix=f'anova_twoway_{dv}'
+                    )
                 
                 # ④ 多重比較：TukeyのHSDテスト
                 st.write("【多重比較（TukeyのHSDテスト）】")

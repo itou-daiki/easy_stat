@@ -9,6 +9,9 @@ import common
 
 st.set_page_config(page_title="単回帰分析", layout="wide")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title("単回帰分析")
 common.display_header()
 st.write("")
@@ -118,6 +121,32 @@ if input_df is not None:
             st.subheader(f"数理モデル: y = {slope:.2f}x + {intercept:.2f}")
             st.subheader(f"数理モデル（解釈）: {target_col} = {slope:.2f} × {feature_col} + {intercept:.2f}")
             st.subheader("")
+
+            # AI解釈機能を追加
+            if enable_ai_interpretation and gemini_api_key:
+                # 回帰係数の情報を辞書形式で取得
+                coefficients = {
+                    'const': {'coef': intercept, 'pvalue': model.pvalues['const']},
+                    feature_col: {'coef': slope, 'pvalue': model.pvalues[feature_col]}
+                }
+
+                # 調整済みR²の計算
+                adj_r_squared = model.rsquared_adj
+
+                regression_results = {
+                    'r_squared': r_squared,
+                    'adj_r_squared': adj_r_squared,
+                    'f_statistic': f_value,
+                    'f_pvalue': f_pvalue,
+                    'coefficients': coefficients
+                }
+                common.AIStatisticalInterpreter.display_ai_interpretation(
+                    api_key=gemini_api_key,
+                    enabled=enable_ai_interpretation,
+                    results=regression_results,
+                    analysis_type='regression',
+                    key_prefix='simple_regression'
+                )
 
 # フッター
 common.display_copyright()

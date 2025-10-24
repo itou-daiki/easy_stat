@@ -12,6 +12,9 @@ import common
 
 st.set_page_config(page_title='t検定(対応なし)', layout='wide')
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title('t検定(対応なし)')
 common.display_header()
 st.write('変数の選択　→　t検定　→　表作成　→　解釈の補助を行います')
@@ -220,6 +223,31 @@ if df is not None:
                     f'{cat_var_str}によって、{index}には{significance}'
                     f'（{xcat_var_d[0]}{comparison}{xcat_var_d[1]}）（p= {p_value:.2f}）'
                 )
+
+                # AI解釈機能を各変数ごとに追加
+                if enable_ai_interpretation and gemini_api_key:
+                    ttest_results = {
+                        't_statistic': row['t'],
+                        'p_value': row['p'],
+                        'dof': row['df'],
+                        'mean1': row[f'{groups[0]}M'],
+                        'mean2': row[f'{groups[1]}M'],
+                        'std1': row[f'{groups[0]}S.D'],
+                        'std2': row[f'{groups[1]}S.D'],
+                        'n1': len(df[df[cat_var[0]] == groups[0]]),
+                        'n2': len(df[df[cat_var[0]] == groups[1]]),
+                        'effect_size': row['d'],
+                        'test_type': 't検定（対応なし）',
+                        'group1_name': groups[0],
+                        'group2_name': groups[1]
+                    }
+                    common.AIStatisticalInterpreter.display_ai_interpretation(
+                        api_key=gemini_api_key,
+                        enabled=enable_ai_interpretation,
+                        results=ttest_results,
+                        analysis_type='ttest',
+                        key_prefix=f'ttest_ind_{index}'
+                    )
 
             st.subheader('【可視化】')
             

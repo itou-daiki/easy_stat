@@ -12,6 +12,9 @@ import common
 
 st.set_page_config(page_title="t検定(対応あり)", layout="wide")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title("t検定(対応あり)")
 common.display_header()
 st.write("変数の選択　→　t検定　→　表作成　→　解釈の補助を行います")
@@ -188,6 +191,11 @@ if df is not None:
                 x_mean = result_df.iloc[idx]['観測値M']
                 y_mean = result_df.iloc[idx]['測定値M']
                 p_value = result_df.iloc[idx]['p']
+                x_std = result_df.iloc[idx]['観測値S.D']
+                y_std = result_df.iloc[idx]['測定値S.D']
+                t_stat = result_df.iloc[idx]['t']
+                df_t = result_df.iloc[idx]['df']
+                d = result_df.iloc[idx]['d']
 
                 comparison = "＞" if x_mean > y_mean else "＜"
 
@@ -200,6 +208,31 @@ if df is not None:
 
                 # 解釈を表示
                 st.write(f'● {interpretation}（p= {p_value:.2f}）')
+
+                # AI解釈機能を各変数ペアごとに追加
+                if enable_ai_interpretation and gemini_api_key:
+                    ttest_results = {
+                        't_statistic': t_stat,
+                        'p_value': p_value,
+                        'dof': df_t,
+                        'mean1': x_mean,
+                        'mean2': y_mean,
+                        'std1': x_std,
+                        'std2': y_std,
+                        'n1': len(df),
+                        'n2': len(df),
+                        'effect_size': d,
+                        'test_type': 't検定（対応あり）',
+                        'group1_name': pre_vars[idx],
+                        'group2_name': post_vars[idx]
+                    }
+                    common.AIStatisticalInterpreter.display_ai_interpretation(
+                        api_key=gemini_api_key,
+                        enabled=enable_ai_interpretation,
+                        results=ttest_results,
+                        analysis_type='ttest',
+                        key_prefix=f'ttest_rel_{idx}'
+                    )
 
             st.subheader('【可視化】')
 

@@ -13,6 +13,9 @@ common.set_font()
 
 # ページ設定
 st.set_page_config(page_title="主成分分析", layout="wide")
+
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
 st.title("主成分分析")
 common.display_header()
 st.write("")
@@ -138,6 +141,29 @@ if df is not None:
                 ax.set_title("バイプロット")
                 st.pyplot(fig)
             
+            # --- AI解釈機能 ---
+            if enable_ai_interpretation and gemini_api_key:
+                try:
+                    # 寄与率をパーセント表記に変換
+                    variance_explained = (pca.explained_variance_ratio_ * 100).tolist()
+                    cumulative_variance = [sum(variance_explained[:i+1]) for i in range(n_components)]
+                    
+                    pca_results = {
+                        'n_components': n_components,
+                        'variance_explained': variance_explained,
+                        'cumulative_variance': cumulative_variance
+                    }
+                    
+                    common.AIStatisticalInterpreter.display_ai_interpretation(
+                        api_key=gemini_api_key,
+                        enabled=enable_ai_interpretation,
+                        results=pca_results,
+                        analysis_type='pca',
+                        key_prefix='pca'
+                    )
+                except Exception as e:
+                    st.warning(f"AI解釈の生成中にエラーが発生しました: {str(e)}")
+
             # --- Excelファイルへのダウンロード ---
             def convert_df_to_excel(df):
                 output = io.BytesIO()

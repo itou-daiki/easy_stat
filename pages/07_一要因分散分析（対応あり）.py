@@ -16,6 +16,9 @@ import common
 
 st.set_page_config(page_title="一要因分散分析（対応あり）", layout="wide")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title("一要因分散分析（対応あり）")
 common.display_header()
 st.write("各時点（例：前・中・後）の変容について検定を行います。")
@@ -334,6 +337,10 @@ if df is not None:
         st.subheader("【解釈の補助】")
         try:
             p_value_overall = res.anova_table['Pr > F'][0]
+            f_value_overall = res.anova_table['F Value'][0]
+            df_num = res.anova_table['Num DF'][0]
+            df_den = res.anova_table['Den DF'][0]
+
             if p_value_overall < 0.01:
                 significance_overall = "有意な差が生まれる"
                 sign_overall = '**'
@@ -347,6 +354,31 @@ if df is not None:
                 significance_overall = "有意な差が生まれない"
                 sign_overall = 'n.s.'
             st.write(f"各条件間で、全体として {significance_overall} （ p = {p_value_overall:.3f} {sign_overall} ）")
+
+            # AI解釈機能を追加
+            if enable_ai_interpretation and gemini_api_key:
+                # 各条件の平均値を辞書形式で取得
+                group_means = {}
+                for cond in df_long['条件'].unique():
+                    cond_mean = df_long[df_long['条件'] == cond]['測定値'].mean()
+                    group_means[str(cond)] = cond_mean
+
+                anova_results = {
+                    'f_statistic': f_value_overall,
+                    'p_value': p_value_overall,
+                    'df_between': df_num,
+                    'df_within': df_den,
+                    'group_means': group_means,
+                    'eta_squared': 0.0,  # 一要因対応ありの場合は効果量が別途計算される
+                    'analysis_type': '一要因分散分析（対応あり）'
+                }
+                common.AIStatisticalInterpreter.display_ai_interpretation(
+                    api_key=gemini_api_key,
+                    enabled=enable_ai_interpretation,
+                    results=anova_results,
+                    analysis_type='anova',
+                    key_prefix='anova_rm_overall'
+                )
         except Exception as e:
             st.error(f"解釈の補助の実行中にエラーが発生しました: {e}")
         

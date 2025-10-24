@@ -16,6 +16,9 @@ import common
 
 
 st.set_page_config(page_title="因子分析", layout="wide")
+
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
 st.title("因子分析")
 common.display_header()
 st.write("データから因子構造を抽出し、因子負荷量、適合度指標、信頼性係数、そして因子平均を算出・ダウンロードできます。")
@@ -302,6 +305,32 @@ if df is not None:
                     else:
                         st.write(f"Factor{i+1}に十分な項目がありません（α係数を計算するには最低2項目必要です）。")
                 
+                # --- AI解釈機能 ---
+                if enable_ai_interpretation and gemini_api_key:
+                    try:
+                        # 固有値から寄与率を計算
+                        ev, _ = fa.get_eigenvalues()
+                        total_variance = np.sum(ev)
+                        variance_explained = [(ev[i] / total_variance * 100) for i in range(n_factors)]
+                        cumulative_variance = [sum(variance_explained[:i+1]) for i in range(n_factors)]
+                        
+                        factor_results = {
+                            'n_factors': n_factors,
+                            'variance_explained': variance_explained,
+                            'cumulative_variance': cumulative_variance,
+                            'loadings': loadings.to_dict()
+                        }
+                        
+                        common.AIStatisticalInterpreter.display_ai_interpretation(
+                            api_key=gemini_api_key,
+                            enabled=enable_ai_interpretation,
+                            results=factor_results,
+                            analysis_type='factor_analysis',
+                            key_prefix='factor_analysis'
+                        )
+                    except Exception as e:
+                        st.warning(f"AI解釈の生成中にエラーが発生しました: {str(e)}")
+
                 # --- 因子平均の計算とExcelファイルへの出力 ---
                 st.subheader("因子平均の計算とExcelファイルのダウンロード")
                 try:

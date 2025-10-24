@@ -51,6 +51,9 @@ if font_path is None:
 
 st.set_page_config(page_title="テキストマイニング", layout="wide")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title("テキストマイニング")
 common.display_header()
 st.write(
@@ -195,6 +198,30 @@ if df is not None and not df.empty:
                 title='出現度数トップ20'
             )
             st.plotly_chart(fig_bar)
+
+        # --- AI解釈機能 ---
+        if enable_ai_interpretation and gemini_api_key:
+            try:
+                # top_wordsをリスト形式で取得
+                top_words = [(row["単語"], row["度数"]) for _, row in df_freq.head(30).iterrows()]
+                n_documents = len(df)
+                n_unique_words = len(freq)
+                
+                text_results = {
+                    'top_words': top_words,
+                    'n_documents': n_documents,
+                    'n_unique_words': n_unique_words
+                }
+                
+                common.AIStatisticalInterpreter.display_ai_interpretation(
+                    api_key=gemini_api_key,
+                    enabled=enable_ai_interpretation,
+                    results=text_results,
+                    analysis_type='text_mining',
+                    key_prefix='text_mining'
+                )
+            except Exception as e:
+                st.warning(f"AI解釈の生成中にエラーが発生しました: {str(e)}")
 
         # カテゴリ별分析と描画
         for cat, grp in df.groupby(selected_category):

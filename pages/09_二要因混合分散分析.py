@@ -11,6 +11,9 @@ import common
 
 st.set_page_config(page_title="二要因混合分散分析", layout="wide")
 
+# AI解釈機能の設定
+gemini_api_key, enable_ai_interpretation = common.AIStatisticalInterpreter.setup_ai_sidebar()
+
 st.title("二要因混合分散分析")
 common.display_header()
 st.write("被験者内因子（前測・後測）と、被験者間因子（１つのみ）を用いた混合ANOVAを実行します。")
@@ -213,6 +216,37 @@ if df is not None:
                 p_val = row["p-adj"]
                 interp_text, sig = interpret_p(p_val)
                 st.write(f"【{group1} vs {group2}】 → {interp_text} (p = {p_val:.3f} {sig})")
+
+            # AI解釈機能を追加（各変数ペアごと）
+            if enable_ai_interpretation and gemini_api_key:
+                # グループの平均値を辞書形式で取得
+                group_means = {}
+                for _, row_desc in desc.iterrows():
+                    group_key = f"{row_desc[selected_between]}_{row_desc['Time']}"
+                    group_means[group_key] = row_desc['mean']
+
+                # ANOVA結果から主効果と交互作用のp値を取得
+                p_between = aov.loc[aov["Source"]=="Between", "p-unc"].values[0] if not aov[aov["Source"]=="Between"].empty else 1
+                p_time = aov.loc[aov["Source"]=="Time", "p-unc"].values[0] if not aov[aov["Source"]=="Time"].empty else 1
+                p_interaction = aov.loc[aov["Source"]=="Interaction", "p-unc"].values[0] if not aov[aov["Source"]=="Interaction"].empty else 1
+                f_interaction = aov.loc[aov["Source"]=="Interaction", "F"].values[0] if not aov[aov["Source"]=="Interaction"].empty else 0
+
+                anova_ai_results = {
+                    'f_statistic': f_interaction,
+                    'p_value': p_interaction,
+                    'df_between': 0,
+                    'df_within': 0,
+                    'group_means': group_means,
+                    'eta_squared': 0.0,
+                    'analysis_type': f'二要因混合分散分析 - {pre}→{post}'
+                }
+                common.AIStatisticalInterpreter.display_ai_interpretation(
+                    api_key=gemini_api_key,
+                    enabled=enable_ai_interpretation,
+                    results=anova_ai_results,
+                    analysis_type='anova',
+                    key_prefix=f'anova_mixed_{i}'
+                )
             
             st.subheader("【可視化】")
             # 前測・後測をまとめたグラフ

@@ -763,6 +763,253 @@ class AIStatisticalInterpreter:
         return prompt
 
     @staticmethod
+    def create_regression_interpretation_prompt(regression_results: Dict[str, Any]) -> str:
+        """回帰分析の解釈プロンプト"""
+        r_squared = regression_results.get('r_squared', 0)
+        adj_r_squared = regression_results.get('adj_r_squared', 0)
+        f_stat = regression_results.get('f_statistic', 0)
+        f_pvalue = regression_results.get('f_pvalue', 1)
+        coefficients = regression_results.get('coefficients', {})
+        
+        coef_str = "\n".join([f"- {var}: 係数={coef['coef']:.4f}, p値={coef['pvalue']:.4f}" 
+                             for var, coef in coefficients.items()])
+        
+        prompt = f"""
+あなたは統計分析の専門家です。以下の回帰分析の結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 決定係数 (R²): {r_squared:.4f}
+- 調整済みR²: {adj_r_squared:.4f}
+- F統計量: {f_stat:.4f}
+- F検定p値: {f_pvalue:.4f}
+
+【回帰係数】
+{coef_str}
+
+【解釈・考察してほしい内容】
+1. モデル全体の適合度
+   - R²と調整済みR²の解釈
+   - モデルの説明力の評価
+
+2. モデルの統計的有意性
+   - F検定の結果
+   - モデル全体の有効性
+
+3. 各説明変数の影響
+   - 有意な変数の特定
+   - 係数の大きさと方向性の解釈
+   - 各変数の実際的な影響度
+
+4. 実用的な示唆
+   - ビジネス・研究での活用
+   - 予測や意思決定への応用
+
+5. 注意点と限界
+   - 多重共線性の可能性
+   - モデルの前提条件
+   - 改善の余地
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def create_factor_analysis_interpretation_prompt(factor_results: Dict[str, Any]) -> str:
+        """因子分析の解釈プロンプト"""
+        n_factors = factor_results.get('n_factors', 0)
+        variance_explained = factor_results.get('variance_explained', [])
+        cumulative_variance = factor_results.get('cumulative_variance', [])
+        loadings = factor_results.get('loadings', {})
+        
+        variance_str = "\n".join([f"- 因子{i+1}: {var:.2f}%" 
+                                 for i, var in enumerate(variance_explained)])
+        
+        prompt = f"""
+あなたは統計分析の専門家です。以下の因子分析の結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 抽出因子数: {n_factors}
+- 累積寄与率: {cumulative_variance[-1] if cumulative_variance else 0:.2f}%
+
+【各因子の寄与率】
+{variance_str}
+
+【解釈・考察してほしい内容】
+1. 因子数の妥当性
+   - 抽出された因子数の適切性
+   - 累積寄与率の評価
+
+2. 各因子の特徴
+   - 因子負荷量のパターン
+   - 各因子が表す潜在的な概念
+
+3. 因子の解釈可能性
+   - 因子の命名提案
+   - ビジネス・研究での意味
+
+4. データの構造理解
+   - 変数間の潜在的関係
+   - データの次元削減効果
+
+5. 実用的な活用方法
+   - 因子得点の利用
+   - 後続分析への応用
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def create_pca_interpretation_prompt(pca_results: Dict[str, Any]) -> str:
+        """主成分分析の解釈プロンプト"""
+        n_components = pca_results.get('n_components', 0)
+        variance_explained = pca_results.get('variance_explained', [])
+        cumulative_variance = pca_results.get('cumulative_variance', [])
+        
+        variance_str = "\n".join([f"- 第{i+1}主成分: {var:.2f}%" 
+                                 for i, var in enumerate(variance_explained)])
+        
+        prompt = f"""
+あなたは統計分析の専門家です。以下の主成分分析の結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 主成分数: {n_components}
+- 累積寄与率: {cumulative_variance[-1] if cumulative_variance else 0:.2f}%
+
+【各主成分の寄与率】
+{variance_str}
+
+【解釈・考察してほしい内容】
+1. 主成分数の妥当性
+   - 選択された主成分数の適切性
+   - 累積寄与率の評価
+   - 情報損失の程度
+
+2. 各主成分の特徴
+   - 寄与率の分布パターン
+   - 主要な主成分の意味
+
+3. 次元削減の効果
+   - データの圧縮度合い
+   - 元の情報の保持状況
+
+4. データの構造理解
+   - 変数間の関係性
+   - データの特徴抽出
+
+5. 実用的な活用方法
+   - 可視化への応用
+   - 機械学習の前処理
+   - ノイズ除去効果
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def create_eda_interpretation_prompt(eda_results: Dict[str, Any]) -> str:
+        """探索的データ分析の解釈プロンプト"""
+        variable_name = eda_results.get('variable_name', '変数')
+        mean = eda_results.get('mean', 0)
+        median = eda_results.get('median', 0)
+        std = eda_results.get('std', 0)
+        min_val = eda_results.get('min', 0)
+        max_val = eda_results.get('max', 0)
+        q1 = eda_results.get('q1', 0)
+        q3 = eda_results.get('q3', 0)
+        skewness = eda_results.get('skewness', 0)
+        kurtosis = eda_results.get('kurtosis', 0)
+        
+        prompt = f"""
+あなたは統計分析の専門家です。以下の探索的データ分析（EDA）の結果を詳細に解釈・考察してください。
+
+【分析対象】
+- 変数名: {variable_name}
+
+【記述統計量】
+- 平均値: {mean:.4f}
+- 中央値: {median:.4f}
+- 標準偏差: {std:.4f}
+- 最小値: {min_val:.4f}
+- 最大値: {max_val:.4f}
+- 第1四分位数: {q1:.4f}
+- 第3四分位数: {q3:.4f}
+- 歪度: {skewness:.4f}
+- 尖度: {kurtosis:.4f}
+
+【解釈・考察してほしい内容】
+1. データの中心傾向
+   - 平均値と中央値の関係
+   - 代表値として適切な指標
+
+2. データのばらつき
+   - 標準偏差の解釈
+   - データの散らばり具合
+
+3. データの分布形状
+   - 歪度からわかる偏り
+   - 尖度からわかる裾の重さ
+   - 正規性の評価
+
+4. 外れ値の可能性
+   - 最小値・最大値の妥当性
+   - 異常値の存在可能性
+
+5. データの特徴まとめ
+   - 全体的な傾向
+   - 注意すべきポイント
+   - 後続分析への示唆
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
+    def create_text_mining_interpretation_prompt(text_results: Dict[str, Any]) -> str:
+        """テキストマイニングの解釈プロンプト"""
+        top_words = text_results.get('top_words', [])
+        n_documents = text_results.get('n_documents', 0)
+        n_unique_words = text_results.get('n_unique_words', 0)
+        
+        words_str = "\n".join([f"- {word}: {count}回" 
+                              for word, count in top_words[:20]])
+        
+        prompt = f"""
+あなたはテキスト分析の専門家です。以下のテキストマイニングの結果を詳細に解釈・考察してください。
+
+【分析結果】
+- 文書数: {n_documents}
+- ユニーク単語数: {n_unique_words}
+
+【頻出単語トップ20】
+{words_str}
+
+【解釈・考察してほしい内容】
+1. 全体的なテーマ
+   - 頻出単語から読み取れる主要テーマ
+   - 文書全体のトピック
+
+2. 単語の出現パターン
+   - 特に目立つキーワード
+   - 単語間の関連性の推測
+
+3. 内容の特徴
+   - ポジティブ/ネガティブな傾向
+   - 専門性や抽象度
+
+4. ビジネス・研究への示唆
+   - テキストから得られる洞察
+   - 実務的な活用方法
+
+5. 追加分析の提案
+   - 深掘りすべきポイント
+   - 有効な分析手法
+
+統計の専門知識がない人にも分かりやすく、実践的な解釈を日本語で提供してください。
+"""
+        return prompt
+
+    @staticmethod
     def display_ai_interpretation(
         api_key: str,
         enabled: bool,
@@ -790,6 +1037,16 @@ class AIStatisticalInterpreter:
                     prompt = AIStatisticalInterpreter.create_ttest_interpretation_prompt(results)
                 elif analysis_type == 'anova':
                     prompt = AIStatisticalInterpreter.create_anova_interpretation_prompt(results)
+                elif analysis_type == 'regression':
+                    prompt = AIStatisticalInterpreter.create_regression_interpretation_prompt(results)
+                elif analysis_type == 'factor_analysis':
+                    prompt = AIStatisticalInterpreter.create_factor_analysis_interpretation_prompt(results)
+                elif analysis_type == 'pca':
+                    prompt = AIStatisticalInterpreter.create_pca_interpretation_prompt(results)
+                elif analysis_type == 'eda':
+                    prompt = AIStatisticalInterpreter.create_eda_interpretation_prompt(results)
+                elif analysis_type == 'text_mining':
+                    prompt = AIStatisticalInterpreter.create_text_mining_interpretation_prompt(results)
                 else:
                     st.error("未対応の分析タイプです。")
                     return
