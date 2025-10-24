@@ -211,7 +211,7 @@ if df is not None:
                 excel_data = common.export_plotly_to_excel(fig, filename=f"二要因分散分析_{dv}.xlsx", sheet_name="グラフ")
                 import base64
                 b64 = base64.b64encode(excel_data).decode()
-                href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="二要因分散分析_{dv}.xlsx">📊 グラフをExcelでダウンロード</a>'
+                href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="二要因分散分析_{dv}.xlsx" style="text-decoration: none; color: #1f77b4;">📊 グラフをExcelでダウンロード</a>'
                 st.markdown(href, unsafe_allow_html=True)
 
                 # ⑥ Final Table（全体結果のまとめ）の作成（ピボット形式）

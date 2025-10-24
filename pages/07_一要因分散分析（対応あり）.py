@@ -320,7 +320,7 @@ if df is not None:
         excel_data = common.export_plotly_to_excel(fig, filename="一要因分散分析対応あり.xlsx", sheet_name="グラフ")
         import base64
         b64 = base64.b64encode(excel_data).decode()
-        href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="一要因分散分析対応あり.xlsx">📊 グラフをExcelでダウンロード</a>'
+        href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="一要因分散分析対応あり.xlsx" style="text-decoration: none; color: #1f77b4;">📊 グラフをExcelでダウンロード</a>'
         st.markdown(href, unsafe_allow_html=True)
 
         caption_text = "各条件ごとの平均値 (SE): " + ", ".join(

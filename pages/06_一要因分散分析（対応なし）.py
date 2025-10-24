@@ -398,7 +398,7 @@ if df is not None:
                 excel_data = common.export_plotly_to_excel(fig, filename=f"一要因分散分析_{num_var}.xlsx", sheet_name="グラフ")
                 import base64
                 b64 = base64.b64encode(excel_data).decode()
-                href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="一要因分散分析_{num_var}.xlsx">📊 グラフをExcelでダウンロード</a>'
+                href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="一要因分散分析_{num_var}.xlsx" style="text-decoration: none; color: #1f77b4;">📊 グラフをExcelでダウンロード</a>'
                 st.markdown(href, unsafe_allow_html=True)
 
                 # グラフキャプションの追加

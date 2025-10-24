@@ -356,7 +356,7 @@ if df is not None:
             excel_data = common.export_plotly_to_excel(fig, filename=f"二要因混合分散分析_{pre}_{post}.xlsx", sheet_name="グラフ")
             import base64
             b64 = base64.b64encode(excel_data).decode()
-            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="二要因混合分散分析_{pre}_{post}.xlsx">📊 グラフをExcelでダウンロード</a>'
+            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="二要因混合分散分析_{pre}_{post}.xlsx" style="text-decoration: none; color: #1f77b4;">📊 グラフをExcelでダウンロード</a>'
             st.markdown(href, unsafe_allow_html=True)
 
             # 各群の平均値 (SD) を計算（全ての時間点の値の平均を使用）
