@@ -274,26 +274,54 @@ if input_df is not None:
     X_columns = st.multiselect("説明変数を選択してください", numerical_cols, key='X_columns')
     st.subheader("目的変数の選択")
     y_columns = st.multiselect("目的変数を選択してください", [col for col in numerical_cols if col not in X_columns], key='y_columns')
-    
+
+    # 交互作用項の選択（オプション）
+    st.subheader("交互作用項の選択（オプション）")
+    include_interactions = st.checkbox("交互作用項を含める", value=False)
+    selected_interactions = []
+    if include_interactions and len(X_columns) >= 2:
+        st.write("分析に含める交互作用項を選択してください:")
+        # 2変数の組み合わせのみを提供
+        possible_interactions = []
+        for i in range(len(X_columns)):
+            for j in range(i+1, len(X_columns)):
+                interaction_name = f"{X_columns[i]} × {X_columns[j]}"
+                possible_interactions.append((X_columns[i], X_columns[j], interaction_name))
+
+        if possible_interactions:
+            selected_interaction_names = st.multiselect(
+                "交互作用項を選択（2変数の積のみ）:",
+                [name for _, _, name in possible_interactions],
+                key='interactions'
+            )
+            selected_interactions = [
+                (var1, var2, name) for var1, var2, name in possible_interactions
+                if name in selected_interaction_names
+            ]
+
     st.subheader("【分析前の確認】")
     st.write(f"{X_columns}から{y_columns}の値を予測します。")
+    if selected_interactions:
+        st.write(f"交互作用項: {[name for _, _, name in selected_interactions]}")
        
     # 重回帰分析の実施
     if st.button('重回帰分析の実行'):
-    
+
         if len(X_columns) > 0 and len(y_columns) > 0:
             # 結果をセッション状態に保存するためのキー
             results_key = "regression_results"
-            X = input_df[X_columns].copy()
-            
-            # 交互作用項の生成（総当たり）
+
+            # 元の説明変数のコピー
+            X_original = input_df[X_columns].copy()
+
+            # 交互作用項の生成（ユーザーが選択したもののみ）
+            X = X_original.copy()
             interaction_terms = []
-            for i in range(2, len(X_columns) + 1):
-                for combination in itertools.combinations(X_columns, i):
-                    term = " × ".join(combination)
-                    X[term] = X[list(combination)].prod(axis=1)
-                    interaction_terms.append(term)
-            
+            if selected_interactions:
+                for var1, var2, interaction_name in selected_interactions:
+                    X[interaction_name] = X_original[var1] * X_original[var2]
+                    interaction_terms.append(interaction_name)
+
             # すべての説明変数（交互作用項を含む）
             X_all_columns = X.columns.tolist()
             
@@ -306,35 +334,61 @@ if input_df is not None:
             
             # AI解釈用の全結果を保存する辞書を初期化
             all_analysis_results = {}
-            
+
+            # 個別結果を保存するリストを初期化
+            individual_results = []
+
             for y_column in y_columns:
                 y = input_df[y_column]
 
+                # 欠損値を含む行を削除（説明変数と目的変数の両方を考慮）
+                data_for_analysis = pd.concat([X, y], axis=1).dropna()
+                X_clean = data_for_analysis[X.columns]
+                y_clean = data_for_analysis[y_column]
+
+                if len(X_clean) == 0:
+                    st.error(f"目的変数 {y_column} の分析でデータが不足しています。欠損値を確認してください。")
+                    continue
+
                 # 元のデータで回帰分析（偏回帰係数用）
-                X_with_const = sm.add_constant(X)
-                model = sm.OLS(y, X_with_const).fit()
+                X_with_const = sm.add_constant(X_clean)
+                model = sm.OLS(y_clean, X_with_const).fit()
 
                 # 偏回帰係数の取得
                 unstandardized_coefs = model.params.values
 
-                # 標準化されたデータで回帰分析（標準化係数用）
-                # SPSS/HADと同じ方法：各変数を標準化してから回帰分析
-                # 説明変数と目的変数を標準化
+                # 標準化係数の計算（元の変数のみ）
+                # 方法: β_standardized = β × (SD_X / SD_Y)
+                # ただし、元の変数のみを標準化して回帰分析を行う
+                X_original_clean = X_clean[X_columns]
+
                 scaler_X = StandardScaler()
                 scaler_y = StandardScaler()
 
-                X_standardized = scaler_X.fit_transform(X)
-                y_standardized = scaler_y.fit_transform(y.values.reshape(-1, 1)).flatten()
+                X_original_standardized = scaler_X.fit_transform(X_original_clean)
+                y_standardized = scaler_y.fit_transform(y_clean.values.reshape(-1, 1)).flatten()
 
-                # 標準化されたデータで回帰分析（定数項なし）
-                model_standardized = sm.OLS(y_standardized, X_standardized).fit()
-                standardized_coefs = model_standardized.params
+                # 標準化されたデータで回帰分析（定数項なし、元の変数のみ）
+                model_standardized = sm.OLS(y_standardized, X_original_standardized).fit()
+                standardized_coefs_original = model_standardized.params
+
+                # 交互作用項の標準化係数を計算（β × SD_X / SD_Y の方法）
+                standardized_coefs_list = list(standardized_coefs_original)
+                if interaction_terms:
+                    sd_y = y_clean.std()
+                    for interaction_name in interaction_terms:
+                        sd_x_interaction = X_clean[interaction_name].std()
+                        # 対応する偏回帰係数のインデックスを取得
+                        var_idx = list(X.columns).index(interaction_name)
+                        beta_unstd = model.params[var_idx + 1]  # +1 は定数項の分
+                        beta_std = beta_unstd * (sd_x_interaction / sd_y)
+                        standardized_coefs_list.append(beta_std)
 
                 # 偏回帰係数と標準化係数をデータフレームにまとめる
                 coefficients = pd.DataFrame({
                     "変数": X_with_const.columns,
                     "偏回帰係数": unstandardized_coefs,
-                    "標準化係数": np.insert(standardized_coefs, 0, np.nan)  # 定数項にnanを挿入
+                    "標準化係数": np.insert(standardized_coefs_list, 0, np.nan)  # 定数項にnanを挿入
                 })
 
                 coefficients['p値'] = model.pvalues.values
@@ -365,7 +419,7 @@ if input_df is not None:
                         return f"{x:.2f}"
                     else:
                         return x
-                coefficients = coefficients.applymap(format_numbers)
+                coefficients = coefficients.map(format_numbers)
                 
                 # データフレームを表示（行番号を非表示）
                 st.subheader(f"重回帰分析の結果：目的変数 {y_column}")
@@ -450,7 +504,16 @@ if input_df is not None:
                     'summary': summary_df.copy(),
                     'equation': equation
                 }
-                
+
+                # 個別結果を保存（セッション状態表示用）
+                # フォーマット適用前のコピーを保存
+                individual_results.append({
+                    'y_column': y_column,
+                    'coefficients': coefficients.copy(),
+                    'summary_df': summary_df.copy(),
+                    'equation': equation
+                })
+
                 # パス図の作成
                 G = nx.DiGraph()
                 
@@ -567,14 +630,18 @@ if input_df is not None:
             }
             
             # 分析手法情報を作成
+            interaction_info = 'なし'
+            if selected_interactions:
+                interaction_info = f"ユーザー選択: {[name for _, _, name in selected_interactions]}"
+
             method_info = {
-                'method_name': '重回帰分析（交互作用項含む）',
+                'method_name': '重回帰分析',
                 'n_features': len(X_columns),
                 'n_observations': len(input_df),
-                'interaction_terms': 'すべての組み合わせを自動生成',
+                'interaction_terms': interaction_info,
                 'missing_handling': 'リストワイズ削除'
             }
-            
+
             # 結果をセッション状態に保存
             st.session_state[results_key] = {
                 'X_columns': X_columns,
@@ -583,84 +650,11 @@ if input_df is not None:
                 'all_edges': all_edges,
                 'dependent_var_stats': dependent_var_stats,
                 'all_analysis_results': all_analysis_results,
-                'individual_results': [],  # 個別結果を保存するリスト
+                'individual_results': individual_results,
                 'input_data_info': input_data_info,
                 'method_info': method_info
             }
-            
-            # 個別結果を再度生成してセッション状態に保存
-            for y_column in y_columns:
-                y = input_df[y_column]
-                X_with_const = sm.add_constant(X)
-                model = sm.OLS(y, X_with_const).fit()
 
-                # 統計結果を再計算
-                unstandardized_coefs = model.params.values
-
-                # 標準化されたデータで回帰分析（標準化係数用）
-                scaler_X = StandardScaler()
-                scaler_y = StandardScaler()
-                X_standardized = scaler_X.fit_transform(X)
-                y_standardized = scaler_y.fit_transform(y.values.reshape(-1, 1)).flatten()
-                model_standardized = sm.OLS(y_standardized, X_standardized).fit()
-                standardized_coefs = model_standardized.params
-
-                coefficients = pd.DataFrame({
-                    "変数": X_with_const.columns,
-                    "偏回帰係数": unstandardized_coefs,
-                    "標準化係数": np.insert(standardized_coefs, 0, np.nan)
-                })
-
-                coefficients['p値'] = model.pvalues.values
-                
-                def significance(p):
-                    if p < 0.01:
-                        return '**'
-                    elif p < 0.05:
-                        return '*'
-                    elif p < 0.1:
-                        return '†'
-                    else:
-                        return 'n.s.'
-                coefficients['Sign'] = coefficients['p値'].apply(significance)
-                
-                coefficients = coefficients[coefficients['変数'] != 'const']
-                coefficients = coefficients.reset_index(drop=True)
-                
-                def format_numbers(x):
-                    if pd.isnull(x):
-                        return ''
-                    elif isinstance(x, float):
-                        return f"{x:.2f}"
-                    else:
-                        return x
-                coefficients = coefficients.applymap(format_numbers)
-                
-                r2 = model.rsquared
-                f_value = model.fvalue
-                df_model = int(model.df_model)
-                df_resid = int(model.df_resid)
-                p_value = model.f_pvalue
-                
-                summary_df = pd.DataFrame({
-                    '指標': ['決定係数', 'F値', '自由度', 'p値'],
-                    '値': [f"{r2:.2f}", f"{f_value:.2f}", f"({df_model}, {df_resid})", f"{p_value:.2f}"]
-                })
-                summary_df = summary_df.reset_index(drop=True)
-                
-                intercept = model.params[0]
-                coefs = model.params[1:]
-                equation_terms = [f"{coef:.2f} × {var}" for coef, var in zip(coefs, X_with_const.columns[1:])]
-                equation = f"{y_column} = {intercept:.2f} + " + " + ".join(equation_terms)
-                
-                # 個別結果を保存
-                st.session_state[results_key]['individual_results'].append({
-                    'y_column': y_column,
-                    'coefficients': coefficients,
-                    'summary_df': summary_df,
-                    'equation': equation
-                })
-            
             # まとめたパス図の作成
             st.subheader("結合されたパス図")
             G_combined = nx.DiGraph()
