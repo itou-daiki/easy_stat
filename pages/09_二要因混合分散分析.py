@@ -94,8 +94,8 @@ def assign_levels(comparisons, category_positions):
         right = max(pos1, pos2)
         sorted_comparisons.append((left, right, comp))
     
-    # 幅の広い順にソート（広いものを下のレベルに配置）
-    sorted_comparisons.sort(key=lambda x: x[1] - x[0], reverse=True)
+    # 幅の狭い順にソート（狭いものを下のレベルに配置）
+    sorted_comparisons.sort(key=lambda x: x[1] - x[0], reverse=False)
     
     # レベルを割り当て
     levels = []
