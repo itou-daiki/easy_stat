@@ -25,7 +25,7 @@ except Exception as e:
     st.warning("画像ファイルが見つかりません。")
 
 # ファイルアップローダー
-uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel または CSV)', type=['xlsx', 'csv'])
+uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
 use_demo_data = st.checkbox('デモデータを使用')
 
 # データの読み込み

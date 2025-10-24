@@ -15,7 +15,7 @@ st.write('簡易的な探索的データ分析（EDA）が実行できます')
 st.write('')
 
 # ファイルアップローダー
-uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel or CSV)', type=['xlsx', 'csv'])
+uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
 
 # デモデータを使うかどうかのチェックボックス
 use_demo_data = st.checkbox('デモデータを使用')

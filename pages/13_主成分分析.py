@@ -21,7 +21,7 @@ st.write("iPad等でも分析を行うことができます")
 st.write("")
 
 # --- ファイルアップロード・デモデータの読み込み ---
-uploaded_file = st.file_uploader("ExcelまたはCSVファイルをアップロードしてください", type=["xlsx", "csv"])
+uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
 use_demo_data = st.checkbox("デモデータを使用")
 
 @st.cache_data

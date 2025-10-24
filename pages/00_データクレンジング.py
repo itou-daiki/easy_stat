@@ -15,7 +15,7 @@ st.write('データセットに対して、欠損値処理や外れ値の処理�
 st.write('')
 
 # ファイルアップローダー
-uploaded_file = st.file_uploader('CSVまたはExcelファイルを選択してください', type=['csv', 'xlsx'])
+uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
 
 if uploaded_file is not None:
     # データの読み込み

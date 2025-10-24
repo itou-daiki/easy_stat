@@ -66,10 +66,7 @@ except FileNotFoundError:
     pass
 
 # ファイルアップロードとデモデータ選択
-uploaded_file = st.file_uploader(
-    'ファイルをアップロードしてください (Excel or CSV)',
-    type=['xlsx', 'csv']
-)
+uploaded_file = st.file_uploader("CSVまたはExcelファイルを選択してください", type=["csv", "xlsx"])
 use_demo_data = st.checkbox('デモデータを使用')
 
 df = None

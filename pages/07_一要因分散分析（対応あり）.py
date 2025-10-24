@@ -29,8 +29,8 @@ except Exception as e:
     st.write("※画像が読み込めませんでした。")
 
 # ファイルアップローダー（Excel, CSV, テキスト）
-uploaded_file = st.file_uploader('ファイルをアップロードしてください (Excel, CSV, またはテキスト)', 
-                                 type=['xlsx', 'csv', 'txt'])
+uploaded_file = st.file_uploader("CSV、Excel、またはテキストファイルを選択してください",
+                                 type=["csv", "xlsx", "txt"])
 
 # デモデータを使うかどうかのチェックボックス
 use_demo_data = st.checkbox('デモデータを使用')
