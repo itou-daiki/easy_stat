@@ -524,26 +524,26 @@ if input_df is not None:
                 G.add_node(y_column)
                 all_nodes.add(y_column)
                 
-                # エッジの追加（有意なもののみ、交互作用項を除く）
+                # エッジの追加（標準化係数が0.1以上のもの、交互作用項を除く）
                 for idx, row in coefficients.iterrows():
                     var = row['変数']
                     coef = float(row['標準化係数']) if row['標準化係数'] != '' else np.nan
-                    p_val = float(row['p値']) if row['p値'] != '' else np.nan
                     if var in X_columns:
-                        if p_val < 0.1:
-                            if abs(coef) >= 0.2:
-                                weight = 1  # 太い線
-                            elif abs(coef) >= 0.1:
-                                weight = 0.5  # 細い線
-                            else:
-                                continue  # 標準化係数が0.1未満は無視
-                            G.add_edge(var, y_column, weight=weight, label=f"{coef:.2f}")
-                            all_edges.append({
-                                'from': var,
-                                'to': y_column,
-                                'weight': weight,
-                                'coef': f"{coef:.2f}"
-                            })
+                        # 標準化係数の絶対値で線の太さを決定
+                        if abs(coef) >= 0.2:
+                            weight = 1  # 太い線
+                        elif abs(coef) >= 0.1:
+                            weight = 0.5  # 細い線
+                        else:
+                            continue  # 標準化係数が0.1未満は線を描画しない
+
+                        G.add_edge(var, y_column, weight=weight, label=f"{coef:.2f}")
+                        all_edges.append({
+                            'from': var,
+                            'to': y_column,
+                            'weight': weight,
+                            'coef': f"{coef:.2f}"
+                        })
                 
                 # ノードの位置設定（ユーザーが選択した順番）
                 pos = {}
