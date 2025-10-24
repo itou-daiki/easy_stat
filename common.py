@@ -866,9 +866,14 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="グラフ"):
     if graph_type == 'bar':
         # 棒グラフの場合
         # X軸のカテゴリを取得（ticktextがあればそれを使用、なければxの値を使用）
-        if hasattr(fig.layout.xaxis, 'ticktext') and fig.layout.xaxis.ticktext:
-            categories = list(fig.layout.xaxis.ticktext)
-        elif hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
+        categories = []
+        if hasattr(fig.layout, 'xaxis') and hasattr(fig.layout.xaxis, 'ticktext'):
+            ticktext = fig.layout.xaxis.ticktext
+            if ticktext is not None and len(ticktext) > 0:
+                categories = list(ticktext)
+
+        # ticktextが取得できなかった場合、xの値を使用
+        if not categories and hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
             categories = list(fig.data[0].x)
         
         # データを収集
@@ -1004,9 +1009,14 @@ def export_plotly_to_excel(fig, filename="graph.xlsx", sheet_name="グラフ"):
     else:
         # その他のグラフタイプ（デフォルトは折れ線グラフとして処理）
         # X軸のカテゴリを取得（ticktextがあればそれを使用）
-        if hasattr(fig.layout.xaxis, 'ticktext') and fig.layout.xaxis.ticktext:
-            categories = list(fig.layout.xaxis.ticktext)
-        elif fig.data and hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
+        categories = []
+        if hasattr(fig.layout, 'xaxis') and hasattr(fig.layout.xaxis, 'ticktext'):
+            ticktext = fig.layout.xaxis.ticktext
+            if ticktext is not None and len(ticktext) > 0:
+                categories = list(ticktext)
+
+        # ticktextが取得できなかった場合、xの値を使用
+        if not categories and fig.data and hasattr(fig.data[0], 'x') and fig.data[0].x is not None:
             categories = list(fig.data[0].x)
         
         # データを収集
