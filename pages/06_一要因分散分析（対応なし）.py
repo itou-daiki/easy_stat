@@ -259,10 +259,10 @@ if df is not None:
                     for level_idx, level_ranges in enumerate(levels):
                         # このレベルで重なりがないかチェック
                         can_place = True
-                        margin = 0.3  # ブラケット間のマージン
+                        margin = 0.5  # ブラケット間のマージン（視覚的な分離を確保）
                         for existing_left, existing_right in level_ranges:
                             # ブラケットが重なるかチェック（マージンを考慮）
-                            # right + margin <= existing_left または left - margin >= existing_right なら配置可能
+                            # 完全に分離されている場合のみ配置可能
                             if not (right + margin <= existing_left or left - margin >= existing_right):
                                 can_place = False
                                 break

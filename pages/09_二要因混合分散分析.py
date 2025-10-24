@@ -107,7 +107,7 @@ def assign_levels(comparisons, category_positions):
         for level_idx, level_ranges in enumerate(levels):
             # このレベルで重なりがないかチェック
             can_place = True
-            margin = 0.3  # ブラケット間のマージン
+            margin = 0.5  # ブラケット間のマージン（視覚的な分離を確保）
             for existing_left, existing_right in level_ranges:
                 # ブラケットが重なるかチェック（マージンを考慮）
                 if not (right + margin <= existing_left or left - margin >= existing_right):
